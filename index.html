@@ -38,7 +38,7 @@
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // 🔑 REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
   authDomain: "mindgames-f116a.firebaseapp.com",
@@ -48,6 +48,7 @@ const firebaseConfig = {
   appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
   measurementId: "G-HC8N4Y4R49"
 };
+
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -59,7 +60,7 @@ const firebaseConfig = {
     window.fbCreateUser = createUserWithEmailAndPassword;
     window.fbSignIn = signInWithEmailAndPassword;
     window.fbSignOut = signOut;
-    window.fbResetPassword = sendPasswordResetEmail; // Correctly assigned function reference
+    window.fbResetPassword = sendPasswordResetEmail;
     window.fbUpdateProfile = updateProfile;
     window.fbDoc = doc;
     window.fbGetDoc = getDoc;
@@ -544,7 +545,6 @@ const firebaseConfig = {
       }
 
       try {
-        // Enforce Unique Username Check via Firestore Index
         const usernameRef = window.fbDoc(window.fbDb, "usernames", username);
         const usernameSnap = await window.fbGetDoc(usernameRef);
 
@@ -556,7 +556,6 @@ const firebaseConfig = {
         const userCred = await window.fbCreateUser(window.fbAuth, email, pass);
         await window.fbUpdateProfile(userCred.user, { displayName: username });
 
-        // Reserve username and construct base document
         await window.fbSetDoc(usernameRef, { uid: userCred.user.uid });
         await window.fbSetDoc(window.fbDoc(window.fbDb, "users", userCred.user.uid), {
           username: username,
@@ -612,7 +611,6 @@ const firebaseConfig = {
       }
 
       try {
-        // Correct global binding invocation
         await window.fbResetPassword(window.fbAuth, email);
         statusEl.textContent = "Reset link dispatched. Check your inbox.";
         statusEl.className = "status-msg success";
@@ -713,15 +711,12 @@ const firebaseConfig = {
 
       document.getElementById('game-status-text').textContent = "Observe the spatial sequence...";
 
-      // Generate random sequence based on target length
       for (let i = 0; i < gameState.sequenceLength; i++) {
         gameState.sequence.push(Math.floor(Math.random() * 9));
       }
 
-      // Reverse sequence mapping for validation
       gameState.expectedReverseInput = [...gameState.sequence].reverse();
 
-      // Play visual sequence animation
       let step = 0;
       const interval = setInterval(() => {
         if (step >= gameState.sequence.length) {
@@ -739,50 +734,53 @@ const firebaseConfig = {
 
     function highlightTile(index) {
       const tiles = document.querySelectorAll('.grid-tile');
-      const tile = tiles[index];
-      tile.classList.add('active');
-      setTimeout(() => tile.classList.remove('active'), 450);
+      const targetTile = tiles[index];
+      targetTile.classList.add('active');
+      setTimeout(() => {
+        targetTile.classList.remove('active');
+      }, 400);
     }
 
-    function handleUserTileClick(tileElement, clickedIndex) {
-      tileElement.classList.add('user-click');
-      setTimeout(() => tileElement.classList.remove('user-click'), 200);
+    function handleUserTileClick(tile, index) {
+      const expected = gameState.expectedReverseInput[gameState.userInputIndex];
 
-      const expectedIndex = gameState.expectedReverseInput[gameState.userInputIndex];
+      if (index === expected) {
+        // Correct input
+        tile.classList.add('user-click');
+        setTimeout(() => tile.classList.remove('user-click'), 200);
 
-      if (clickedIndex === expectedIndex) {
-        // Correct Click
         gameState.userInputIndex++;
-        
-        // Check if Round Complete successfully
+
+        // Check if round completed successfully
         if (gameState.userInputIndex >= gameState.expectedReverseInput.length) {
-          const roundPoints = gameState.sequenceLength * 150;
-          gameState.cumulativeScore += roundPoints;
-          gameState.roundScores.push(roundPoints);
+          const roundScore = gameState.sequenceLength * 100;
+          gameState.cumulativeScore += roundScore;
+          gameState.roundScores.push(roundScore);
           gameState.maxReachedLength = Math.max(gameState.maxReachedLength, gameState.sequenceLength);
-          
-          updateGameHUD();
-          document.getElementById('game-status-text').textContent = "Round Cleared Perfect! Advancing...";
+
+          document.getElementById('game-status-text').textContent = "Round Cleared! Loading next sequence...";
           
           setTimeout(() => {
             gameState.round++;
             gameState.sequenceLength++;
             updateGameHUD();
             startRoundSequence();
-          }, 1200);
+          }, 1000);
         }
       } else {
-        // MISTAKE MADE - Stop Round Immediately
-        tileElement.classList.add('error-flash');
-        setTimeout(() => tileElement.classList.remove('error-flash'), 600);
+        // Mistake made
+        tile.classList.add('error-flash');
+        setTimeout(() => tile.classList.remove('error-flash'), 400);
         
-        triggerRoundMistakeBreakdown();
+        handleRoundFailure();
       }
     }
 
-    function triggerRoundMistakeBreakdown() {
+    function handleRoundFailure() {
+      gameState.isShowingSequence = true;
+      
       document.getElementById('summary-round').textContent = gameState.round;
-      document.getElementById('summary-round-score').textContent = 0;
+      document.getElementById('summary-round-score').textContent = gameState.sequenceLength * 50;
       document.getElementById('summary-length').textContent = gameState.sequenceLength;
       document.getElementById('summary-total-score').textContent = gameState.cumulativeScore;
 
@@ -797,57 +795,60 @@ const firebaseConfig = {
       startRoundSequence();
     }
 
-    async function finalizeAndAbortGame() {
+    function finalizeAndAbortGame() {
       closeModal('modal-round-end');
-      await persistGameSessionToFirestore();
-      loadDashboardData();
-      navigateTo('screen-home');
+      saveGameSessionToFirestore();
     }
 
-    async function abortEntireGameSession() {
-      if (confirm("Are you sure you want to exit? Current progress will be saved.")) {
-        await persistGameSessionToFirestore();
-        loadDashboardData();
-        navigateTo('screen-home');
+    function abortEntireGameSession() {
+      if (confirm("Are you sure you want to abort the session? Current scores will be saved.")) {
+        saveGameSessionToFirestore();
       }
     }
 
-    async function persistGameSessionToFirestore() {
-      if (!window.currentUser) return;
+    async function saveGameSessionToFirestore() {
+      if (!window.currentUser) {
+        navigateTo('screen-home');
+        return;
+      }
 
       try {
-        // Record complete session metrics
-        await window.fbAddDoc(window.fbCollection(window.fbDb, "game_sessions"), {
-          uid: window.currentUser.uid,
-          username: window.currentUserData.username,
-          gameType: "Reverse Working Memory",
-          roundsCompleted: gameState.round - 1,
-          finalScore: gameState.cumulativeScore,
-          maxSequenceLength: gameState.maxReachedLength,
-          timestamp: window.fbTimestamp()
-        });
-
-        // Update aggregate user statistics
         const userRef = window.fbDoc(window.fbDb, "users", window.currentUser.uid);
-        const currentStats = window.currentUserData.stats || {};
-        
+        const userSnap = await window.fbGetDoc(userRef);
+        const currentStats = userSnap.data().stats || {};
+
+        const newTotalSessions = (currentStats.totalSessions || 0) + 1;
         const newHighScore = Math.max(currentStats.highestScore || 0, gameState.cumulativeScore);
         const newMaxSeq = Math.max(currentStats.maxSequenceLength || 0, gameState.maxReachedLength);
 
+        // Update User Profile Stats
         await window.fbSetDoc(userRef, {
           stats: {
-            totalSessions: window.fbIncrement(1),
+            totalSessions: newTotalSessions,
             highestScore: newHighScore,
             maxSequenceLength: newMaxSeq
           }
         }, { merge: true });
 
-        // Refresh local cache
+        // Record Detailed Session History Log
+        await window.fbAddDoc(window.fbCollection(window.fbDb, "sessions"), {
+          uid: window.currentUser.uid,
+          game: "Reverse Working Memory",
+          score: gameState.cumulativeScore,
+          maxSequenceLength: gameState.maxReachedLength,
+          roundsPlayed: gameState.round,
+          timestamp: window.fbTimestamp()
+        });
+
+        // Refresh local cache and home screen
         const updatedSnap = await window.fbGetDoc(userRef);
         window.currentUserData = updatedSnap.data();
+        loadDashboardData();
 
-      } catch (e) {
-        console.error("Error committing game session: ", e);
+        navigateTo('screen-home');
+      } catch (err) {
+        console.error("Failed to save session data:", err);
+        navigateTo('screen-home');
       }
     }
   </script>
