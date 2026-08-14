@@ -12,6 +12,7 @@
       --card-bg: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
+      --border-color: #e2e8f0;
       --success: #16a34a;
       --error: #dc2626;
     }
@@ -22,75 +23,145 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
-      padding: 1rem;
+      display: flex;
+      flex-direction: column;
     }
 
-    .container {
-      background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    /* Top Navigation Bar */
+    header {
       width: 100%;
-      max-width: 500px;
-      padding: 2.5rem 2rem;
-      text-align: center;
+      padding: 1.25rem 3rem;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    h1 { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem; }
-    .subtitle { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
 
-    .screen { display: none; }
+    .tagline {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Full Screen Main Canvas */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
     .screen.active { display: block; }
 
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      max-width: 300px;
-      padding: 0.85rem 1rem;
-      font-size: 1.1rem;
-      text-align: center;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      outline: none;
-      margin-bottom: 1.25rem;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    input:focus { border-color: var(--primary); }
+    h2 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    p.description {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Inputs & Buttons */
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      max-width: 420px;
+      padding: 1rem 1.25rem;
+      font-size: 1.35rem;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      outline: none;
+      margin-bottom: 1.5rem;
+      background: #ffffff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
 
     .btn {
       background-color: var(--primary);
       color: white;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
-      padding: 0.85rem 2rem;
+      padding: 1rem 3rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
-      width: 100%;
-      max-width: 300px;
+      transition: background-color 0.2s, transform 0.1s;
     }
 
     .btn:hover { background-color: var(--primary-hover); }
+    .btn:active { transform: scale(0.99); }
 
     .number-display {
-      font-size: 3.5rem;
+      font-size: 5rem;
       font-weight: 800;
-      letter-spacing: 0.3rem;
+      letter-spacing: 0.4rem;
       color: var(--primary);
-      margin: 1.5rem 0;
+      margin: 2rem 0;
     }
 
-    /* Clock Styling for Round 3 */
+    /* Clocks Section */
+    .clocks-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .clock-box {
+      text-align: center;
+    }
+
+    .clock-title {
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
     .clock-container {
-      width: 180px;
-      height: 180px;
+      width: 200px;
+      height: 200px;
       border: 6px solid var(--text-main);
       border-radius: 50%;
-      margin: 1.5rem auto;
       position: relative;
-      background: #fff;
+      background: #ffffff;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     }
 
     .hand {
@@ -102,105 +173,189 @@
       border-radius: 4px;
     }
 
-    .hour-hand { width: 6px; height: 50px; }
-    .minute-hand { width: 4px; height: 70px; background: var(--primary); }
+    .hour-hand { width: 6px; height: 55px; }
+    .minute-hand { width: 4px; height: 80px; background: var(--primary); }
 
-    .leaderboard-card {
-      background: #f1f5f9;
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-top: 1.5rem;
-      text-align: left;
+    /* Results / Leaderboard Grid */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+      margin: 2rem auto;
     }
 
-    .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0; }
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: left;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 1.1rem;
+    }
+
     .stat-row:last-child { border-bottom: none; }
-    .status-msg { margin-top: 1rem; font-weight: 600; color: var(--error); min-height: 24px; }
+
+    .status-msg {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--error);
+      min-height: 28px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>CogniShift</h1>
-    <p class="subtitle">Cognitive Assessment & Working Memory</p>
+  <header>
+    <div class="logo">CogniShift</div>
+    <div class="tagline">Cognitive Performance & Memory Assessment</div>
+  </header>
 
+  <main>
     <!-- SCREEN 1: LOGIN -->
     <div id="screen-login" class="screen active">
       <h2>Player Registration</h2>
-      <p style="margin: 1rem 0; color: var(--text-muted);">Enter your handle to track your global score.</p>
-      <input type="text" id="username-input" placeholder="Enter Username / Player ID" />
-      <br/>
+      <p class="description">Enter your username or handle to track your global standing across all 4 rounds.</p>
+      <div>
+        <input type="text" id="username-input" placeholder="e.g. Alex" autofocus />
+      </div>
       <button class="btn" onclick="registerUser()">Start Assessment</button>
     </div>
 
     <!-- SCREEN 2: ROUND 1 (FORWARD DIGITS) -->
     <div id="screen-r1" class="screen">
-      <h3>Round 1: Forward Memory</h3>
-      <p style="color: var(--text-muted); margin-top: 0.5rem;">Memorize the sequence in FORWARD order.</p>
+      <h2>Round 1: Forward Memory</h2>
+      <p class="description">Memorize the digit sequence below. Enter them in <strong>FORWARD</strong> order when they disappear.</p>
       <div id="r1-display" class="number-display">---</div>
       <div id="r1-input-area" style="display:none;">
         <input type="text" id="r1-input" placeholder="Type digits in forward order" />
         <br/>
-        <button class="btn" onclick="submitR1()">Submit</button>
+        <button class="btn" onclick="submitR1()">Submit Answer</button>
       </div>
     </div>
 
     <!-- SCREEN 3: ROUND 2 (REVERSE DIGITS) -->
     <div id="screen-r2" class="screen">
-      <h3>Round 2: Reverse Memory</h3>
-      <p style="color: var(--text-muted); margin-top: 0.5rem;">Memorize and enter digits in REVERSE order.</p>
+      <h2>Round 2: Reverse Memory</h2>
+      <p class="description">Memorize the digit sequence below. Enter them in <strong>REVERSE</strong> order when they disappear.</p>
       <div id="r2-display" class="number-display">---</div>
       <div id="r2-input-area" style="display:none;">
         <input type="text" id="r2-input" placeholder="Type digits in REVERSE order" />
         <br/>
-        <button class="btn" onclick="submitR2()">Submit</button>
+        <button class="btn" onclick="submitR2()">Submit Answer</button>
       </div>
     </div>
 
-    <!-- SCREEN 4: ROUND 3 (CLOCK ANGLE MEMORY) -->
+    <!-- SCREEN 4: ROUND 3 (SINGLE CLOCK ANGLE) -->
     <div id="screen-r3" class="screen">
-      <h3>Round 3: Analog Clock Angles</h3>
-      <p style="color: var(--text-muted); margin-top: 0.5rem;">Memorize the clock time shown.</p>
+      <h2>Round 3: Single Clock Angle</h2>
+      <p class="description">Memorize the clock hands position. Calculate the angle in degrees between the hour and minute hands.</p>
       
-      <div id="clock-display" class="clock-container">
-        <div id="hour-hand" class="hand hour-hand"></div>
-        <div id="minute-hand" class="hand minute-hand"></div>
+      <div id="clock-display-1" class="clocks-wrapper">
+        <div class="clock-box">
+          <div class="clock-container">
+            <div id="r3-hour-hand" class="hand hour-hand"></div>
+            <div id="r3-minute-hand" class="hand minute-hand"></div>
+          </div>
+        </div>
       </div>
 
       <div id="r3-input-area" style="display:none;">
-        <p style="margin-bottom: 0.5rem; font-weight: 600;">What was the angle (in degrees) between the hands?</p>
-        <input type="number" id="r3-input" placeholder="e.g. 90, 180" />
+        <input type="number" id="r3-input" placeholder="Angle in degrees (e.g. 90, 120)" />
         <br/>
-        <button class="btn" onclick="submitR3()">Submit Answer</button>
+        <button class="btn" onclick="submitR3()">Submit Angle</button>
       </div>
     </div>
 
-    <!-- SCREEN 5: GAME OVER & LEADERBOARD -->
-    <div id="screen-results" class="screen">
-      <h2>Assessment Complete!</h2>
-      <div id="final-score" class="number-display" style="font-size: 2.8rem; margin: 0.5rem 0;">0 pts</div>
-
-      <div class="leaderboard-card">
-        <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Global Leaderboard</h3>
-        <div class="stat-row">
-          <span>Global #1 Player:</span>
-          <strong id="top-player-name">---</strong>
+    <!-- SCREEN 5: ROUND 4 (DUAL CLOCK TIME DIFFERENCE) -->
+    <div id="screen-r4" class="screen">
+      <h2>Round 4: Dual Clock Time Shift</h2>
+      <p class="description">Memorize both clocks. Determine how many minutes of time difference exist between Clock A and Clock B.</p>
+      
+      <div id="clock-display-2" class="clocks-wrapper">
+        <div class="clock-box">
+          <div class="clock-title">Clock A</div>
+          <div class="clock-container">
+            <div id="r4-hour-hand-a" class="hand hour-hand"></div>
+            <div id="r4-minute-hand-a" class="hand minute-hand"></div>
+          </div>
         </div>
-        <div class="stat-row">
-          <span>#1 High Score:</span>
-          <strong id="top-player-score">0 pts</strong>
-        </div>
-        <div class="stat-row">
-          <span>Your Global Rank:</span>
-          <strong id="player-rank">#--</strong>
+        <div class="clock-box">
+          <div class="clock-title">Clock B</div>
+          <div class="clock-container">
+            <div id="r4-hour-hand-b" class="hand hour-hand"></div>
+            <div id="r4-minute-hand-b" class="hand minute-hand"></div>
+          </div>
         </div>
       </div>
 
-      <button class="btn" style="margin-top: 1.5rem;" onclick="location.reload()">Play Again</button>
+      <div id="r4-input-area" style="display:none;">
+        <input type="number" id="r4-input" placeholder="Time difference in minutes (e.g. 45, 90)" />
+        <br/>
+        <button class="btn" onclick="submitR4()">Submit Difference</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: RESULTS & LEADERBOARD -->
+    <div id="screen-results" class="screen">
+      <h2>Assessment Complete</h2>
+      <p class="description">Here is your overall performance breakdown across all rounds.</p>
+
+      <div id="final-score" class="number-display" style="font-size: 4rem; margin: 0.5rem 0;">0 pts</div>
+
+      <div class="results-grid">
+        <div class="card">
+          <h3>Your Performance</h3>
+          <div class="stat-row">
+            <span>Player Handle:</span>
+            <strong id="res-username">---</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total Points:</span>
+            <strong id="res-score">0 pts</strong>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Global Standings</h3>
+          <div class="stat-row">
+            <span>Global #1 Leader:</span>
+            <strong id="top-player-name">---</strong>
+          </div>
+          <div class="stat-row">
+            <span>Top Score:</span>
+            <strong id="top-player-score">0 pts</strong>
+          </div>
+          <div class="stat-row">
+            <span>Your Global Rank:</span>
+            <strong id="player-rank">#--</strong>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" style="margin-top: 1rem;" onclick="location.reload()">Play Again</button>
     </div>
 
     <div id="status-msg" class="status-msg"></div>
-  </div>
+  </main>
 
   <script>
     const BACKEND_URL = "https://cognishift-game.onrender.com";
@@ -208,7 +363,8 @@
     let username = "";
     let totalScore = 0;
     let currentSessionId = "";
-    let targetClockAngle = 0;
+    let targetR3Angle = 0;
+    let targetR4MinuteDiff = 0;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -216,7 +372,7 @@
       document.getElementById('status-msg').textContent = "";
     }
 
-    // 1. REGISTER USER
+    // 1. LOGIN
     function registerUser() {
       const input = document.getElementById('username-input').value.trim();
       if (!input) {
@@ -246,10 +402,10 @@
         setTimeout(() => {
           document.getElementById('r1-display').textContent = "???";
           document.getElementById('r1-input-area').style.display = 'block';
-        }, 2000);
+        }, 2500);
 
       } catch (e) {
-        document.getElementById('status-msg').textContent = "Error connecting to server.";
+        document.getElementById('status-msg').textContent = "Error connecting to Render backend.";
       }
     }
 
@@ -263,7 +419,7 @@
       const data = await res.json();
 
       if (data.success) {
-        totalScore += 20;
+        totalScore += 25;
         startRound2();
       } else {
         finishAssessment();
@@ -289,10 +445,10 @@
         setTimeout(() => {
           document.getElementById('r2-display').textContent = "???";
           document.getElementById('r2-input-area').style.display = 'block';
-        }, 2500);
+        }, 2800);
 
       } catch (e) {
-        document.getElementById('status-msg').textContent = "Error connecting to server.";
+        document.getElementById('status-msg').textContent = "Error connecting to Render backend.";
       }
     }
 
@@ -306,51 +462,93 @@
       const data = await res.json();
 
       if (data.success) {
-        totalScore += 30;
+        totalScore += 35;
         startRound3();
       } else {
         finishAssessment();
       }
     }
 
-    // 4. ROUND 3: CLOCK ANGLE MEMORY
+    // 4. ROUND 3: SINGLE CLOCK ANGLE
     function startRound3() {
       showScreen('screen-r3');
       document.getElementById('r3-input-area').style.display = 'none';
-      document.getElementById('clock-display').style.display = 'block';
+      document.getElementById('clock-display-1').style.display = 'flex';
 
-      // Pick random time
       const hour = Math.floor(Math.random() * 12) + 1;
       const minute = Math.floor(Math.random() * 12) * 5;
 
-      // Calculate angles
-      const minuteAngle = minute * 6; // 360 / 60
-      const hourAngle = (hour % 12) * 30 + (minute * 0.5); // 360 / 12 + minute fraction
+      const minuteAngle = minute * 6;
+      const hourAngle = (hour % 12) * 30 + (minute * 0.5);
 
       let diff = Math.abs(hourAngle - minuteAngle);
-      targetClockAngle = Math.min(diff, 360 - diff);
+      targetR3Angle = Math.min(diff, 360 - diff);
 
-      document.getElementById('hour-hand').style.transform = `rotate(${hourAngle}deg)`;
-      document.getElementById('minute-hand').style.transform = `rotate(${minuteAngle}deg)`;
+      document.getElementById('r3-hour-hand').style.transform = `rotate(${hourAngle}deg)`;
+      document.getElementById('r3-minute-hand').style.transform = `rotate(${minuteAngle}deg)`;
 
       setTimeout(() => {
-        document.getElementById('clock-display').style.display = 'none';
+        document.getElementById('clock-display-1').style.display = 'none';
         document.getElementById('r3-input-area').style.display = 'block';
-      }, 3000);
+      }, 3200);
     }
 
     function submitR3() {
       const userAngle = parseFloat(document.getElementById('r3-input').value);
-      if (!isNaN(userAngle) && Math.abs(userAngle - targetClockAngle) <= 15) {
+      if (!isNaN(userAngle) && Math.abs(userAngle - targetR3Angle) <= 15) {
+        totalScore += 40;
+      }
+      startRound4();
+    }
+
+    // 5. ROUND 4: DUAL CLOCK TIME DIFFERENCE
+    function startRound4() {
+      showScreen('screen-r4');
+      document.getElementById('r4-input-area').style.display = 'none';
+      document.getElementById('clock-display-2').style.display = 'flex';
+
+      // Clock A
+      const hA = Math.floor(Math.random() * 12) + 1;
+      const mA = Math.floor(Math.random() * 12) * 5;
+      const minAngleA = mA * 6;
+      const hrAngleA = (hA % 12) * 30 + (mA * 0.5);
+
+      // Clock B
+      const hB = Math.floor(Math.random() * 12) + 1;
+      const mB = Math.floor(Math.random() * 12) * 5;
+      const minAngleB = mB * 6;
+      const hrAngleB = (hB % 12) * 30 + (mB * 0.5);
+
+      // Total minutes calculation
+      const totalMinA = (hA % 12) * 60 + mA;
+      const totalMinB = (hB % 12) * 60 + mB;
+      targetR4MinuteDiff = Math.abs(totalMinA - totalMinB);
+
+      document.getElementById('r4-hour-hand-a').style.transform = `rotate(${hrAngleA}deg)`;
+      document.getElementById('r4-minute-hand-a').style.transform = `rotate(${minAngleA}deg)`;
+      document.getElementById('r4-hour-hand-b').style.transform = `rotate(${hrAngleB}deg)`;
+      document.getElementById('r4-minute-hand-b').style.transform = `rotate(${minAngleB}deg)`;
+
+      setTimeout(() => {
+        document.getElementById('clock-display-2').style.display = 'none';
+        document.getElementById('r4-input-area').style.display = 'block';
+      }, 4000);
+    }
+
+    function submitR4() {
+      const userDiff = parseFloat(document.getElementById('r4-input').value);
+      if (!isNaN(userDiff) && Math.abs(userDiff - targetR4MinuteDiff) <= 15) {
         totalScore += 50;
       }
       finishAssessment();
     }
 
-    // 5. FINISH & FETCH LEADERBOARD STATS
+    // 6. FINISH & FETCH LEADERBOARD
     async function finishAssessment() {
       showScreen('screen-results');
       document.getElementById('final-score').textContent = `${totalScore} pts`;
+      document.getElementById('res-username').textContent = username;
+      document.getElementById('res-score').textContent = `${totalScore} pts`;
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(username)}`);
@@ -360,7 +558,7 @@
         document.getElementById('top-player-score').textContent = `${stats.topLeaderScore || 0} pts`;
         document.getElementById('player-rank').textContent = `#${stats.playerRank} of ${stats.totalPlayers}`;
       } catch (e) {
-        console.error(e);
+        console.error("Leaderboard fetch error:", e);
       }
     }
   </script>
