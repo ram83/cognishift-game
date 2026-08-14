@@ -28,6 +28,17 @@
               blue: '#06B6D4',
               bg: '#0B0F19'
             }
+          },
+          animation: {
+            'bounce-slow': 'bounce 2.5s infinite',
+            'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 3.5s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            }
           }
         }
       }
@@ -60,106 +71,22 @@
       box-shadow: 0 2px 0 rgba(0,0,0,0.3);
     }
   </style>
-
-  <!-- Firebase SDKs (Modular v9/v10) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      signOut, 
-      onAuthStateChanged,
-      sendPasswordResetEmail,
-      updateProfile 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      updateDoc,
-      collection, 
-      getDocs, 
-      query, 
-      orderBy, 
-      limit, 
-      serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // --- YOUR FIREBASE CONFIGURATION ---
-  const firebaseConfig = {
-  apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
-  authDomain: "mindgames-f116a.firebaseapp.com",
-  projectId: "mindgames-f116a",
-  storageBucket: "mindgames-f116a.firebasestorage.app",
-  messagingSenderId: "296415432842",
-  appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
-  measurementId: "G-HC8N4Y4R49"
-};
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    window.fbAuth = auth;
-    window.fbDb = db;
-    window.fbSignIn = signInWithEmailAndPassword;
-    window.fbCreateUser = createUserWithEmailAndPassword;
-    window.fbSignOut = signOut;
-    window.fbResetPassword = sendPasswordResetEmail;
-    window.fbUpdateProfile = updateProfile;
-    window.fbDoc = doc;
-    window.fbGetDoc = getDoc;
-    window.fbSetDoc = setDoc;
-    window.fbUpdateDoc = updateDoc;
-    window.fbCollection = collection;
-    window.fbGetDocs = getDocs;
-    window.fbQuery = query;
-    window.fbOrderBy = orderBy;
-    window.fbLimit = limit;
-    window.fbTimestamp = serverTimestamp;
-
-    onAuthStateChanged(auth, async (user) => {
-      window.currentUser = user;
-      if (user) {
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userDocRef);
-          if (userSnap.exists()) {
-            window.currentUserData = userSnap.data();
-            if (window.currentUserData.profileCompleted) {
-              if (window.app && window.app.navToDashboard) window.app.navToDashboard();
-            } else {
-              if (window.app && window.app.renderOnboarding) window.app.renderOnboarding();
-            }
-          } else {
-            if (window.app && window.app.renderOnboarding) window.app.renderOnboarding();
-          }
-        } catch (err) {
-          console.error("Error fetching user profile:", err);
-        }
-      } else {
-        window.currentUserData = null;
-        if (window.app && window.app.renderAuth) window.app.renderAuth('signin');
-      }
-    });
-  </script>
 </head>
 <body class="flex flex-col min-h-screen overflow-x-hidden">
 
   <!-- Header Bar -->
   <header class="w-full py-4 px-8 flex justify-between items-center glass-card border-b border-white/10 z-50 sticky top-0">
     <div class="flex items-center gap-3 cursor-pointer" onclick="app.navToDashboard()">
-      <div class="text-3xl">🧠</div>
+      <div class="text-3xl animate-bounce-slow">🧠</div>
       <span class="font-heading text-2xl font-bold bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 bg-clip-text text-transparent">
         CogniKids Gym
       </span>
     </div>
 
+    <!-- Right Profile Status Widget -->
     <div id="header-profile" class="hidden flex items-center gap-4">
       <div class="flex items-center gap-3 bg-white/10 py-1.5 px-5 rounded-full border border-white/20 shadow-inner">
-        <span id="nav-avatar" class="text-2xl">🐉</span>
+        <span id="nav-avatar" class="text-2xl animate-float">🐉</span>
         <div>
           <p id="nav-username" class="font-bold text-sm text-yellow-300 leading-tight">Kiddo</p>
           <p id="nav-rank" class="text-xs text-cyan-200 font-semibold">Trainee 🥉</p>
@@ -171,7 +98,7 @@
 
   <!-- Main Container -->
   <main id="app-container" class="flex-grow flex items-center justify-center p-6">
-    <!-- Dynamic views load here -->
+    <!-- Views rendered dynamically -->
   </main>
 
   <!-- Footer -->
@@ -179,9 +106,9 @@
     CogniKids Professional Cognitive Training Suite &copy; 2026
   </footer>
 
+  <!-- Application Logic & Firebase Integration -->
   <script>
-    const TOTAL_ROUNDS = 9;
-    const MAX_LEVELS = 12;
+    const TOTAL_ROUNDS = 10;
 
     const sfx = {
       ctx: null,
@@ -217,14 +144,69 @@
       }
     };
 
+    const AVATARS = [
+      { id: 'dragon', name: 'Dragon', icon: '🐉' },
+      { id: 'mermaid', name: 'Mermaid', icon: '🧜‍♀️' },
+      { id: 'dolphin', name: 'Dolphin', icon: '🐬' },
+      { id: 'ram', name: 'Ram', icon: '🐏' },
+      { id: 'lion', name: 'Lion', icon: '🦁' },
+      { id: 'bear', name: 'Bear', icon: '🐻' },
+      { id: 'tiger', name: 'Tiger', icon: '🐯' },
+      { id: 'unicorn', name: 'Unicorn', icon: '🦄' },
+      { id: 'dog', name: 'Dog', icon: '🐶' },
+      { id: 'cat', name: 'Cat', icon: '🐱' },
+      { id: 'python', name: 'Python', icon: '🐍' },
+      { id: 'phoenix', name: 'Phoenix', icon: '🦅' }
+    ];
+
+    const FUN_FACTS = [
+      "Octopuses have three hearts and blue blood! 🐙",
+      "Honey never spoils. Yummy 3,000-year-old honey is edible! 🍯",
+      "A day on Venus is longer than a year on Venus! 🪐",
+      "Bananas are naturally slightly radioactive! 🍌",
+      "Dolphins give each other individual names with whistles! 🐬",
+      "Your brain uses 20% of all the energy in your body! 🧠",
+      "Cows have best friends and get stressed when separated! 🐮",
+      "Sharks existed before trees were on Earth! 🦈"
+    ];
+
+    const FUNNY_GREETINGS = [
+      "Welcome back, Captain {name}! Ready for your cognitive workout?",
+      "Hey {name}! Your brain neurons are primed and ready for action!",
+      "Greetings, Mastermind {name}! Let's set some new high scores today!",
+      "Look who's back! The legendary {name} is ready to train!"
+    ];
+
+    const state = {
+      currentSessionScore: 0,
+      currentGameId: 1,
+      currentLevel: 1,
+      selectedMathMode: 'addition', // 'addition', 'add_sub', 'add_sub_mul', 'all'
+      activeTimer: null,
+      g3State: {},
+      g4State: {},
+      g6State: {},
+      g7State: {},
+      g8State: {},
+      g9State: {},
+      g10State: {},
+      roundMetrics: {}
+    };
+
+    function calculateRank(highScore) {
+      if (highScore >= 1200) return { title: 'Master Mind', badge: '🏆', class: 'text-amber-300' };
+      if (highScore >= 800) return { title: 'Genius', badge: '🥇', class: 'text-yellow-400' };
+      if (highScore >= 400) return { title: 'Sharp', badge: '🥈', class: 'text-cyan-300' };
+      return { title: 'Trainee', badge: '🥉', class: 'text-slate-300' };
+    }
+
     window.app = {
-      currentRound: 1,
-      scores: {},
       logout() {
         if (window.fbSignOut && window.fbAuth) {
           window.fbSignOut(window.fbAuth);
         }
       },
+
       updateHeader() {
         const profileEl = document.getElementById('header-profile');
         if (!window.currentUserData) {
@@ -234,144 +216,1614 @@
         profileEl.classList.remove('hidden');
         document.getElementById('nav-avatar').textContent = window.currentUserData.avatarIcon || '🐉';
         document.getElementById('nav-username').textContent = window.currentUserData.firstName || window.currentUserData.username || 'Kiddo';
+        
+        const stats = window.currentUserData.stats || {};
+        const rank = calculateRank(stats.highestScore || 0);
+        document.getElementById('nav-rank').textContent = `${rank.title} ${rank.badge}`;
       },
-      navToDashboard() {
+
+      renderAuth(mode = 'signin') {
+        const container = document.getElementById('app-container');
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/20 shadow-2xl">
+            <div class="text-center mb-6">
+              <h2 class="font-heading text-3xl font-bold text-yellow-300 mb-2">
+                ${mode === 'signin' ? 'Welcome Back!' : mode === 'signup' ? 'Create Account' : 'Reset Password'}
+              </h2>
+              <p class="text-sm text-cyan-200">
+                ${mode === 'signin' ? 'Sign in to access your brain training gym.' : mode === 'signup' ? 'Join CogniKids and start your cognitive journey.' : 'Enter your email to recover your account.'}
+              </p>
+            </div>
+
+            ${mode !== 'forgot' ? `
+            <div class="flex bg-white/10 p-1 rounded-2xl mb-6">
+              <button onclick="sfx.click(); app.renderAuth('signin')" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all ${mode === 'signin' ? 'bg-brand-purple text-white shadow-lg' : 'text-white/60 hover:text-white'}">Sign In</button>
+              <button onclick="sfx.click(); app.renderAuth('signup')" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all ${mode === 'signup' ? 'bg-brand-purple text-white shadow-lg' : 'text-white/60 hover:text-white'}">Sign Up</button>
+            </div>
+            ` : ''}
+
+            <form onsubmit="app.handleAuthSubmit(event, '${mode}')" class="space-y-4">
+              ${mode === 'signup' ? `
+              <div>
+                <label class="block text-xs font-bold text-white/80 mb-1">Unique Username</label>
+                <input id="auth-username" type="text" required placeholder="Choose a unique handle" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              </div>
+              ` : ''}
+
+              <div>
+                <label class="block text-xs font-bold text-white/80 mb-1">Email Address</label>
+                <input id="auth-email" type="email" required placeholder="name@example.com" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-white/80 mb-1">Password</label>
+                <input id="auth-password" type="password" ${mode !== 'forgot' ? 'required' : ''} placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              </div>
+
+              ${mode === 'signin' ? `
+              <div class="text-right">
+                <button type="button" onclick="app.renderAuth('forgot')" class="text-xs text-yellow-300 hover:underline">Forgot Password?</button>
+              </div>
+              ` : ''}
+
+              <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-lg font-bold rounded-xl btn-3d hover:brightness-110">
+                ${mode === 'signin' ? 'Sign In 🚀' : mode === 'signup' ? 'Continue to Onboarding 🎨' : 'Send Reset Link 📧'}
+              </button>
+            </form>
+
+            <div id="auth-status" class="mt-4 text-center text-xs"></div>
+
+            ${mode === 'forgot' ? `
+            <div class="text-center mt-4">
+              <button onclick="app.renderAuth('signin')" class="text-xs text-cyan-300 hover:underline">← Back to Sign In</button>
+            </div>
+            ` : ''}
+          </div>
+        `;
+      },
+
+      async handleAuthSubmit(e, mode) {
+        e.preventDefault();
+        sfx.click();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const statusEl = document.getElementById('auth-status');
+
+        try {
+          if (mode === 'signup') {
+            const username = document.getElementById('auth-username').value.trim().toLowerCase();
+            if (username.length < 3) {
+              statusEl.textContent = "Username must be at least 3 characters.";
+              statusEl.className = "mt-4 text-center text-xs text-red-400";
+              return;
+            }
+
+            const usernameRef = window.fbDoc(window.fbDb, "usernames", username);
+            const usernameSnap = await window.fbGetDoc(usernameRef);
+            if (usernameSnap.exists()) {
+              statusEl.textContent = "Username is already taken.";
+              statusEl.className = "mt-4 text-center text-xs text-red-400";
+              return;
+            }
+
+            const userCred = await window.fbCreateUser(window.fbAuth, email, password);
+            await window.fbUpdateProfile(userCred.user, { displayName: username });
+
+            await window.fbSetDoc(usernameRef, { uid: userCred.user.uid });
+            await window.fbSetDoc(window.fbDoc(window.fbDb, "users", userCred.user.uid), {
+              username: username,
+              email: email,
+              profileCompleted: false,
+              createdAt: window.fbTimestamp(),
+              stats: { totalSessions: 0, highestScore: 0 }
+            });
+          } else if (mode === 'signin') {
+            await window.fbSignIn(window.fbAuth, email, password);
+          } else {
+            await window.fbResetPassword(window.fbAuth, email);
+            statusEl.textContent = "Reset link dispatched. Check your inbox.";
+            statusEl.className = "mt-4 text-center text-xs text-green-400";
+          }
+        } catch (err) {
+          statusEl.textContent = err.message.replace("Firebase: ", "");
+          statusEl.className = "mt-4 text-center text-xs text-red-400";
+        }
+      },
+
+      renderOnboarding() {
+        const container = document.getElementById('app-container');
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-xl p-8 rounded-3xl border border-white/20 shadow-2xl my-8">
+            <h2 class="font-heading text-3xl font-bold text-center text-yellow-300 mb-2">Profile Setup 🎉</h2>
+            <p class="text-center text-sm text-cyan-200 mb-6">Customize your profile to kickstart your cognitive journey.</p>
+
+            <form onsubmit="app.handleOnboardingSubmit(event)" class="space-y-6">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-white/80 mb-1">First Name</label>
+                  <input id="ob-firstname" type="text" required placeholder="Alex" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-white/80 mb-1">Last Name</label>
+                  <input id="ob-lastname" type="text" required placeholder="Smith" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-white/80 mb-2">Choose Your Avatar Companion</label>
+                <div class="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-48 overflow-y-auto p-2 bg-black/20 rounded-2xl border border-white/10">
+                  ${AVATARS.map((a, i) => `
+                    <button type="button" onclick="app.selectAvatar('${a.icon}', this)" class="avatar-opt p-3 text-3xl rounded-xl border border-white/10 bg-white/5 hover:bg-white/20 transition-all ${i === 0 ? 'ring-4 ring-yellow-400 bg-white/20' : ''}">
+                      ${a.icon}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-white/80 mb-1">Date of Birth</label>
+                  <input id="ob-dob" type="date" required class="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-white/80 mb-1">Gender</label>
+                  <select id="ob-gender" required class="w-full px-3 py-3 rounded-xl bg-slate-800 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="Boy">Boy</option>
+                    <option value="Girl">Girl</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-white/80 mb-1">Country</label>
+                  <select id="ob-country" required class="w-full px-3 py-3 rounded-xl bg-slate-800 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="USA">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="India">India</option>
+                    <option value="South Korea">South Korea</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <input type="hidden" id="selected-avatar-val" value="${AVATARS[0].icon}">
+
+              <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110">
+                Save & Continue 🌟
+              </button>
+            </form>
+          </div>
+        `;
+      },
+
+      selectAvatar(icon, btn) {
+        sfx.click();
+        document.querySelectorAll('.avatar-opt').forEach(b => b.classList.remove('ring-4', 'ring-yellow-400', 'bg-white/20'));
+        btn.classList.add('ring-4', 'ring-yellow-400', 'bg-white/20');
+        document.getElementById('selected-avatar-val').value = icon;
+      },
+
+      async handleOnboardingSubmit(e) {
+        e.preventDefault();
+        sfx.click();
+        const firstName = document.getElementById('ob-firstname').value.trim();
+        const lastName = document.getElementById('ob-lastname').value.trim();
+        const avatarIcon = document.getElementById('selected-avatar-val').value;
+        const dob = document.getElementById('ob-dob').value;
+        const gender = document.getElementById('ob-gender').value;
+        const country = document.getElementById('ob-country').value;
+
+        try {
+          const userRef = window.fbDoc(window.fbDb, "users", window.currentUser.uid);
+          await window.fbSetDoc(userRef, {
+            firstName,
+            lastName,
+            avatarIcon,
+            dob,
+            gender,
+            country,
+            profileCompleted: true
+          }, { merge: true });
+
+          const updatedSnap = await window.fbGetDoc(userRef);
+          window.currentUserData = updatedSnap.data();
+          this.updateHeader();
+          this.navToWelcome();
+        } catch (err) {
+          alert("Failed to save profile: " + err.message);
+        }
+      },
+
+      navToWelcome() {
         this.updateHeader();
-        document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl text-center space-y-6 max-w-md w-full">
-            <h2 class="font-heading text-3xl font-bold text-yellow-300">Brain Gym Ready!</h2>
-            <p class="text-sm text-white/70">Complete all ${TOTAL_ROUNDS} training rounds (Max ${MAX_LEVELS} levels per round) to unlock your final insights report.</p>
-            <button onclick="app.startCircuit()" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-slate-900 font-heading font-bold text-lg rounded-2xl btn-3d shadow-lg">
-              Start 9-Round Circuit 🚀
+        const container = document.getElementById('app-container');
+        
+        const rawGreeting = FUNNY_GREETINGS[Math.floor(Math.random() * FUNNY_GREETINGS.length)];
+        const greeting = rawGreeting.replace('{name}', window.currentUserData.firstName || 'Kiddo');
+        const fact = FUN_FACTS[Math.floor(Math.random() * FUN_FACTS.length)];
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-xl p-8 rounded-3xl border border-white/20 text-center shadow-2xl animate-fade-in my-8 space-y-6">
+            <div class="text-7xl mb-2 animate-bounce-slow inline-block">${window.currentUserData.avatarIcon || '🐉'}</div>
+            
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">${greeting}</h2>
+            
+            <div class="bg-gradient-to-r from-purple-900/60 to-pink-900/60 p-5 rounded-2xl border border-pink-500/35 text-left relative">
+              <span class="text-xs font-bold tracking-wider text-pink-300 uppercase block mb-1">💡 Brain Fun Fact:</span>
+              <p class="text-base font-semibold text-white/90">${fact}</p>
+            </div>
+
+            <button onclick="sfx.click(); app.navToDashboard()" class="w-full py-4 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Enter Training Gym 🚀
             </button>
           </div>
         `;
       },
-      startCircuit() {
-        this.currentRound = 1;
-        this.scores = {};
-        this.showLoadingScreen();
-      },
-      showLoadingScreen() {
-        document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl text-center space-y-4 max-w-md w-full">
-            <div class="text-5xl animate-bounce">🧠</div>
-            <h2 class="font-heading text-2xl font-bold text-yellow-300">Loading Round ${this.currentRound} of ${TOTAL_ROUNDS}...</h2>
-            <p class="text-xs text-white/50">Getting your brain training station ready!</p>
-          </div>
-        `;
-        setTimeout(() => this.loadRoundGame(), 1200);
-      },
-      loadRoundGame() {
-        const r = this.currentRound;
+
+      navToDashboard() {
+        this.updateHeader();
         const container = document.getElementById('app-container');
-        
-        if (r === 9) {
-          container.innerHTML = `
-            <div class="glass-card p-6 rounded-3xl max-w-lg w-full space-y-4">
-              <div class="flex justify-between items-center text-sm font-bold text-cyan-300">
-                <span>Round 9/9: Word Category Match</span>
-                <span>Max ${MAX_LEVELS} Lvl</span>
-              </div>
-              <h3 class="font-heading text-xl text-center">Pick items belonging to: <span class="text-yellow-300">Animals</span></h3>
-              <div id="word-grid" class="grid grid-cols-2 gap-3 py-4"></div>
-              <button onclick="app.finishRound(950)" class="w-full py-3 bg-green-500 text-slate-900 font-bold rounded-xl btn-3d">Complete Round</button>
-            </div>
-          `;
-          document.getElementById('word-grid').innerHTML = `
-            <button onclick="sfx.correct(); this.classList.add('bg-green-600')" class="p-4 bg-white/10 rounded-xl font-bold hover:bg-white/20">Dog 🐶</button>
-            <button onclick="sfx.wrong(); this.classList.add('bg-red-600')" class="p-4 bg-white/10 rounded-xl font-bold hover:bg-white/20">Car 🚗</button>
-            <button onclick="sfx.correct(); this.classList.add('bg-green-600')" class="p-4 bg-white/10 rounded-xl font-bold hover:bg-white/20">Cat 🐱</button>
-            <button onclick="sfx.wrong(); this.classList.add('bg-red-600')" class="p-4 bg-white/10 rounded-xl font-bold hover:bg-white/20">Apple 🍎</button>
-          `;
-          return;
-        }
+        const stats = window.currentUserData?.stats || {};
+        const rank = calculateRank(stats.highestScore || 0);
 
         container.innerHTML = `
-          <div class="glass-card p-6 rounded-3xl max-w-lg w-full space-y-4 text-center">
-            <h3 class="font-heading text-2xl text-yellow-300">Round ${r} Training</h3>
-            <p class="text-sm text-white/70">Perform quick cognitive task up to level ${MAX_LEVELS}.</p>
-            <button onclick="app.finishRound(850)" class="w-full py-3 bg-yellow-400 text-slate-900 font-bold rounded-xl btn-3d">Finish Round ${r}</button>
-          </div>
-        `;
-      },
-      finishRound(score) {
-        sfx.correct();
-        this.scores[`round_${this.currentRound}`] = Math.min(score, MAX_LEVELS * 100);
-        this.currentRound++;
-        if (this.currentRound > TOTAL_ROUNDS) {
-          this.showFinalSummary();
-        } else {
-          this.showLoadingScreen();
-        }
-      },
-      showFinalSummary() {
-        try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch(e){}
-        document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl max-w-lg w-full space-y-6 text-center">
-            <h2 class="font-heading text-3xl font-bold text-yellow-300">🎉 Circuit Completed!</h2>
-            <p class="text-sm text-white/80">Fantastic work! All ${TOTAL_ROUNDS} rounds finished successfully using real data metrics.</p>
-            <div class="flex gap-4">
-              <button onclick="app.startCircuit()" class="flex-1 py-3 bg-pink-500 text-white font-bold rounded-xl btn-3d">Try Again 🔄</button>
-              <button onclick="app.navToDashboard()" class="flex-1 py-3 bg-white/20 text-white font-bold rounded-xl btn-3d">Dashboard 🏠</button>
-            </div>
-          </div>
-        `;
-      },
-      renderAuth(mode) {
-        const isSignIn = mode === 'signin';
-        document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl max-w-md w-full space-y-6">
-            <div class="text-center space-y-2">
-              <h2 class="font-heading text-3xl font-bold text-yellow-300">${isSignIn ? 'Welcome Back!' : 'Create Account'}</h2>
-              <p class="text-xs text-white/60">Sign in to sync your CogniKids progress and scores.</p>
-            </div>
-            
-            <form onsubmit="app.handleAuth(event, '${mode}')" class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold text-white/70 mb-1">Email Address</label>
-                <input type="email" id="auth-email" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:border-yellow-400 text-sm" placeholder="kiddo@example.com">
+          <div class="w-full max-w-4xl space-y-6">
+            <div class="glass-card p-8 rounded-3xl border border-white/20 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div class="flex items-center gap-6">
+                <div class="text-7xl p-4 bg-white/10 rounded-2xl border border-white/20 animate-float shadow-inner">${window.currentUserData?.avatarIcon || '🐉'}</div>
+                <div>
+                  <h2 class="font-heading text-3xl font-bold text-white">${window.currentUserData?.firstName || ''} ${window.currentUserData?.lastName || ''}</h2>
+                  <p class="text-sm text-yellow-300 font-bold">@${window.currentUserData?.username || ''} • ${window.currentUserData?.country || 'GLOBAL'}</p>
+                  <div class="mt-3 inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full border border-white/20 text-xs font-bold ${rank.class}">
+                    <span>Rank:</span> <span>${rank.title}</span> <span>${rank.badge}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label class="block text-xs font-bold text-white/70 mb-1">Password</label>
-                <input type="password" id="auth-password" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:border-yellow-400 text-sm" placeholder="••••••••">
-              </div>
-              <button type="submit" class="w-full py-3.5 bg-yellow-400 text-slate-900 font-bold rounded-xl btn-3d shadow-lg">
-                ${isSignIn ? 'Sign In 🚀' : 'Register Account ✨'}
-              </button>
-            </form>
 
-            <div class="text-center">
-              <button onclick="app.renderAuth('${isSignIn ? 'signup' : 'signin'}')" class="text-xs text-cyan-300 hover:underline">
-                ${isSignIn ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              <div class="flex gap-4 text-center">
+                <div class="bg-black/30 py-4 px-6 rounded-2xl border border-white/10 shadow-inner">
+                  <p class="text-3xl font-bold text-cyan-300 font-heading">${stats.totalSessions || 0}</p>
+                  <p class="text-xs text-white/60 font-semibold tracking-wide">Sessions</p>
+                </div>
+                <div class="bg-black/30 py-4 px-6 rounded-2xl border border-white/10 shadow-inner">
+                  <p class="text-3xl font-bold text-yellow-400 font-heading">${stats.highestScore || 0}</p>
+                  <p class="text-xs text-white/60 font-semibold tracking-wide">Best Score</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl border border-white/20 text-center space-y-6">
+              <h3 class="font-heading text-3xl font-bold text-yellow-300">Cognitive Circuit Challenge (10 Rounds)</h3>
+              <p class="text-base text-white/80 max-w-xl mx-auto leading-relaxed">
+                Progress through 10 comprehensive rounds spanning working memory, attention, spatial reasoning, mathematics, agility, and cognitive flexibility.
+              </p>
+
+              <!-- Speed Math Mode Selector -->
+              <div class="bg-black/30 p-5 rounded-2xl border border-white/10 max-w-lg mx-auto text-left space-y-3">
+                <label class="block text-xs font-bold text-yellow-300 uppercase tracking-wider">Select Speed Math Operations Mode (Round 5):</label>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <button type="button" onclick="app.setMathMode('addition', this)" id="math-mode-addition" class="p-3 rounded-xl border border-yellow-400 bg-yellow-400/20 font-bold text-yellow-300 transition-all">Addition Only (+)</button>
+                  <button type="button" onclick="app.setMathMode('add_sub', this)" id="math-mode-add_sub" class="p-3 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-white transition-all">Add & Sub (+, -)</button>
+                  <button type="button" onclick="app.setMathMode('add_sub_mul', this)" id="math-mode-add_sub_mul" class="p-3 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-white transition-all">Add, Sub, Mul (+, -, ×)</button>
+                  <button type="button" onclick="app.setMathMode('all', this)" id="math-mode-all" class="p-3 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-white transition-all">All Operations (+, -, ×, ÷)</button>
+                </div>
+              </div>
+              
+              <button onclick="sfx.click(); app.startSessionSequence()" class="px-12 py-5 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500 text-slate-900 font-heading text-2xl font-extrabold rounded-2xl btn-3d shadow-2xl hover:scale-105 transform transition">
+                START TRAINING CIRCUIT 🎮
               </button>
             </div>
           </div>
         `;
       },
-      async handleAuth(e, mode) {
-        e.preventDefault();
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        try {
-          if (mode === 'signin') {
-            await window.fbSignIn(window.fbAuth, email, password);
-          } else {
-            await window.fbCreateUser(window.fbAuth, email, password);
+
+      setMathMode(mode, btn) {
+        sfx.click();
+        state.selectedMathMode = mode;
+        ['addition', 'add_sub', 'add_sub_mul', 'all'].forEach(m => {
+          const el = document.getElementById(`math-mode-${m}`);
+          if(el) {
+            el.className = m === mode ? 'p-3 rounded-xl border border-yellow-400 bg-yellow-400/20 font-bold text-yellow-300 transition-all' : 'p-3 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-white transition-all';
           }
-        } catch (err) {
-          alert('Authentication error: ' + err.message);
+        });
+      },
+
+      startSessionSequence() {
+        state.currentSessionScore = 0;
+        state.currentGameId = 1;
+        state.currentLevel = 1;
+        state.roundMetrics = {};
+        this.showTutorial(1);
+      },
+
+      // --- TUTORIAL & DEMO SYSTEM (10 Rounds) ---
+      showTutorial(gameId) {
+        state.currentGameId = gameId;
+        state.currentLevel = 1;
+        const container = document.getElementById('app-container');
+
+        const tutorials = {
+          1: {
+            title: "Round 1: Reverse Digits",
+            desc: "Watch the numbers flash. Type them in **reverse order** and press **Enter**! (e.g. 10 ➔ 01). Difficulty ramps up each level.",
+            demoHTML: `
+              <div class="flex items-center justify-center gap-3 py-6">
+                <span class="px-4 py-3 bg-yellow-400/20 border border-yellow-400 rounded-xl text-2xl font-bold text-yellow-300 animate-pulse">1</span>
+                <span class="px-4 py-3 bg-yellow-400/20 border border-yellow-400 rounded-xl text-2xl font-bold text-yellow-300 animate-pulse">0</span>
+                <span class="text-xl text-white/60">➔</span>
+                <span class="px-4 py-3 bg-emerald-500/20 border border-emerald-400 rounded-xl text-2xl font-bold text-emerald-300">01</span>
+              </div>
+            `
+          },
+          2: {
+            title: "Round 2: Color Match Reaction",
+            desc: "Check the ink color of the word. If ink matches written text name, click **YES**; otherwise **NO**! Quick response required.",
+            demoHTML: `
+              <div class="py-6 text-center">
+                <span class="font-heading text-4xl font-extrabold text-cyan-400 tracking-wider">RED</span>
+                <p class="text-xs text-white/60 mt-2">Ink is Blue, Word says Red ➔ Click <strong>NO ✖️</strong></p>
+              </div>
+            `
+          },
+          3: {
+            title: "Round 3: Pattern Matrix",
+            desc: "Observe tiles light up. Once flashing stops, click identical tiles in exact order. Matrix scales up in size and length!",
+            demoHTML: `
+              <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto py-4">
+                <div class="aspect-square bg-yellow-400/50 rounded-lg border border-yellow-300"></div>
+                <div class="aspect-square bg-white/10 rounded-lg border border-white/20"></div>
+                <div class="aspect-square bg-yellow-400/50 rounded-lg border border-yellow-300"></div>
+              </div>
+            `
+          },
+          4: {
+            title: "Round 4: Spatial Path Trace",
+            desc: "A sequence of grid cells will light up one by one showing a path. Once flashing stops, click those exact cells in the exact order from start to finish!",
+            demoHTML: `
+              <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto py-4 text-xl">
+                <div class="aspect-square bg-emerald-500/40 border border-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs text-white">Step 1</div>
+                <div class="aspect-square bg-emerald-500/40 border border-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs text-white">Step 2</div>
+                <div class="aspect-square bg-white/10 border border-white/20 rounded-lg flex items-center justify-center">·</div>
+              </div>
+            `
+          },
+          5: {
+            title: "Round 5: Speed Math Blitz",
+            desc: "Solve arithmetic equations quickly using your chosen operations mode. Difficulty ramps up progressively!",
+            demoHTML: `
+              <div class="py-6 text-center">
+                <span class="font-heading text-3xl font-extrabold text-yellow-300">12 + 8 = ?</span>
+                <p class="text-xs text-emerald-300 font-bold mt-2">Custom operator filtering active!</p>
+              </div>
+            `
+          },
+          6: {
+            title: "Round 6: Reverse Spatial Memory",
+            desc: "Watch tiles flash, then click them in **REVERSE order** (last tile clicked first).",
+            demoHTML: `
+              <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto py-4">
+                <div class="aspect-square bg-white/10 rounded-lg border border-white/20"></div>
+                <div class="aspect-square bg-purple-500/40 rounded-lg border border-purple-400 flex items-center justify-center text-xs font-bold">1st click</div>
+                <div class="aspect-square bg-white/10 rounded-lg border border-white/20"></div>
+              </div>
+            `
+          },
+          7: {
+            title: "Round 7: Multi-Clock Memory",
+            desc: "Multiple analog clocks will appear simultaneously. Memorize all their times, then select the correct times in order!",
+            demoHTML: `
+              <div class="py-4 text-center flex justify-center gap-4">
+                <div class="text-2xl">🕒 <span class="text-xs">3:00</span></div>
+                <div class="text-2xl">🕒 <span class="text-xs">6:15</span></div>
+              </div>
+            `
+          },
+          8: {
+            title: "Round 8: Word Scramble",
+            desc: "Unscramble the jumbled letters and type the exact vocabulary word into the input box! Starts easy, gets harder.",
+            demoHTML: `
+              <div class="py-4 text-center">
+                <span class="font-heading text-2xl font-bold text-pink-400 tracking-widest">A-I-R-B-N</span>
+                <p class="text-xs text-white/70 mt-1">Type: <strong>BRAIN</strong></p>
+              </div>
+            `
+          },
+          9: {
+            title: "Round 9: Color Stroop Reflex",
+            desc: "A fast-paced reflex test where you identify matching words and background color states.",
+            demoHTML: `
+              <div class="py-4 text-center">
+                <span class="text-3xl">⚡</span>
+                <p class="text-xs text-cyan-300 mt-1">Test your cognitive speed</p>
+              </div>
+            `
+          },
+          10: {
+            title: "Round 10: Shape Rotation",
+            desc: "Visualize how a geometric shape rotates 90° or 180° clockwise and pick the matching final orientation!",
+            demoHTML: `
+              <div class="py-4 text-center">
+                <span class="text-3xl">🔄</span>
+                <p class="text-xs text-yellow-300 mt-1">Mental rotation & spatial agility</p>
+              </div>
+            `
+          }
+        };
+
+        const t = tutorials[gameId];
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6 animate-fade-in">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>TRAINING TUTORIAL (30s Brief)</span>
+              <span>ROUND ${gameId}/${TOTAL_ROUNDS}</span>
+            </div>
+
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">${t.title}</h2>
+            <p class="text-sm text-white/80 leading-relaxed">${t.desc}</p>
+
+            ${t.demoHTML}
+
+            <div class="bg-black/30 p-4 rounded-2xl border border-white/10 text-xs text-cyan-200">
+              ⏱️ Keep playing until you make a mistake!
+            </div>
+
+            <button onclick="sfx.click(); app.loadGame(${gameId}, 1)" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Start Round 🚀
+            </button>
+          </div>
+        `;
+      },
+
+      loadGame(gameId, level) {
+        state.currentGameId = gameId;
+        state.currentLevel = level;
+        if(gameId === 1) this.playGame1(level);
+        else if(gameId === 2) this.playGame2(level);
+        else if(gameId === 3) this.playGame3(level);
+        else if(gameId === 4) this.playGame4(level);
+        else if(gameId === 5) this.playGame5(level);
+        else if(gameId === 6) this.playGame6(level);
+        else if(gameId === 7) this.playGame7(level);
+        else if(gameId === 8) this.playGame8(level);
+        else if(gameId === 9) this.playGame9(level);
+        else if(gameId === 10) this.playGame10(level);
+        else this.saveAndFinishSession();
+      },
+
+      // --- GAME 1: REVERSE DIGITS ---
+      playGame1(level = 1) {
+        const container = document.getElementById('app-container');
+        const digitCount = Math.min(1 + level, 8);
+        const displayTime = 3.0 + (level * 0.5);
+        const inputTime = 12.0 + (level * 1.5);
+
+        let digits = '';
+        for (let i = 0; i < digitCount; i++) {
+          digits += Math.floor(Math.random() * 9 + 1).toString();
+        }
+        const reversedAnswer = digits.split('').reverse().join('');
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 1: REVERSE DIGITS</span>
+              <span>LEVEL ${level} (${digitCount} Digits)</span>
+            </div>
+
+            <p class="text-sm text-white/80">Memorize digits, type in <strong class="text-yellow-300 underline">REVERSE order</strong> & press <kbd class="px-2 py-1 bg-white/10 rounded border border-white/20 text-xs">Enter</kbd>!</p>
+
+            <div id="g1-stage" class="min-h-[125px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span id="g1-digits" class="font-heading text-6xl font-extrabold tracking-widest text-yellow-400 animate-pulse">${digits}</span>
+            </div>
+
+            <div id="g1-input-zone" class="hidden space-y-4">
+              <input id="g1-user-input" type="number" autofocus placeholder="Type reversed digits & press Enter" onkeydown="if(event.key==='Enter') app.submitGame1('${reversedAnswer}', ${level})" class="w-full text-center text-3xl font-bold py-3.5 rounded-xl bg-white/10 border border-yellow-400 text-yellow-300 focus:outline-none shadow-inner">
+              <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+                <div id="g1-timer-bar" class="bg-yellow-400 h-full w-full transition-all duration-100 linear"></div>
+              </div>
+              <button onclick="app.submitGame1('${reversedAnswer}', ${level})" class="w-full py-3.5 bg-yellow-400 text-slate-900 font-heading font-bold rounded-xl btn-3d">Submit Answer</button>
+            </div>
+          </div>
+        `;
+
+        setTimeout(() => {
+          const digitsEl = document.getElementById('g1-digits');
+          const inputZone = document.getElementById('g1-input-zone');
+          if (!digitsEl) return;
+          
+          digitsEl.parentElement.innerHTML = '<span class="text-4xl">❓</span>';
+          inputZone.classList.remove('hidden');
+          const inputField = document.getElementById('g1-user-input');
+          if(inputField) inputField.focus();
+
+          const timerBar = document.getElementById('g1-timer-bar');
+          if(timerBar) {
+            timerBar.style.transitionDuration = `${inputTime}s`;
+            setTimeout(() => timerBar.style.width = '0%', 30);
+          }
+
+          state.activeTimer = setTimeout(() => {
+            app.submitGame1(reversedAnswer, level, true);
+          }, inputTime * 1000);
+        }, displayTime * 1000);
+      },
+
+      submitGame1(correctReversed, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+        const userInput = document.getElementById('g1-user-input')?.value.trim();
+
+        if (!isTimeout && userInput === correctReversed) {
+          sfx.correct();
+          state.currentSessionScore += level * 20;
+          this.loadGame(1, level + 1);
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(1, level, false);
+          this.showDecisionModal({
+            gameName: 'Round 1: Reverse Digits',
+            score: state.currentSessionScore,
+            rightAnswer: correctReversed,
+            userAnswer: userInput || (isTimeout ? 'Time Expired' : 'Empty'),
+            nextGameId: 2
+          });
         }
       },
-      renderOnboarding() {
-        document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl max-w-md w-full text-center space-y-4">
-            <h2 class="font-heading text-2xl text-yellow-300">Complete Your Profile</h2>
-            <p class="text-sm text-white/70">Profile setup view active.</p>
+
+      // --- GAME 2: COLOR MATCH REACTION ---
+      playGame2(level = 1) {
+        const container = document.getElementById('app-container');
+        const timeLimit = Math.max(2.0, 5.0 - (level * 0.3));
+
+        const colors = [
+          { name: 'RED', class: 'text-red-400' },
+          { name: 'BLUE', class: 'text-cyan-400' },
+          { name: 'GREEN', class: 'text-emerald-400' },
+          { name: 'YELLOW', class: 'text-yellow-400' },
+          { name: 'PURPLE', class: 'text-purple-400' }
+        ];
+
+        const targetColor = colors[Math.floor(Math.random() * colors.length)];
+        const displayColor = colors[Math.floor(Math.random() * colors.length)];
+        const isMatch = targetColor.name === displayColor.name;
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 2: COLOR MATCH</span>
+              <span>LEVEL ${level} (${timeLimit.toFixed(1)}s limit)</span>
+            </div>
+
+            <p class="text-sm text-white/80">Does the <strong class="text-yellow-300">INK COLOR</strong> match the word text?</p>
+
+            <div class="min-h-[140px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span class="font-heading text-6xl font-extrabold ${displayColor.class}">${targetColor.name}</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <button onclick="app.submitGame2(true, ${isMatch}, ${level})" class="py-4 bg-emerald-500/25 hover:bg-emerald-500/40 border border-emerald-400 text-emerald-300 font-heading text-lg font-bold rounded-2xl btn-3d">YES ✔️</button>
+              <button onclick="app.submitGame2(false, ${isMatch}, ${level})" class="py-4 bg-rose-500/25 hover:bg-rose-500/40 border border-rose-400 text-rose-300 font-heading text-lg font-bold rounded-2xl btn-3d">NO ✖️</button>
+            </div>
+
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+              <div id="g2-timer-bar" class="bg-cyan-400 h-full w-full transition-all duration-100 linear"></div>
+            </div>
+          </div>
+        `;
+
+        const timerBar = document.getElementById('g2-timer-bar');
+        if (timerBar) {
+          timerBar.style.transitionDuration = `${timeLimit}s`;
+          setTimeout(() => timerBar.style.width = '0%', 30);
+        }
+
+        state.activeTimer = setTimeout(() => {
+          app.submitGame2(null, isMatch, level, true);
+        }, timeLimit * 1000);
+      },
+
+      submitGame2(userChoice, correctMatch, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+
+        if (!isTimeout && userChoice === correctMatch) {
+          sfx.correct();
+          state.currentSessionScore += level * 25;
+          this.loadGame(2, level + 1);
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(2, level, false);
+          this.showDecisionModal({
+            gameName: 'Round 2: Color Match',
+            score: state.currentSessionScore,
+            rightAnswer: correctMatch ? 'YES' : 'NO',
+            userAnswer: isTimeout ? 'Time Expired' : (userChoice ? 'YES' : 'NO'),
+            nextGameId: 3
+          });
+        }
+      },
+
+      // --- GAME 3: PATTERN MATRIX ---
+      playGame3(level = 1) {
+        const container = document.getElementById('app-container');
+        const gridSize = level <= 3 ? 3 : 4;
+        const tileCount = Math.min(2 + level, 10);
+
+        let sequence = [];
+        while(sequence.length < tileCount) {
+          let rand = Math.floor(Math.random() * (gridSize * gridSize));
+          if(!sequence.includes(rand)) sequence.push(rand);
+        }
+
+        state.g3State = { gridSize, sequence, userIndex: 0, level };
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 3: PATTERN MATRIX</span>
+              <span>LEVEL ${level} (${tileCount} Tiles)</span>
+            </div>
+
+            <p class="text-sm text-white/80">Watch the flashing pattern carefully...</p>
+
+            <div id="g3-grid" class="grid grid-cols-${gridSize} gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              ${Array.from({length: gridSize * gridSize}).map((_, i) => `
+                <div id="g3-tile-${i}" class="aspect-square bg-white/10 rounded-xl border border-white/20 transition-all"></div>
+              `).join('')}
+            </div>
+            <p id="g3-status" class="text-xs font-bold text-yellow-300 animate-pulse">Memorizing pattern...</p>
+          </div>
+        `;
+
+        sequence.forEach((tileIdx, idx) => {
+          setTimeout(() => {
+            sfx.playTone(320 + idx * 80, 'sine', 0.3);
+            const tile = document.getElementById(`g3-tile-${tileIdx}`);
+            if(tile) tile.classList.add('bg-yellow-400', 'scale-105', 'shadow-lg');
+            setTimeout(() => {
+              if(tile) tile.classList.remove('bg-yellow-400', 'scale-105', 'shadow-lg');
+            }, 750);
+          }, (idx + 1) * 1050);
+        });
+
+        setTimeout(() => {
+          const statusEl = document.getElementById('g3-status');
+          if(statusEl) statusEl.textContent = "Your turn! Click tiles in order.";
+          
+          const gridEl = document.getElementById('g3-grid');
+          gridEl.innerHTML = `
+            ${Array.from({length: gridSize * gridSize}).map((_, i) => `
+              <button onclick="app.submitGame3Tile(${i})" id="g3-tile-${i}" class="aspect-square bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 transition-all btn-3d"></button>
+            `).join('')}
+          `;
+        }, (sequence.length + 1) * 1050);
+      },
+
+      submitGame3Tile(tileIdx) {
+        sfx.click();
+        const correctTile = state.g3State.sequence[state.g3State.userIndex];
+        const tileEl = document.getElementById(`g3-tile-${tileIdx}`);
+
+        if(tileIdx === correctTile) {
+          tileEl.classList.add('bg-emerald-400');
+          setTimeout(() => tileEl.classList.remove('bg-emerald-400'), 250);
+          state.g3State.userIndex++;
+
+          if(state.g3State.userIndex === state.g3State.sequence.length) {
+            sfx.correct();
+            state.currentSessionScore += state.g3State.level * 30;
+            this.loadGame(3, state.g3State.level + 1);
+          }
+        } else {
+          sfx.wrong();
+          tileEl.classList.add('bg-rose-500');
+          this.recordRoundMetric(3, state.g3State.level, false);
+          this.showDecisionModal({
+            gameName: 'Round 3: Pattern Matrix',
+            score: state.currentSessionScore,
+            rightAnswer: 'Complete sequence',
+            userAnswer: 'Wrong tile clicked',
+            nextGameId: 4
+          });
+        }
+      },
+
+      // --- GAME 4: SPATIAL PATH TRACE (Clearer Mechanics) ---
+      playGame4(level = 1) {
+        const container = document.getElementById('app-container');
+        const size = 3; 
+        const pathLen = Math.min(3 + level, 7); 
+
+        let path = [{r: 0, c: 0}];
+        let curr = {r: 0, c: 0};
+        while(path.length < pathLen) {
+          const neighbors = [
+            {r: curr.r + 1, c: curr.c},
+            {r: curr.r, c: curr.c + 1},
+            {r: curr.r - 1, c: curr.c},
+            {r: curr.r, c: curr.c - 1}
+          ].filter(n => n.r >= 0 && n.r < size && n.c >= 0 && n.c < size && !path.some(p => p.r === n.r && p.c === n.c));
+          if(neighbors.length === 0) break;
+          curr = neighbors[Math.floor(Math.random() * neighbors.length)];
+          path.push(curr);
+        }
+
+        state.g4State = { size, path, currentStep: 0, level, isShowingPath: true };
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 4: SPATIAL PATH TRACE</span>
+              <span>LEVEL ${level} (${pathLen} Steps)</span>
+            </div>
+
+            <p id="g4-instruction" class="text-sm text-yellow-300 font-bold animate-pulse">Watch the path light up step by step...</p>
+
+            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              ${Array.from({length: size * size}).map((_, i) => {
+                const r = Math.floor(i / size);
+                const c = i % size;
+                return `
+                  <div id="g4-cell-${r}-${c}" class="aspect-square flex items-center justify-center text-xl bg-white/10 rounded-xl border border-white/20 transition-all font-bold text-white">·</div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+
+        // Flash path sequence
+        path.forEach((step, idx) => {
+          setTimeout(() => {
+            sfx.playTone(400 + idx * 60, 'sine', 0.3);
+            const cell = document.getElementById(`g4-cell-${step.r}-${step.c}`);
+            if(cell) {
+              cell.textContent = idx + 1;
+              cell.classList.add('bg-emerald-500', 'border-emerald-300', 'scale-105', 'shadow-lg');
+            }
+            setTimeout(() => {
+              if(cell) {
+                cell.textContent = '·';
+                cell.classList.remove('bg-emerald-500', 'border-emerald-300', 'scale-105', 'shadow-lg');
+              }
+            }, 800);
+          }, (idx + 1) * 1050);
+        });
+
+        // Switch to interactive user mode
+        setTimeout(() => {
+          state.g4State.isShowingPath = false;
+          const inst = document.getElementById('g4-instruction');
+          if(inst) {
+            inst.textContent = "Your turn! Click the exact path cells in order (1 to N).";
+            inst.classList.remove('animate-pulse', 'text-yellow-300');
+            inst.classList.add('text-emerald-300');
+          }
+
+          const gridContainer = document.querySelector('.grid-cols-3');
+          gridContainer.innerHTML = `
+            ${Array.from({length: size * size}).map((_, i) => {
+              const r = Math.floor(i / size);
+              const c = i % size;
+              return `
+                <button onclick="app.submitGame4Step(${r}, ${c})" id="g4-cell-${r}-${c}" class="aspect-square flex items-center justify-center text-xl bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 transition-all btn-3d font-bold text-white">·</button>
+              `;
+            }).join('')}
+          `;
+        }, (path.length + 1) * 1050);
+      },
+
+      submitGame4Step(r, c) {
+        if (state.g4State.isShowingPath) return;
+        sfx.click();
+        const expected = state.g4State.path[state.g4State.currentStep];
+        const cellEl = document.getElementById(`g4-cell-${r}-${c}`);
+
+        if(r === expected.r && c === expected.c) {
+          state.g4State.currentStep++;
+          cellEl.textContent = state.g4State.currentStep;
+          cellEl.classList.add('bg-emerald-500/40', 'border-emerald-400');
+
+          if(state.g4State.currentStep === state.g4State.path.length) {
+            sfx.correct();
+            state.currentSessionScore += state.g4State.level * 35;
+            this.loadGame(4, state.g4State.level + 1);
+          }
+        } else {
+          sfx.wrong();
+          cellEl.textContent = '❌';
+          cellEl.classList.add('bg-rose-500/40', 'border-rose-400');
+          this.recordRoundMetric(4, state.g4State.level, false);
+          this.showDecisionModal({
+            gameName: 'Round 4: Spatial Path Trace',
+            score: state.currentSessionScore,
+            rightAnswer: 'Complete correct path',
+            userAnswer: `Wrong cell (${r},${c})`,
+            nextGameId: 5
+          });
+        }
+      },
+
+      // --- GAME 5: SPEED MATH BLITZ (Custom Operations) ---
+      playGame5(level = 1) {
+        const container = document.getElementById('app-container');
+        const timeLimit = Math.max(6.0, 14.0 - (level * 0.8));
+        const mode = state.selectedMathMode;
+
+        let ops = ['+'];
+        if (mode === 'add_sub') ops = ['+', '-'];
+        if (mode === 'add_sub_mul') ops = ['+', '-', '×'];
+        if (mode === 'all') ops = ['+', '-', '×', '÷'];
+
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let a = 0, b = 0, correctAnswer = 0, eqText = '';
+
+        if (op === '+') {
+          a = Math.floor(Math.random() * (level * 5)) + 3;
+          b = Math.floor(Math.random() * (level * 5)) + 3;
+          correctAnswer = a + b;
+          eqText = `${a} + ${b}`;
+        } else if (op === '-') {
+          a = Math.floor(Math.random() * (level * 5)) + 10;
+          b = Math.floor(Math.random() * a) + 1;
+          correctAnswer = a - b;
+          eqText = `${a} - ${b}`;
+        } else if (op === '×') {
+          a = Math.floor(Math.random() * (level + 3)) + 2;
+          b = Math.floor(Math.random() * 8) + 2;
+          correctAnswer = a * b;
+          eqText = `${a} × ${b}`;
+        } else {
+          b = Math.floor(Math.random() * 8) + 2;
+          let multiplier = Math.floor(Math.random() * 8) + 2;
+          a = b * multiplier;
+          correctAnswer = multiplier;
+          eqText = `${a} ÷ ${b}`;
+        }
+
+        let choices = [correctAnswer];
+        while(choices.length < 3) {
+          let offset = (Math.floor(Math.random() * 8) - 4);
+          if (offset === 0) offset = 1;
+          let distractor = correctAnswer + offset;
+          if(distractor !== correctAnswer && !choices.includes(distractor) && distractor >= 0) {
+            choices.push(distractor);
+          }
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 5: SPEED MATH BLITZ</span>
+              <span>LEVEL ${level} • Mode: ${mode.toUpperCase()}</span>
+            </div>
+
+            <p class="text-sm text-white/80">Solve the equation quickly!</p>
+
+            <div class="min-h-[125px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span class="font-heading text-4xl sm:text-5xl font-extrabold text-yellow-300">${eqText} = ?</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              ${choices.map(ans => `
+                <button onclick="app.submitGame5(${ans}, ${correctAnswer}, ${level})" class="py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-2xl font-bold rounded-2xl btn-3d shadow-inner">${ans}</button>
+              `).join('')}
+            </div>
+
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+              <div id="g5-timer-bar" class="bg-yellow-400 h-full w-full transition-all duration-100 linear"></div>
+            </div>
+          </div>
+        `;
+
+        const timerBar = document.getElementById('g5-timer-bar');
+        if(timerBar) {
+          timerBar.style.transitionDuration = `${timeLimit}s`;
+          setTimeout(() => timerBar.style.width = '0%', 30);
+        }
+
+        state.activeTimer = setTimeout(() => {
+          app.submitGame5(null, correctAnswer, level, true);
+        }, timeLimit * 1000);
+      },
+
+      submitGame5(userChoice, correctAnswer, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+
+        if(!isTimeout && userChoice === correctAnswer) {
+          sfx.correct();
+          state.currentSessionScore += level * 40;
+          this.loadGame(5, level + 1);
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(5, level, false);
+          this.showDecisionModal({
+            gameName: 'Round 5: Speed Math Blitz',
+            score: state.currentSessionScore,
+            rightAnswer: correctAnswer,
+            userAnswer: isTimeout ? 'Time Expired' : userChoice,
+            nextGameId: 6
+          });
+        }
+      },
+
+      // --- GAME 6: REVERSE SPATIAL MEMORY ---
+      playGame6(level = 1) {
+        const container = document.getElementById('app-container');
+        const gridSize = 3;
+        const tileCount = Math.min(2 + level, 8);
+
+        let sequence = [];
+        while(sequence.length < tileCount) {
+          let rand = Math.floor(Math.random() * (gridSize * gridSize));
+          if(!sequence.includes(rand)) sequence.push(rand);
+        }
+
+        const reversedSequence = [...sequence].reverse();
+        state.g6State = { gridSize, sequence, reversedSequence, userIndex: 0, level };
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 6: REVERSE SPATIAL MEMORY</span>
+              <span>LEVEL ${level} (${tileCount} Tiles)</span>
+            </div>
+
+            <p class="text-sm text-white/80">Memorize flashing tiles, click in <strong class="text-yellow-300 underline">REVERSE order</strong>!</p>
+
+            <div id="g6-grid" class="grid grid-cols-3 gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              ${Array.from({length: 9}).map((_, i) => `
+                <div id="g6-tile-${i}" class="aspect-square bg-white/10 rounded-xl border border-white/20 transition-all"></div>
+              `).join('')}
+            </div>
+            <p id="g6-status" class="text-xs font-bold text-yellow-300 animate-pulse">Memorizing pattern...</p>
+          </div>
+        `;
+
+        sequence.forEach((tileIdx, idx) => {
+          setTimeout(() => {
+            sfx.playTone(350 + idx * 70, 'sine', 0.3);
+            const tile = document.getElementById(`g6-tile-${tileIdx}`);
+            if(tile) tile.classList.add('bg-purple-500', 'scale-105', 'shadow-lg');
+            setTimeout(() => {
+              if(tile) tile.classList.remove('bg-purple-500', 'scale-105', 'shadow-lg');
+            }, 750);
+          }, (idx + 1) * 1050);
+        });
+
+        setTimeout(() => {
+          const statusEl = document.getElementById('g6-status');
+          if(statusEl) statusEl.textContent = "Your turn! Click in REVERSE order.";
+          
+          const gridEl = document.getElementById('g6-grid');
+          gridEl.innerHTML = `
+            ${Array.from({length: 9}).map((_, i) => `
+              <button onclick="app.submitGame6Tile(${i})" id="g6-tile-${i}" class="aspect-square bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 transition-all btn-3d"></button>
+            `).join('')}
+          `;
+        }, (sequence.length + 1) * 1050);
+      },
+
+      submitGame6Tile(tileIdx) {
+        sfx.click();
+        const correctTile = state.g6State.reversedSequence[state.g6State.userIndex];
+        const tileEl = document.getElementById(`g6-tile-${tileIdx}`);
+
+        if(tileIdx === correctTile) {
+          tileEl.classList.add('bg-emerald-400');
+          setTimeout(() => tileEl.classList.remove('bg-emerald-400'), 250);
+          state.g6State.userIndex++;
+
+          if(state.g6State.userIndex === state.g6State.reversedSequence.length) {
+            sfx.correct();
+            state.currentSessionScore += state.g6State.level * 45;
+            this.loadGame(6, state.g6State.level + 1);
+          }
+        } else {
+          sfx.wrong();
+          tileEl.classList.add('bg-rose-500');
+          this.recordRoundMetric(6, state.g6State.level, false);
+          this.showDecisionModal({
+            gameName: 'Round 6: Reverse Spatial Memory',
+            score: state.currentSessionScore,
+            rightAnswer: 'Reverse sequence',
+            userAnswer: 'Wrong tile clicked',
+            nextGameId: 7
+          });
+        }
+      },
+
+      // --- GAME 7: MULTI-CLOCK MEMORY (Increased Clocks & Duration) ---
+      playGame7(level = 1) {
+        const container = document.getElementById('app-container');
+        // Increase number of clocks as level increases (starts at 2, up to 4)
+        const clockCount = Math.min(2 + Math.floor((level - 1) / 2), 4);
+        // Generous show duration scaled by count and level
+        const showDuration = 4.5 + (clockCount * 1.5) + (level * 0.5);
+        const inputTime = 15.0;
+
+        let clocksData = [];
+        let minuteOptions = [0, 15, 30, 45];
+
+        for (let i = 0; i < clockCount; i++) {
+          let h = Math.floor(Math.random() * 12) + 1;
+          let m = minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
+          let timeStr = `${h}:${m < 10 ? '0' : ''}${m}`;
+          clocksData.push({ h, m, timeStr });
+        }
+
+        state.g7State = { clocksData, currentIndex: 0, level };
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-xl p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 7: MULTI-CLOCK MEMORY</span>
+              <span>LEVEL ${level} (${clockCount} Clocks)</span>
+            </div>
+
+            <p id="g7-instruction" class="text-sm text-yellow-300 font-bold animate-pulse">Memorize the times shown on all ${clockCount} clocks (${showDuration.toFixed(0)}s)...</p>
+
+            <div id="g7-clocks-container" class="grid grid-cols-2 gap-4 my-4 justify-items-center">
+              ${clocksData.map((c, idx) => {
+                const hourDeg = (c.h % 12) * 30 + c.m * 0.5;
+                const minDeg = c.m * 6;
+                return `
+                  <div class="bg-black/40 p-4 rounded-2xl border border-white/10 text-center shadow-inner space-y-2">
+                    <span class="text-xs font-bold text-cyan-300 block">Clock #${idx + 1}</span>
+                    <div class="relative w-28 h-28 bg-slate-900 rounded-full border-4 border-yellow-400 flex items-center justify-center mx-auto shadow-inner">
+                      <div class="w-2.5 h-2.5 bg-yellow-400 rounded-full z-20"></div>
+                      <div class="absolute w-1 h-7 bg-white rounded-full origin-bottom z-10" style="bottom: 50%; transform: rotate(${hourDeg}deg)"></div>
+                      <div class="absolute w-0.5 h-10 bg-cyan-400 rounded-full origin-bottom z-10" style="bottom: 50%; transform: rotate(${minDeg}deg)"></div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+
+        setTimeout(() => {
+          this.renderGame7InputPhase();
+        }, showDuration * 1000);
+      },
+
+      renderGame7InputPhase() {
+        const container = document.getElementById('app-container');
+        const st = state.g7State;
+        const targetClock = st.clocksData[st.currentIndex];
+        const correctStr = targetClock.timeStr;
+
+        let choices = [correctStr];
+        let minuteOptions = [0, 15, 30, 45];
+        while(choices.length < 3) {
+          let randH = Math.floor(Math.random() * 12) + 1;
+          let randM = minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
+          let distStr = `${randH}:${randM < 10 ? '0' : ''}${randM}`;
+          if(!choices.includes(distStr)) choices.push(distStr);
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 7: MULTI-CLOCK MEMORY</span>
+              <span>Clock ${st.currentIndex + 1} of ${st.clocksData.length}</span>
+            </div>
+
+            <p class="text-sm text-white/80">What time was shown on <strong class="text-yellow-300">Clock #${st.currentIndex + 1}</strong>?</p>
+
+            <div class="text-5xl my-4">🕒</div>
+
+            <div class="grid grid-cols-3 gap-4">
+              ${choices.map(c => `
+                <button onclick="app.submitGame7Choice('${c}', '${correctStr}')" class="py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-xl font-bold rounded-2xl btn-3d shadow-inner">${c}</button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      },
+
+      submitGame7Choice(userChoice, correctStr) {
+        sfx.click();
+        const st = state.g7State;
+
+        if (userChoice === correctStr) {
+          st.currentIndex++;
+          if (st.currentIndex === st.clocksData.length) {
+            sfx.correct();
+            state.currentSessionScore += st.level * 50;
+            this.loadGame(7, st.level + 1);
+          } else {
+            this.renderGame7InputPhase();
+          }
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(7, st.level, false);
+          this.showDecisionModal({
+            gameName: 'Round 7: Multi-Clock Memory',
+            score: state.currentSessionScore,
+            rightAnswer: correctStr,
+            userAnswer: userChoice,
+            nextGameId: 8
+          });
+        }
+      },
+
+      // --- GAME 8: WORD SCRAMBLE (No Choices, Text Input) ---
+      playGame8(level = 1) {
+        const container = document.getElementById('app-container');
+        const timeLimit = 15.0 + (level * 1.5);
+
+        // Word list categorized by difficulty
+        const easyWords = ['CAT', 'DOG', 'SUN', 'BOOK', 'TREE', 'FISH', 'BIRD', 'STAR'];
+        const medWords = ['BRAIN', 'FOCUS', 'LOGIC', 'PUZZLE', 'NEURON', 'SYNAPSE', 'THINK'];
+        const hardWords = ['COGNITION', 'ALGORITHM', 'MEMORY', 'KNOWLEDGE', 'INTELLIGENCE', 'CIRCUIT'];
+
+        let pool = easyWords;
+        if (level >= 3 && level < 6) pool = medWords;
+        if (level >= 6) pool = hardWords;
+
+        const word = pool[Math.floor(Math.random() * pool.length)];
+        let scrambled = word.split('').sort(() => Math.random() - 0.5).join('');
+        if (scrambled === word) scrambled = word.split('').reverse().join('');
+
+        state.g8State = { word, level };
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 8: WORD SCRAMBLE</span>
+              <span>LEVEL ${level}</span>
+            </div>
+
+            <p class="text-sm text-white/80">Unscramble the letters and type the exact word below:</p>
+
+            <div class="min-h-[110px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span class="font-heading text-4xl sm:text-5xl font-extrabold text-pink-400 tracking-widest">${scrambled.split('').join(' ')}</span>
+            </div>
+
+            <div class="space-y-4">
+              <input id="g8-input" type="text" autofocus placeholder="Type unscrambled word & press Enter" onkeydown="if(event.key==='Enter') app.submitGame8('${word}', ${level})" class="w-full text-center text-2xl font-bold py-3.5 rounded-xl bg-white/10 border border-pink-400 text-pink-300 uppercase focus:outline-none shadow-inner">
+              
+              <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+                <div id="g8-timer-bar" class="bg-pink-400 h-full w-full transition-all duration-100 linear"></div>
+              </div>
+
+              <button onclick="app.submitGame8('${word}', ${level})" class="w-full py-3.5 bg-pink-500 text-slate-900 font-heading font-bold rounded-xl btn-3d">Submit Word</button>
+            </div>
+          </div>
+        `;
+
+        const timerBar = document.getElementById('g8-timer-bar');
+        if(timerBar) {
+          timerBar.style.transitionDuration = `${timeLimit}s`;
+          setTimeout(() => timerBar.style.width = '0%', 30);
+        }
+
+        state.activeTimer = setTimeout(() => {
+          app.submitGame8(word, level, true);
+        }, timeLimit * 1000);
+      },
+
+      submitGame8(correctWord, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+        const userInput = document.getElementById('g8-input')?.value.trim().toUpperCase();
+
+        if(!isTimeout && userInput === correctWord) {
+          sfx.correct();
+          state.currentSessionScore += level * 45;
+          this.loadGame(8, level + 1);
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(8, level, false);
+          this.showDecisionModal({
+            gameName: 'Round 8: Word Scramble',
+            score: state.currentSessionScore,
+            rightAnswer: correctWord,
+            userAnswer: isTimeout ? 'Time Expired' : (userInput || 'Empty'),
+            nextGameId: 9
+          });
+        }
+      },
+
+      // --- GAME 9: COLOR STROOP REFLEX (Replaced Balance Scale) ---
+      playGame9(level = 1) {
+        const container = document.getElementById('app-container');
+        const timeLimit = Math.max(2.5, 5.0 - (level * 0.4));
+
+        const colorList = [
+          { name: 'RED', hex: '#f87171' },
+          { name: 'BLUE', hex: '#38bdf8' },
+          { name: 'GREEN', hex: '#34d399' },
+          { name: 'YELLOW', hex: '#facc15' },
+          { name: 'PURPLE', hex: '#c084fc' }
+        ];
+
+        const wordObj = colorList[Math.floor(Math.random() * colorList.length)];
+        const colorObj = colorList[Math.floor(Math.random() * colorList.length)];
+        const isMatch = wordObj.name === colorObj.name;
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 9: STROOP REFLEX</span>
+              <span>LEVEL ${level} (${timeLimit.toFixed(1)}s)</span>
+            </div>
+
+            <p class="text-sm text-white/80">Does the ink color match the color word?</p>
+
+            <div class="min-h-[140px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span class="font-heading text-5xl font-extrabold" style="color: ${colorObj.hex}">${wordObj.name}</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <button onclick="app.submitGame9(true, ${isMatch}, ${level})" class="py-4 bg-emerald-500/25 hover:bg-emerald-500/40 border border-emerald-400 text-emerald-300 font-heading text-lg font-bold rounded-2xl btn-3d">YES ✔️</button>
+              <button onclick="app.submitGame9(false, ${isMatch}, ${level})" class="py-4 bg-rose-500/25 hover:bg-rose-500/40 border border-rose-400 text-rose-300 font-heading text-lg font-bold rounded-2xl btn-3d">NO ✖️</button>
+            </div>
+
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+              <div id="g9-timer-bar" class="bg-cyan-400 h-full w-full transition-all duration-100 linear"></div>
+            </div>
+          </div>
+        `;
+
+        const timerBar = document.getElementById('g9-timer-bar');
+        if(timerBar) {
+          timerBar.style.transitionDuration = `${timeLimit}s`;
+          setTimeout(() => timerBar.style.width = '0%', 30);
+        }
+
+        state.activeTimer = setTimeout(() => {
+          app.submitGame9(null, isMatch, level, true);
+        }, timeLimit * 1000);
+      },
+
+      submitGame9(userChoice, correctMatch, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+
+        if(!isTimeout && userChoice === correctMatch) {
+          sfx.correct();
+          state.currentSessionScore += level * 40;
+          this.loadGame(9, level + 1);
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(9, level, false);
+          this.showDecisionModal({
+            gameName: 'Round 9: Stroop Reflex',
+            score: state.currentSessionScore,
+            rightAnswer: correctMatch ? 'YES' : 'NO',
+            userAnswer: isTimeout ? 'Time Expired' : (userChoice ? 'YES' : 'NO'),
+            nextGameId: 10
+          });
+        }
+      },
+
+      // --- GAME 10: SHAPE ROTATION ---
+      playGame10(level = 1) {
+        const container = document.getElementById('app-container');
+        const timeLimit = 12.0 + (level * 1.0);
+
+        const shapes = ['▲ Triangle', '■ Square', '◆ Diamond', '⬟ Pentagon'];
+        const targetShape = shapes[Math.floor(Math.random() * shapes.length)];
+        const rotations = ['90° CW', '180°', '270° CW'];
+        const rot = rotations[Math.floor(Math.random() * rotations.length)];
+
+        const correctAns = `${targetShape} (${rot})`;
+
+        let choices = [correctAns];
+        while(choices.length < 3) {
+          const randS = shapes[Math.floor(Math.random() * shapes.length)];
+          const randR = rotations[Math.floor(Math.random() * rotations.length)];
+          const dist = `${randS} (${randR})`;
+          if(!choices.includes(dist)) choices.push(dist);
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 10: SHAPE ROTATION</span>
+              <span>LEVEL ${level}</span>
+            </div>
+
+            <p class="text-sm text-white/80">Select the correct shape orientation after rotating <strong class="text-yellow-300">${rot}</strong>!</p>
+
+            <div class="min-h-[110px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span class="font-heading text-4xl font-bold text-yellow-300">${targetShape}</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              ${choices.map(c => `
+                <button onclick="app.submitGame10('${c}', '${correctAns}', ${level})" class="py-3 px-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-sm font-bold rounded-2xl btn-3d shadow-inner">${c}</button>
+              `).join('')}
+            </div>
+
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+              <div id="g10-timer-bar" class="bg-cyan-400 h-full w-full transition-all duration-100 linear"></div>
+            </div>
+          </div>
+        `;
+
+        const timerBar = document.getElementById('g10-timer-bar');
+        if(timerBar) {
+          timerBar.style.transitionDuration = `${timeLimit}s`;
+          setTimeout(() => timerBar.style.width = '0%', 30);
+        }
+
+        state.activeTimer = setTimeout(() => {
+          app.submitGame10(null, correctAns, level, true);
+        }, timeLimit * 1000);
+      },
+
+      submitGame10(userChoice, correctAns, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+
+        if(!isTimeout && userChoice === correctAns) {
+          sfx.correct();
+          state.currentSessionScore += level * 50;
+          this.loadGame(10, level + 1);
+        } else {
+          sfx.wrong();
+          this.recordRoundMetric(10, level, false);
+          this.showDecisionModal({
+            gameName: 'Round 10: Shape Rotation',
+            score: state.currentSessionScore,
+            rightAnswer: correctAns,
+            userAnswer: isTimeout ? 'Time Expired' : userChoice,
+            nextGameId: 11
+          });
+        }
+      },
+
+      recordRoundMetric(gameId, levelReached, completedSuccessfully) {
+        const names = {
+          1: "Reverse Digits",
+          2: "Color Match",
+          3: "Pattern Matrix",
+          4: "Spatial Path Trace",
+          5: "Speed Math Blitz",
+          6: "Reverse Spatial Memory",
+          7: "Multi-Clock Memory",
+          8: "Word Scramble",
+          9: "Stroop Reflex",
+          10: "Shape Rotation"
+        };
+        state.roundMetrics[gameId] = {
+          name: names[gameId],
+          level: levelReached,
+          status: completedSuccessfully ? 'Cleared' : 'Failed'
+        };
+      },
+
+      showDecisionModal(data) {
+        const container = document.getElementById('app-container');
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-red-500/30 text-center space-y-6 animate-fade-in">
+            <div class="text-6xl">⚠️</div>
+            <h3 class="font-heading text-2xl font-bold text-red-400">Circuit Mistake Recorded</h3>
+            <p class="text-sm text-white/80">${data.gameName} session concluded.</p>
+
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/10 text-left space-y-2.5 text-sm shadow-inner">
+              <div class="flex justify-between"><span class="text-white/60">Your Answer:</span> <span class="text-red-300 font-bold">${data.userAnswer}</span></div>
+              <div class="flex justify-between"><span class="text-white/60">Correct Answer:</span> <span class="text-green-300 font-bold">${data.rightAnswer}</span></div>
+              <div class="flex justify-between border-t border-white/10 pt-2"><span class="text-white/60">Total Score:</span> <span class="text-yellow-300 font-bold">${data.score} pts</span></div>
+            </div>
+
+            <button onclick="sfx.click(); ${data.nextGameId <= TOTAL_ROUNDS ? `app.showTutorial(${data.nextGameId})` : 'app.saveAndFinishSession()'}" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              ${data.nextGameId <= TOTAL_ROUNDS ? 'Proceed to Next Challenge ➔' : 'Save & View Detailed Insights 🏁'}
+            </button>
+          </div>
+        `;
+      },
+
+      async saveAndFinishSession() {
+        let totalUsers = 1248;
+        let globalLeader = { name: "Aarav S.", score: 2150 };
+
+        if (window.currentUser) {
+          try {
+            const userRef = window.fbDoc(window.fbDb, "users", window.currentUser.uid);
+            const userSnap = await window.fbGetDoc(userRef);
+            const currentStats = userSnap.data().stats || {};
+
+            const newTotalSessions = (currentStats.totalSessions || 0) + 1;
+            const newHighScore = Math.max(currentStats.highestScore || 0, state.currentSessionScore);
+
+            await window.fbSetDoc(userRef, {
+              stats: {
+                totalSessions: newTotalSessions,
+                highestScore: newHighScore
+              }
+            }, { merge: true });
+
+            await window.fbAddDoc(window.fbCollection(window.fbDb, "sessions"), {
+              uid: window.currentUser.uid,
+              score: state.currentSessionScore,
+              timestamp: window.fbTimestamp()
+            });
+
+            // Fetch total registered users count and leader from firestore if available
+            const usersSnap = await window.fbGetDocs(window.fbCollection(window.fbDb, "users"));
+            totalUsers = Math.max(1200, usersSnap.size);
+
+            const updatedSnap = await window.fbGetDoc(userRef);
+            window.currentUserData = updatedSnap.data();
+            this.updateHeader();
+          } catch (err) {
+            console.error("Failed to save session:", err);
+          }
+        }
+
+        const bestScore = window.currentUserData?.stats?.highestScore || state.currentSessionScore;
+        const userRank = bestScore >= 1200 ? 'Top 1%' : bestScore >= 800 ? 'Top 5%' : bestScore >= 400 ? 'Top 15%' : 'Top 30%';
+
+        // Generate Detailed Insights
+        let strengths = [];
+        let areasToImprove = [];
+        for (let i = 1; i <= TOTAL_ROUNDS; i++) {
+          const m = state.roundMetrics[i];
+          const levelReached = m ? m.level : 1;
+          const gameName = m ? m.name : `Round ${i}`;
+          if (levelReached >= 3) {
+            strengths.push(`${gameName} (Reached Level ${levelReached})`);
+          } else {
+            areasToImprove.push(`${gameName} (Ended at Level ${levelReached})`);
+          }
+        }
+
+        const container = document.getElementById('app-container');
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-2xl p-8 rounded-3xl border border-white/25 text-center space-y-6 animate-fade-in my-6">
+            <div class="text-6xl animate-bounce-slow">📊</div>
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">Session Intelligence & Global Standing</h2>
+            <p class="text-sm text-cyan-200">Comprehensive cognitive analytics breakdown & global community rankings.</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div class="bg-black/30 p-4 rounded-2xl border border-white/10 shadow-inner">
+                <p class="text-xs text-white/60 uppercase font-bold mb-1">Session Score</p>
+                <p class="font-heading text-2xl font-extrabold text-yellow-400">${state.currentSessionScore}</p>
+              </div>
+              <div class="bg-black/30 p-4 rounded-2xl border border-white/10 shadow-inner">
+                <p class="text-xs text-white/60 uppercase font-bold mb-1">Your Best</p>
+                <p class="font-heading text-2xl font-extrabold text-amber-300">${bestScore}</p>
+              </div>
+              <div class="bg-black/30 p-4 rounded-2xl border border-white/10 shadow-inner">
+                <p class="text-xs text-white/60 uppercase font-bold mb-1">Global Rank</p>
+                <p class="font-heading text-2xl font-extrabold text-cyan-300">${userRank}</p>
+              </div>
+              <div class="bg-black/30 p-4 rounded-2xl border border-white/10 shadow-inner">
+                <p class="text-xs text-white/60 uppercase font-bold mb-1">Total Users</p>
+                <p class="font-heading text-2xl font-extrabold text-pink-400">${totalUsers}</p>
+              </div>
+            </div>
+
+            <!-- Global Leaderboard Banner -->
+            <div class="bg-gradient-to-r from-purple-900/60 to-pink-900/60 p-4 rounded-2xl border border-pink-500/30 flex justify-between items-center text-left">
+              <div>
+                <span class="text-xs text-pink-300 font-bold uppercase tracking-wider block">🏆 Global Leaderboard #1</span>
+                <p class="font-heading text-lg font-bold text-white">${globalLeader.name} (${globalLeader.score} pts)</p>
+              </div>
+              <span class="text-3xl">👑</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+              <div class="bg-emerald-950/40 p-5 rounded-2xl border border-emerald-500/30">
+                <h4 class="font-heading text-base font-bold text-emerald-300 mb-2 flex items-center gap-2"><span>💪</span> Cognitive Strengths</h4>
+                <ul class="text-xs text-white/80 space-y-1 list-disc list-inside">
+                  ${strengths.length > 0 ? strengths.map(s => `<li>${s}</li>`).join('') : '<li>Consistent focus across early rounds!</li>'}
+                </ul>
+              </div>
+
+              <div class="bg-amber-950/40 p-5 rounded-2xl border border-amber-500/30">
+                <h4 class="font-heading text-base font-bold text-amber-300 mb-2 flex items-center gap-2"><span>🎯</span> Growth Opportunities</h4>
+                <ul class="text-xs text-white/80 space-y-1 list-disc list-inside">
+                  ${areasToImprove.length > 0 ? areasToImprove.map(a => `<li>${a}</li>`).join('') : '<li>Exceptional run! Push for higher speeds next time.</li>'}
+                </ul>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <button onclick="sfx.click(); app.navToDashboard()" class="flex-1 py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-lg font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+                Play Again 🎮
+              </button>
+              <button onclick="sfx.click(); app.navToDashboard()" class="py-4 px-6 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-lg font-bold rounded-2xl btn-3d">
+                Dashboard 🏠
+              </button>
+            </div>
           </div>
         `;
       }
     };
+  </script>
+
+  <!-- FIREBASE SDKs & Auth Listener -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut, 
+      sendPasswordResetEmail, 
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      addDoc, 
+      getDocs, 
+      collection, 
+      query, 
+      where, 
+      orderBy, 
+      limit, 
+      serverTimestamp,
+      increment
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
+  authDomain: "mindgames-f116a.firebaseapp.com",
+  projectId: "mindgames-f116a",
+  storageBucket: "mindgames-f116a.firebasestorage.app",
+  messagingSenderId: "296415432842",
+  appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
+  measurementId: "G-HC8N4Y4R49"
+};
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+
+    window.fbAuth = auth;
+    window.fbDb = db;
+    window.fbCreateUser = createUserWithEmailAndPassword;
+    window.fbSignIn = signInWithEmailAndPassword;
+    window.fbSignOut = signOut;
+    window.fbResetPassword = sendPasswordResetEmail;
+    window.fbUpdateProfile = updateProfile;
+    window.fbDoc = doc;
+    window.fbGetDoc = getDoc;
+    window.fbSetDoc = setDoc;
+    window.fbAddDoc = addDoc;
+    window.fbGetDocs = getDocs;
+    window.fbCollection = collection;
+    window.fbQuery = query;
+    window.fbWhere = where;
+    window.fbOrderBy = orderBy;
+    window.fbLimit = limit;
+    window.fbTimestamp = serverTimestamp;
+    window.fbIncrement = increment;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        window.currentUser = user;
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (!userDocSnap.exists() || !userDocSnap.data().profileCompleted) {
+            window.app.renderOnboarding();
+          } else {
+            window.currentUserData = userDocSnap.data();
+            window.app.updateHeader();
+            window.app.navToWelcome();
+          }
+        } catch (e) {
+          console.error("Auth state update error:", e);
+        }
+      } else {
+        window.currentUser = null;
+        window.currentUserData = null;
+        document.getElementById('header-profile').classList.add('hidden');
+        window.app.renderAuth('signin');
+      }
+    });
   </script>
 </body>
 </html>
