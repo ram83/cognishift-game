@@ -88,7 +88,7 @@
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // --- YOUR FIREBASE CONFIGURATION ---
-    const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
   authDomain: "mindgames-f116a.firebaseapp.com",
   projectId: "mindgames-f116a",
@@ -266,7 +266,6 @@
         const r = this.currentRound;
         const container = document.getElementById('app-container');
         
-        // If Round 9, load Word Category Match (replacing shape rotation)
         if (r === 9) {
           container.innerHTML = `
             <div class="glass-card p-6 rounded-3xl max-w-lg w-full space-y-4">
@@ -274,12 +273,11 @@
                 <span>Round 9/9: Word Category Match</span>
                 <span>Max ${MAX_LEVELS} Lvl</span>
               </div>
-              <h3 class="font-heading text-xl text-center">Pick items belonging to: <span id="word-category" class="text-yellow-300">Animals</span></h3>
+              <h3 class="font-heading text-xl text-center">Pick items belonging to: <span class="text-yellow-300">Animals</span></h3>
               <div id="word-grid" class="grid grid-cols-2 gap-3 py-4"></div>
               <button onclick="app.finishRound(950)" class="w-full py-3 bg-green-500 text-slate-900 font-bold rounded-xl btn-3d">Complete Round</button>
             </div>
           `;
-          // Initialize mock word category game interaction
           document.getElementById('word-grid').innerHTML = `
             <button onclick="sfx.correct(); this.classList.add('bg-green-600')" class="p-4 bg-white/10 rounded-xl font-bold hover:bg-white/20">Dog 🐶</button>
             <button onclick="sfx.wrong(); this.classList.add('bg-red-600')" class="p-4 bg-white/10 rounded-xl font-bold hover:bg-white/20">Car 🚗</button>
@@ -289,7 +287,6 @@
           return;
         }
 
-        // Generic template for Rounds 1-8
         container.innerHTML = `
           <div class="glass-card p-6 rounded-3xl max-w-lg w-full space-y-4 text-center">
             <h3 class="font-heading text-2xl text-yellow-300">Round ${r} Training</h3>
@@ -322,16 +319,55 @@
         `;
       },
       renderAuth(mode) {
+        const isSignIn = mode === 'signin';
         document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl text-center">
-            <h2 class="text-2xl text-yellow-300 mb-4">Please Sign In</h2>
+          <div class="glass-card p-8 rounded-3xl max-w-md w-full space-y-6">
+            <div class="text-center space-y-2">
+              <h2 class="font-heading text-3xl font-bold text-yellow-300">${isSignIn ? 'Welcome Back!' : 'Create Account'}</h2>
+              <p class="text-xs text-white/60">Sign in to sync your CogniKids progress and scores.</p>
+            </div>
+            
+            <form onsubmit="app.handleAuth(event, '${mode}')" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-white/70 mb-1">Email Address</label>
+                <input type="email" id="auth-email" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:border-yellow-400 text-sm" placeholder="kiddo@example.com">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-white/70 mb-1">Password</label>
+                <input type="password" id="auth-password" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:border-yellow-400 text-sm" placeholder="••••••••">
+              </div>
+              <button type="submit" class="w-full py-3.5 bg-yellow-400 text-slate-900 font-bold rounded-xl btn-3d shadow-lg">
+                ${isSignIn ? 'Sign In 🚀' : 'Register Account ✨'}
+              </button>
+            </form>
+
+            <div class="text-center">
+              <button onclick="app.renderAuth('${isSignIn ? 'signup' : 'signin'}')" class="text-xs text-cyan-300 hover:underline">
+                ${isSignIn ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              </button>
+            </div>
           </div>
         `;
       },
+      async handleAuth(e, mode) {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        try {
+          if (mode === 'signin') {
+            await window.fbSignIn(window.fbAuth, email, password);
+          } else {
+            await window.fbCreateUser(window.fbAuth, email, password);
+          }
+        } catch (err) {
+          alert('Authentication error: ' + err.message);
+        }
+      },
       renderOnboarding() {
         document.getElementById('app-container').innerHTML = `
-          <div class="glass-card p-8 rounded-3xl text-center">
-            <h2 class="text-2xl text-yellow-300 mb-4">Complete Your Profile</h2>
+          <div class="glass-card p-8 rounded-3xl max-w-md w-full text-center space-y-4">
+            <h2 class="font-heading text-2xl text-yellow-300">Complete Your Profile</h2>
+            <p class="text-sm text-white/70">Profile setup view active.</p>
           </div>
         `;
       }
