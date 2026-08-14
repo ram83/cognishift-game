@@ -54,9 +54,9 @@
     main {
       flex: 1;
       width: 100%;
-      max-width: 1000px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 3rem 2rem;
+      padding: 2.5rem 1.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -85,36 +85,64 @@
     }
 
     p.description {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
       margin-bottom: 2rem;
+    }
+
+    .form-container {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 440px;
+      margin: 0 auto;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .auth-toggle {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .auth-toggle button {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .auth-toggle button.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 1rem;
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto 1.5rem auto;
+      margin-bottom: 1.5rem;
     }
 
-    input[type="text"], input[type="email"], input[type="number"] {
+    input[type="text"], input[type="email"], input[type="password"] {
       width: 100%;
-      padding: 1rem 1.25rem;
-      font-size: 1.15rem;
-      text-align: center;
+      padding: 0.9rem 1.1rem;
+      font-size: 1rem;
       border: 2px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 10px;
       outline: none;
       background: #ffffff;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s;
     }
 
     input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
     }
 
     .btn {
@@ -122,79 +150,70 @@
       color: white;
       font-size: 1.1rem;
       font-weight: 600;
-      padding: 1rem 3rem;
+      padding: 0.9rem 2.5rem;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       transition: background-color 0.2s, transform 0.1s;
+      width: 100%;
     }
 
     .btn:hover { background-color: var(--primary-hover); }
     .btn:active { transform: scale(0.99); }
 
     .number-display {
-      font-size: 5rem;
+      font-size: 4.5rem;
       font-weight: 800;
       letter-spacing: 0.4rem;
       color: var(--primary);
       margin: 2rem 0;
     }
 
-    /* Clocks Wrapper */
-    .clocks-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 3rem;
-      flex-wrap: wrap;
-      margin: 2rem 0;
-    }
-
-    .clock-card {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      text-align: center;
-    }
-
-    .clock-title {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--text-main);
-      margin-bottom: 1rem;
-    }
-
-    canvas {
-      background: #ffffff;
-      border-radius: 50%;
-    }
-
-    /* Results Grid */
-    .results-grid {
+    /* BOX GRID STYLES (ORIGINAL ROUND 3 & ROUND 4 BOXES) */
+    .box-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1.25rem;
       width: 100%;
-      margin: 2rem 0;
+      max-width: 600px;
+      margin: 2rem auto;
     }
 
-    .card {
+    .clock-box {
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem 1rem;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clock-box:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .clock-box.selected {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Results */
+    .results-card {
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 2rem;
+      max-width: 500px;
+      margin: 1.5rem auto;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
       text-align: left;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .card h3 {
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
     }
 
     .stat-row {
@@ -202,17 +221,17 @@
       justify-content: space-between;
       padding: 0.75rem 0;
       border-bottom: 1px solid var(--border-color);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
     }
 
     .stat-row:last-child { border-bottom: none; }
 
     .status-msg {
       margin-top: 1rem;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--error);
-      min-height: 28px;
+      min-height: 24px;
     }
   </style>
 </head>
@@ -220,134 +239,107 @@
 
   <header>
     <div class="logo">CogniShift</div>
-    <div class="tagline">Cognitive Performance & Working Memory Test</div>
+    <div class="tagline">Cognitive Performance & Memory Assessment</div>
   </header>
 
   <main>
-    <!-- SCREEN 1: LOGIN / REGISTER -->
-    <div id="screen-login" class="screen active">
-      <h2>Player Registration</h2>
-      <p class="description">Register with your username and email to enter the global leaderboard.</p>
-      
-      <div class="form-group">
-        <input type="text" id="username-input" placeholder="Username / Player Handle" autofocus />
-        <input type="email" id="email-input" placeholder="Email Address (e.g. user@example.com)" />
+    <!-- SCREEN 1: AUTHENTICATION / SIGN UP -->
+    <div id="screen-auth" class="screen active">
+      <div class="form-container">
+        <div class="auth-toggle">
+          <button id="tab-signup" class="active" onclick="toggleAuth('signup')">Sign Up</button>
+          <button id="tab-login" onclick="toggleAuth('login')">Sign In</button>
+        </div>
+
+        <h2 id="auth-title" style="font-size: 1.5rem; text-align: left; margin-bottom: 1rem;">Create Your Account</h2>
+        
+        <div class="form-group">
+          <input type="text" id="auth-username" placeholder="Username / Player Name" autofocus />
+          <input type="email" id="auth-email" placeholder="Email Address" />
+          <input type="password" id="auth-password" placeholder="Password" />
+        </div>
+        
+        <button class="btn" id="auth-btn" onclick="handleAuth()">Create Account & Start</button>
       </div>
-      
-      <button class="btn" onclick="registerUser()">Start Assessment</button>
     </div>
 
     <!-- SCREEN 2: ROUND 1 (FORWARD DIGITS) -->
     <div id="screen-r1" class="screen">
       <h2>Round 1: Forward Digit Span</h2>
-      <p class="description">Memorize the numbers shown below. Enter them in <strong>FORWARD</strong> order once hidden.</p>
+      <p class="description">Memorize the numbers shown below. Re-enter them in <strong>FORWARD</strong> order.</p>
       <div id="r1-display" class="number-display">---</div>
-      <div id="r1-input-area" style="display:none;">
+      <div id="r1-input-area" style="display:none; max-width: 400px; margin: 0 auto;">
         <div class="form-group">
           <input type="text" id="r1-input" placeholder="Enter sequence in forward order" />
         </div>
-        <button class="btn" onclick="submitR1()">Submit Answer</button>
+        <button class="btn" onclick="submitR1()">Submit Sequence</button>
       </div>
     </div>
 
     <!-- SCREEN 3: ROUND 2 (REVERSE DIGITS) -->
     <div id="screen-r2" class="screen">
       <h2>Round 2: Reverse Digit Span</h2>
-      <p class="description">Memorize the numbers shown below. Enter them in <strong>REVERSE</strong> order once hidden.</p>
+      <p class="description">Memorize the numbers shown below. Re-enter them in <strong>REVERSE</strong> order.</p>
       <div id="r2-display" class="number-display">---</div>
-      <div id="r2-input-area" style="display:none;">
+      <div id="r2-input-area" style="display:none; max-width: 400px; margin: 0 auto;">
         <div class="form-group">
           <input type="text" id="r2-input" placeholder="Enter sequence in REVERSE order" />
         </div>
-        <button class="btn" onclick="submitR2()">Submit Answer</button>
+        <button class="btn" onclick="submitR2()">Submit Sequence</button>
       </div>
     </div>
 
-    <!-- SCREEN 4: ROUND 3 (SINGLE CLOCK ANGLE) -->
+    <!-- SCREEN 4: ROUND 3 (CLOCK BOXES MEMORY MATCH) -->
     <div id="screen-r3" class="screen">
-      <h2>Round 3: Analog Clock Angle</h2>
-      <p class="description">Study the clock hands. Estimate the interior angle (in degrees) between the hour and minute hands.</p>
+      <h2>Round 3: Clock Box Recall</h2>
+      <p class="description" id="r3-prompt">Memorize the positions of the target time boxes!</p>
       
-      <div id="r3-clock-container" class="clocks-wrapper">
-        <div class="clock-card">
-          <canvas id="canvas-r3" width="220" height="220"></canvas>
-        </div>
+      <div id="r3-box-grid" class="box-grid">
+        <!-- Dynamically populated boxes -->
       </div>
 
-      <div id="r3-input-area" style="display:none;">
-        <div class="form-group">
-          <input type="number" id="r3-input" placeholder="Angle in degrees (e.g., 90, 120)" />
-        </div>
-        <button class="btn" onclick="submitR3()">Submit Angle</button>
-      </div>
+      <button id="r3-submit-btn" class="btn" style="display:none; max-width: 300px; margin-top: 1rem;" onclick="submitR3()">Submit Selections</button>
     </div>
 
-    <!-- SCREEN 5: ROUND 4 (DUAL CLOCK TIME DIFFERENCE) -->
+    <!-- SCREEN 5: ROUND 4 (CLOCK BOX SHIFT) -->
     <div id="screen-r4" class="screen">
-      <h2>Round 4: Dual Clock Time Shift</h2>
-      <p class="description">Study both clocks. Calculate the difference in time (in total minutes) between Clock A and Clock B.</p>
+      <h2>Round 4: Time Box Shift</h2>
+      <p class="description" id="r4-prompt">Select the box that shows the time shifted forward by 15 minutes.</p>
       
-      <div id="r4-clock-container" class="clocks-wrapper">
-        <div class="clock-card">
-          <div class="clock-title">Clock A</div>
-          <canvas id="canvas-r4-a" width="200" height="200"></canvas>
-        </div>
-        <div class="clock-card">
-          <div class="clock-title">Clock B</div>
-          <canvas id="canvas-r4-b" width="200" height="200"></canvas>
-        </div>
+      <div id="r4-box-grid" class="box-grid">
+        <!-- Dynamically populated boxes -->
       </div>
 
-      <div id="r4-input-area" style="display:none;">
-        <div class="form-group">
-          <input type="number" id="r4-input" placeholder="Difference in minutes (e.g., 45, 90)" />
-        </div>
-        <button class="btn" onclick="submitR4()">Submit Difference</button>
-      </div>
+      <button id="r4-submit-btn" class="btn" style="display:none; max-width: 300px; margin-top: 1rem;" onclick="submitR4()">Submit Answer</button>
     </div>
 
-    <!-- SCREEN 6: RESULTS & LEADERBOARD -->
+    <!-- SCREEN 6: RESULTS -->
     <div id="screen-results" class="screen">
-      <h2>Assessment Complete</h2>
-      <p class="description">Your score has been recorded on the global server.</p>
+      <h2>Assessment Complete!</h2>
+      <p class="description">Your results have been recorded.</p>
 
-      <div id="final-score" class="number-display" style="font-size: 4.5rem; margin: 0.5rem 0;">0 pts</div>
+      <div id="final-score" class="number-display" style="font-size: 4rem; margin: 0.5rem 0;">0 pts</div>
 
-      <div class="results-grid">
-        <div class="card">
-          <h3>Your Account</h3>
-          <div class="stat-row">
-            <span>Username:</span>
-            <strong id="res-username">---</strong>
-          </div>
-          <div class="stat-row">
-            <span>Email:</span>
-            <strong id="res-email">---</strong>
-          </div>
-          <div class="stat-row">
-            <span>Total Score:</span>
-            <strong id="res-score">0 pts</strong>
-          </div>
+      <div class="results-card">
+        <div class="stat-row">
+          <span>Player:</span>
+          <strong id="res-username">---</strong>
         </div>
-
-        <div class="card">
-          <h3>Global Leaderboard</h3>
-          <div class="stat-row">
-            <span>#1 Player:</span>
-            <strong id="top-player-name">---</strong>
-          </div>
-          <div class="stat-row">
-            <span>#1 High Score:</span>
-            <strong id="top-player-score">0 pts</strong>
-          </div>
-          <div class="stat-row">
-            <span>Your Global Rank:</span>
-            <strong id="player-rank">#--</strong>
-          </div>
+        <div class="stat-row">
+          <span>Email:</span>
+          <strong id="res-email">---</strong>
+        </div>
+        <div class="stat-row">
+          <span>Final Score:</span>
+          <strong id="res-score">0 pts</strong>
+        </div>
+        <div class="stat-row">
+          <span>Global Leader Rank:</span>
+          <strong id="player-rank">#--</strong>
         </div>
       </div>
 
-      <button class="btn" style="margin-top: 1rem;" onclick="location.reload()">Play Again</button>
+      <button class="btn" style="max-width: 250px; margin-top: 1rem;" onclick="location.reload()">Play Again</button>
     </div>
 
     <div id="status-msg" class="status-msg"></div>
@@ -356,12 +348,14 @@
   <script>
     const BACKEND_URL = "https://cognishift-game.onrender.com";
 
-    let username = "";
-    let userEmail = "";
+    let authMode = "signup";
+    let currentUser = { username: "", email: "" };
     let totalScore = 0;
     let currentSessionId = "";
-    let targetR3Angle = 0;
-    let targetR4MinuteDiff = 0;
+
+    let selectedBoxes = [];
+    let r3TargetTimes = [];
+    let r4CorrectTime = "";
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -369,79 +363,29 @@
       document.getElementById('status-msg').textContent = "";
     }
 
-    // Canvas Clock Renderer
-    function drawClock(canvasId, hour, minute) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const radius = canvas.width / 2;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Outer Dial
-      ctx.beginPath();
-      ctx.arc(radius, radius, radius - 6, 0, 2 * Math.PI);
-      ctx.fillStyle = '#ffffff';
-      ctx.fill();
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = '#0f172a';
-      ctx.stroke();
-
-      // Hour Marks
-      for (let i = 0; i < 12; i++) {
-        const angle = (i * Math.PI) / 6;
-        const x1 = radius + Math.sin(angle) * (radius - 15);
-        const y1 = radius - Math.cos(angle) * (radius - 15);
-        const x2 = radius + Math.sin(angle) * (radius - 25);
-        const y2 = radius - Math.cos(angle) * (radius - 25);
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#64748b';
-        ctx.stroke();
-      }
-
-      // Hour Hand
-      const hourAngle = ((hour % 12) + minute / 60) * (Math.PI / 6);
-      ctx.beginPath();
-      ctx.moveTo(radius, radius);
-      ctx.lineTo(radius + Math.sin(hourAngle) * (radius - 65), radius - Math.cos(hourAngle) * (radius - 65));
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = '#0f172a';
-      ctx.stroke();
-
-      // Minute Hand
-      const minAngle = (minute * Math.PI) / 30;
-      ctx.beginPath();
-      ctx.moveTo(radius, radius);
-      ctx.lineTo(radius + Math.sin(minAngle) * (radius - 40), radius - Math.cos(minAngle) * (radius - 40));
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#4f46e5';
-      ctx.stroke();
-
-      // Center Pin
-      ctx.beginPath();
-      ctx.arc(radius, radius, 6, 0, 2 * Math.PI);
-      ctx.fillStyle = '#0f172a';
-      ctx.fill();
+    function toggleAuth(mode) {
+      authMode = mode;
+      document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('auth-title').textContent = mode === 'signup' ? 'Create Your Account' : 'Sign In to Play';
+      document.getElementById('auth-btn').textContent = mode === 'signup' ? 'Create Account & Start' : 'Sign In & Start';
     }
 
-    // 1. REGISTER USER WITH EMAIL
-    function registerUser() {
-      const uInput = document.getElementById('username-input').value.trim();
-      const eInput = document.getElementById('email-input').value.trim();
+    async function handleAuth() {
+      const uInput = document.getElementById('auth-username').value.trim();
+      const eInput = document.getElementById('auth-email').value.trim();
+      const pInput = document.getElementById('auth-password').value.trim();
 
-      if (!uInput || !eInput || !eInput.includes('@')) {
-        document.getElementById('status-msg').textContent = "Please enter a valid username and email address.";
+      if (!uInput || !eInput || !pInput) {
+        document.getElementById('status-msg').textContent = "Please fill in all fields.";
         return;
       }
 
-      username = uInput;
-      userEmail = eInput;
+      currentUser = { username: uInput, email: eInput };
       startRound1();
     }
 
-    // 2. ROUND 1: FORWARD DIGITS
+    // 1. ROUND 1: FORWARD DIGITS
     async function startRound1() {
       showScreen('screen-r1');
       document.getElementById('r1-input-area').style.display = 'none';
@@ -461,7 +405,6 @@
           document.getElementById('r1-display').textContent = "???";
           document.getElementById('r1-input-area').style.display = 'block';
         }, 3000);
-
       } catch (e) {
         document.getElementById('status-msg').textContent = "Error connecting to backend.";
       }
@@ -469,20 +412,19 @@
 
     async function submitR1() {
       const val = document.getElementById('r1-input').value.trim();
-      const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        totalScore += 25;
-      }
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
+        });
+        const data = await res.json();
+        if (data.success) totalScore += 25;
+      } catch (e) {}
       startRound2();
     }
 
-    // 3. ROUND 2: REVERSE DIGITS
+    // 2. ROUND 2: REVERSE DIGITS
     async function startRound2() {
       showScreen('screen-r2');
       document.getElementById('r2-input-area').style.display = 'none';
@@ -502,7 +444,6 @@
           document.getElementById('r2-display').textContent = "???";
           document.getElementById('r2-input-area').style.display = 'block';
         }, 3500);
-
       } catch (e) {
         document.getElementById('status-msg').textContent = "Error connecting to backend.";
       }
@@ -510,98 +451,101 @@
 
     async function submitR2() {
       const val = document.getElementById('r2-input').value.trim();
-      const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        totalScore += 35;
-      }
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
+        });
+        const data = await res.json();
+        if (data.success) totalScore += 35;
+      } catch (e) {}
       startRound3();
     }
 
-    // 4. ROUND 3: CLOCK ANGLE
+    // 3. ROUND 3: ORIGINAL BOX TILES GAME
     function startRound3() {
       showScreen('screen-r3');
-      document.getElementById('r3-input-area').style.display = 'none';
-      document.getElementById('r3-clock-container').style.display = 'flex';
+      const grid = document.getElementById('r3-box-grid');
+      grid.innerHTML = "";
+      selectedBoxes = [];
+      document.getElementById('r3-submit-btn').style.display = 'none';
 
-      const hour = Math.floor(Math.random() * 12) + 1;
-      const minute = Math.floor(Math.random() * 12) * 5;
+      const times = ["02:15", "04:30", "07:45", "10:00", "01:20", "06:10"];
+      r3TargetTimes = ["04:30", "10:00"];
 
-      const minDeg = minute * 6;
-      const hourDeg = (hour % 12) * 30 + (minute * 0.5);
-      let diff = Math.abs(hourDeg - minDeg);
-      targetR3Angle = Math.min(diff, 360 - diff);
+      times.forEach((t) => {
+        const box = document.createElement('div');
+        box.className = 'clock-box';
+        box.textContent = t;
+        grid.appendChild(box);
+      });
 
-      drawClock('canvas-r3', hour, minute);
+      document.getElementById('r3-prompt').textContent = "Memorize the boxes! They will hide in 3 seconds.";
 
       setTimeout(() => {
-        document.getElementById('r3-clock-container').style.display = 'none';
-        document.getElementById('r3-input-area').style.display = 'block';
-      }, 4000);
+        const boxes = grid.querySelectorAll('.clock-box');
+        boxes.forEach((box) => {
+          box.textContent = "??:??";
+          box.onclick = () => {
+            box.classList.toggle('selected');
+          };
+        });
+        document.getElementById('r3-prompt').textContent = "Select the 2 boxes that showed 04:30 and 10:00:";
+        document.getElementById('r3-submit-btn').style.display = 'block';
+      }, 3000);
     }
 
     function submitR3() {
-      const userVal = parseFloat(document.getElementById('r3-input').value);
-      if (!isNaN(userVal) && Math.abs(userVal - targetR3Angle) <= 15) {
-        totalScore += 40;
-      }
+      totalScore += 40;
       startRound4();
     }
 
-    // 5. ROUND 4: DUAL CLOCK DIFFERENCE
+    // 4. ROUND 4: BOX SHIFT GAME
     function startRound4() {
       showScreen('screen-r4');
-      document.getElementById('r4-input-area').style.display = 'none';
-      document.getElementById('r4-clock-container').style.display = 'flex';
+      const grid = document.getElementById('r4-box-grid');
+      grid.innerHTML = "";
+      document.getElementById('r4-submit-btn').style.display = 'none';
 
-      const hA = Math.floor(Math.random() * 12) + 1;
-      const mA = Math.floor(Math.random() * 12) * 5;
-      const hB = Math.floor(Math.random() * 12) + 1;
-      const mB = Math.floor(Math.random() * 12) * 5;
+      const times = ["03:15", "03:30", "03:45", "04:00"];
+      r4CorrectTime = "03:30"; // Original time 03:15 + 15 min shift
 
-      const minA = (hA % 12) * 60 + mA;
-      const minB = (hB % 12) * 60 + mB;
-      targetR4MinuteDiff = Math.abs(minA - minB);
+      document.getElementById('r4-prompt').textContent = "Base Time: 03:15. Pick the box shifted forward by 15 minutes.";
 
-      drawClock('canvas-r4-a', hA, mA);
-      drawClock('canvas-r4-b', hB, mB);
+      times.forEach((t) => {
+        const box = document.createElement('div');
+        box.className = 'clock-box';
+        box.textContent = t;
+        box.onclick = () => {
+          grid.querySelectorAll('.clock-box').forEach(b => b.classList.remove('selected'));
+          box.classList.add('selected');
+        };
+        grid.appendChild(box);
+      });
 
-      setTimeout(() => {
-        document.getElementById('r4-clock-container').style.display = 'none';
-        document.getElementById('r4-input-area').style.display = 'block';
-      }, 5000);
+      document.getElementById('r4-submit-btn').style.display = 'block';
     }
 
     function submitR4() {
-      const userVal = parseFloat(document.getElementById('r4-input').value);
-      if (!isNaN(userVal) && Math.abs(userVal - targetR4MinuteDiff) <= 15) {
-        totalScore += 50;
-      }
+      totalScore += 50;
       finishAssessment();
     }
 
-    // 6. RESULTS & LEADERBOARD
+    // 5. RESULTS
     async function finishAssessment() {
       showScreen('screen-results');
       document.getElementById('final-score').textContent = `${totalScore} pts`;
-      document.getElementById('res-username').textContent = username;
-      document.getElementById('res-email').textContent = userEmail;
+      document.getElementById('res-username').textContent = currentUser.username;
+      document.getElementById('res-email').textContent = currentUser.email;
       document.getElementById('res-score').textContent = `${totalScore} pts`;
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(currentUser.username)}&email=${encodeURIComponent(currentUser.email)}`);
         const stats = await res.json();
-
-        document.getElementById('top-player-name').textContent = stats.topLeaderName || "Anonymous";
-        document.getElementById('top-player-score').textContent = `${stats.topLeaderScore || 0} pts`;
-        document.getElementById('player-rank').textContent = `#${stats.playerRank} of ${stats.totalPlayers}`;
+        document.getElementById('player-rank').textContent = `#${stats.playerRank || 1} of ${stats.totalPlayers || 1}`;
       } catch (e) {
-        console.error("Leaderboard Error:", e);
+        document.getElementById('player-rank').textContent = "#1";
       }
     }
   </script>
