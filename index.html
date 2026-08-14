@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CogniShift | Mind Games</title>
+  <title>CogniShift | Mind Games & Memory Assessment</title>
   <style>
     :root {
       --primary: #4f46e5;
@@ -28,7 +28,6 @@
       flex-direction: column;
     }
 
-    /* Top Navigation Bar */
     header {
       width: 100%;
       padding: 1.25rem 3rem;
@@ -52,11 +51,10 @@
       font-weight: 500;
     }
 
-    /* Full Screen Main Canvas */
     main {
       flex: 1;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: 3rem 2rem;
       display: flex;
@@ -89,20 +87,27 @@
     p.description {
       font-size: 1.15rem;
       color: var(--text-muted);
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
-    /* Inputs & Buttons */
-    input[type="text"], input[type="number"] {
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
       width: 100%;
       max-width: 420px;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    input[type="text"], input[type="email"], input[type="number"] {
+      width: 100%;
       padding: 1rem 1.25rem;
-      font-size: 1.35rem;
+      font-size: 1.15rem;
       text-align: center;
       border: 2px solid var(--border-color);
       border-radius: 12px;
       outline: none;
-      margin-bottom: 1.5rem;
       background: #ffffff;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -135,55 +140,44 @@
       margin: 2rem 0;
     }
 
-    /* Clocks Section */
+    /* Clocks Wrapper */
     .clocks-wrapper {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 3rem;
       flex-wrap: wrap;
       margin: 2rem 0;
     }
 
-    .clock-box {
+    .clock-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       text-align: center;
     }
 
     .clock-title {
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-main);
+      margin-bottom: 1rem;
     }
 
-    .clock-container {
-      width: 200px;
-      height: 200px;
-      border: 6px solid var(--text-main);
-      border-radius: 50%;
-      position: relative;
+    canvas {
       background: #ffffff;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      border-radius: 50%;
     }
 
-    .hand {
-      position: absolute;
-      bottom: 50%;
-      left: 50%;
-      transform-origin: bottom center;
-      background: var(--text-main);
-      border-radius: 4px;
-    }
-
-    .hour-hand { width: 6px; height: 55px; }
-    .minute-hand { width: 4px; height: 80px; background: var(--primary); }
-
-    /* Results / Leaderboard Grid */
+    /* Results Grid */
     .results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
       width: 100%;
-      max-width: 900px;
-      margin: 2rem auto;
+      margin: 2rem 0;
     }
 
     .card {
@@ -214,7 +208,7 @@
     .stat-row:last-child { border-bottom: none; }
 
     .status-msg {
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       font-size: 1.1rem;
       font-weight: 600;
       color: var(--error);
@@ -226,61 +220,64 @@
 
   <header>
     <div class="logo">CogniShift</div>
-    <div class="tagline">Cognitive Performance & Memory Assessment</div>
+    <div class="tagline">Cognitive Performance & Working Memory Test</div>
   </header>
 
   <main>
-    <!-- SCREEN 1: LOGIN -->
+    <!-- SCREEN 1: LOGIN / REGISTER -->
     <div id="screen-login" class="screen active">
       <h2>Player Registration</h2>
-      <p class="description">Enter your username or handle to track your global standing across all 4 rounds.</p>
-      <div>
-        <input type="text" id="username-input" placeholder="e.g. Alex" autofocus />
+      <p class="description">Register with your username and email to enter the global leaderboard.</p>
+      
+      <div class="form-group">
+        <input type="text" id="username-input" placeholder="Username / Player Handle" autofocus />
+        <input type="email" id="email-input" placeholder="Email Address (e.g. user@example.com)" />
       </div>
+      
       <button class="btn" onclick="registerUser()">Start Assessment</button>
     </div>
 
     <!-- SCREEN 2: ROUND 1 (FORWARD DIGITS) -->
     <div id="screen-r1" class="screen">
-      <h2>Round 1: Forward Memory</h2>
-      <p class="description">Memorize the digit sequence below. Enter them in <strong>FORWARD</strong> order when they disappear.</p>
+      <h2>Round 1: Forward Digit Span</h2>
+      <p class="description">Memorize the numbers shown below. Enter them in <strong>FORWARD</strong> order once hidden.</p>
       <div id="r1-display" class="number-display">---</div>
       <div id="r1-input-area" style="display:none;">
-        <input type="text" id="r1-input" placeholder="Type digits in forward order" />
-        <br/>
+        <div class="form-group">
+          <input type="text" id="r1-input" placeholder="Enter sequence in forward order" />
+        </div>
         <button class="btn" onclick="submitR1()">Submit Answer</button>
       </div>
     </div>
 
     <!-- SCREEN 3: ROUND 2 (REVERSE DIGITS) -->
     <div id="screen-r2" class="screen">
-      <h2>Round 2: Reverse Memory</h2>
-      <p class="description">Memorize the digit sequence below. Enter them in <strong>REVERSE</strong> order when they disappear.</p>
+      <h2>Round 2: Reverse Digit Span</h2>
+      <p class="description">Memorize the numbers shown below. Enter them in <strong>REVERSE</strong> order once hidden.</p>
       <div id="r2-display" class="number-display">---</div>
       <div id="r2-input-area" style="display:none;">
-        <input type="text" id="r2-input" placeholder="Type digits in REVERSE order" />
-        <br/>
+        <div class="form-group">
+          <input type="text" id="r2-input" placeholder="Enter sequence in REVERSE order" />
+        </div>
         <button class="btn" onclick="submitR2()">Submit Answer</button>
       </div>
     </div>
 
     <!-- SCREEN 4: ROUND 3 (SINGLE CLOCK ANGLE) -->
     <div id="screen-r3" class="screen">
-      <h2>Round 3: Single Clock Angle</h2>
-      <p class="description">Memorize the clock hands position. Calculate the angle in degrees between the hour and minute hands.</p>
+      <h2>Round 3: Analog Clock Angle</h2>
+      <p class="description">Study the clock hands. Estimate the interior angle (in degrees) between the hour and minute hands.</p>
       
-      <div id="clock-display-1" class="clocks-wrapper">
-        <div class="clock-box">
-          <div class="clock-container">
-            <div id="r3-hour-hand" class="hand hour-hand"></div>
-            <div id="r3-minute-hand" class="hand minute-hand"></div>
-          </div>
+      <div id="r3-clock-container" class="clocks-wrapper">
+        <div class="clock-card">
+          <canvas id="canvas-r3" width="220" height="220"></canvas>
         </div>
       </div>
 
       <div id="r3-input-area" style="display:none;">
-        <input type="number" id="r3-input" placeholder="Angle in degrees (e.g. 90, 120)" />
-        <br/>
+        <div class="form-group">
+          <input type="number" id="r3-input" placeholder="Angle in degrees (e.g., 90, 120)" />
+        </div>
         <button class="btn" onclick="submitR3()">Submit Angle</button>
       </div>
     </div>
@@ -288,28 +285,23 @@
     <!-- SCREEN 5: ROUND 4 (DUAL CLOCK TIME DIFFERENCE) -->
     <div id="screen-r4" class="screen">
       <h2>Round 4: Dual Clock Time Shift</h2>
-      <p class="description">Memorize both clocks. Determine how many minutes of time difference exist between Clock A and Clock B.</p>
+      <p class="description">Study both clocks. Calculate the difference in time (in total minutes) between Clock A and Clock B.</p>
       
-      <div id="clock-display-2" class="clocks-wrapper">
-        <div class="clock-box">
+      <div id="r4-clock-container" class="clocks-wrapper">
+        <div class="clock-card">
           <div class="clock-title">Clock A</div>
-          <div class="clock-container">
-            <div id="r4-hour-hand-a" class="hand hour-hand"></div>
-            <div id="r4-minute-hand-a" class="hand minute-hand"></div>
-          </div>
+          <canvas id="canvas-r4-a" width="200" height="200"></canvas>
         </div>
-        <div class="clock-box">
+        <div class="clock-card">
           <div class="clock-title">Clock B</div>
-          <div class="clock-container">
-            <div id="r4-hour-hand-b" class="hand hour-hand"></div>
-            <div id="r4-minute-hand-b" class="hand minute-hand"></div>
-          </div>
+          <canvas id="canvas-r4-b" width="200" height="200"></canvas>
         </div>
       </div>
 
       <div id="r4-input-area" style="display:none;">
-        <input type="number" id="r4-input" placeholder="Time difference in minutes (e.g. 45, 90)" />
-        <br/>
+        <div class="form-group">
+          <input type="number" id="r4-input" placeholder="Difference in minutes (e.g., 45, 90)" />
+        </div>
         <button class="btn" onclick="submitR4()">Submit Difference</button>
       </div>
     </div>
@@ -317,31 +309,35 @@
     <!-- SCREEN 6: RESULTS & LEADERBOARD -->
     <div id="screen-results" class="screen">
       <h2>Assessment Complete</h2>
-      <p class="description">Here is your overall performance breakdown across all rounds.</p>
+      <p class="description">Your score has been recorded on the global server.</p>
 
-      <div id="final-score" class="number-display" style="font-size: 4rem; margin: 0.5rem 0;">0 pts</div>
+      <div id="final-score" class="number-display" style="font-size: 4.5rem; margin: 0.5rem 0;">0 pts</div>
 
       <div class="results-grid">
         <div class="card">
-          <h3>Your Performance</h3>
+          <h3>Your Account</h3>
           <div class="stat-row">
-            <span>Player Handle:</span>
+            <span>Username:</span>
             <strong id="res-username">---</strong>
           </div>
           <div class="stat-row">
-            <span>Total Points:</span>
+            <span>Email:</span>
+            <strong id="res-email">---</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total Score:</span>
             <strong id="res-score">0 pts</strong>
           </div>
         </div>
 
         <div class="card">
-          <h3>Global Standings</h3>
+          <h3>Global Leaderboard</h3>
           <div class="stat-row">
-            <span>Global #1 Leader:</span>
+            <span>#1 Player:</span>
             <strong id="top-player-name">---</strong>
           </div>
           <div class="stat-row">
-            <span>Top Score:</span>
+            <span>#1 High Score:</span>
             <strong id="top-player-score">0 pts</strong>
           </div>
           <div class="stat-row">
@@ -361,6 +357,7 @@
     const BACKEND_URL = "https://cognishift-game.onrender.com";
 
     let username = "";
+    let userEmail = "";
     let totalScore = 0;
     let currentSessionId = "";
     let targetR3Angle = 0;
@@ -372,14 +369,75 @@
       document.getElementById('status-msg').textContent = "";
     }
 
-    // 1. LOGIN
+    // Canvas Clock Renderer
+    function drawClock(canvasId, hour, minute) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const radius = canvas.width / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Outer Dial
+      ctx.beginPath();
+      ctx.arc(radius, radius, radius - 6, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = '#0f172a';
+      ctx.stroke();
+
+      // Hour Marks
+      for (let i = 0; i < 12; i++) {
+        const angle = (i * Math.PI) / 6;
+        const x1 = radius + Math.sin(angle) * (radius - 15);
+        const y1 = radius - Math.cos(angle) * (radius - 15);
+        const x2 = radius + Math.sin(angle) * (radius - 25);
+        const y2 = radius - Math.cos(angle) * (radius - 25);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#64748b';
+        ctx.stroke();
+      }
+
+      // Hour Hand
+      const hourAngle = ((hour % 12) + minute / 60) * (Math.PI / 6);
+      ctx.beginPath();
+      ctx.moveTo(radius, radius);
+      ctx.lineTo(radius + Math.sin(hourAngle) * (radius - 65), radius - Math.cos(hourAngle) * (radius - 65));
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#0f172a';
+      ctx.stroke();
+
+      // Minute Hand
+      const minAngle = (minute * Math.PI) / 30;
+      ctx.beginPath();
+      ctx.moveTo(radius, radius);
+      ctx.lineTo(radius + Math.sin(minAngle) * (radius - 40), radius - Math.cos(minAngle) * (radius - 40));
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#4f46e5';
+      ctx.stroke();
+
+      // Center Pin
+      ctx.beginPath();
+      ctx.arc(radius, radius, 6, 0, 2 * Math.PI);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+    }
+
+    // 1. REGISTER USER WITH EMAIL
     function registerUser() {
-      const input = document.getElementById('username-input').value.trim();
-      if (!input) {
-        document.getElementById('status-msg').textContent = "Please enter a valid username.";
+      const uInput = document.getElementById('username-input').value.trim();
+      const eInput = document.getElementById('email-input').value.trim();
+
+      if (!uInput || !eInput || !eInput.includes('@')) {
+        document.getElementById('status-msg').textContent = "Please enter a valid username and email address.";
         return;
       }
-      username = input;
+
+      username = uInput;
+      userEmail = eInput;
       startRound1();
     }
 
@@ -402,10 +460,10 @@
         setTimeout(() => {
           document.getElementById('r1-display').textContent = "???";
           document.getElementById('r1-input-area').style.display = 'block';
-        }, 2500);
+        }, 3000);
 
       } catch (e) {
-        document.getElementById('status-msg').textContent = "Error connecting to Render backend.";
+        document.getElementById('status-msg').textContent = "Error connecting to backend.";
       }
     }
 
@@ -420,10 +478,8 @@
 
       if (data.success) {
         totalScore += 25;
-        startRound2();
-      } else {
-        finishAssessment();
       }
+      startRound2();
     }
 
     // 3. ROUND 2: REVERSE DIGITS
@@ -445,10 +501,10 @@
         setTimeout(() => {
           document.getElementById('r2-display').textContent = "???";
           document.getElementById('r2-input-area').style.display = 'block';
-        }, 2800);
+        }, 3500);
 
       } catch (e) {
-        document.getElementById('status-msg').textContent = "Error connecting to Render backend.";
+        document.getElementById('status-msg').textContent = "Error connecting to backend.";
       }
     }
 
@@ -463,102 +519,89 @@
 
       if (data.success) {
         totalScore += 35;
-        startRound3();
-      } else {
-        finishAssessment();
       }
+      startRound3();
     }
 
-    // 4. ROUND 3: SINGLE CLOCK ANGLE
+    // 4. ROUND 3: CLOCK ANGLE
     function startRound3() {
       showScreen('screen-r3');
       document.getElementById('r3-input-area').style.display = 'none';
-      document.getElementById('clock-display-1').style.display = 'flex';
+      document.getElementById('r3-clock-container').style.display = 'flex';
 
       const hour = Math.floor(Math.random() * 12) + 1;
       const minute = Math.floor(Math.random() * 12) * 5;
 
-      const minuteAngle = minute * 6;
-      const hourAngle = (hour % 12) * 30 + (minute * 0.5);
-
-      let diff = Math.abs(hourAngle - minuteAngle);
+      const minDeg = minute * 6;
+      const hourDeg = (hour % 12) * 30 + (minute * 0.5);
+      let diff = Math.abs(hourDeg - minDeg);
       targetR3Angle = Math.min(diff, 360 - diff);
 
-      document.getElementById('r3-hour-hand').style.transform = `rotate(${hourAngle}deg)`;
-      document.getElementById('r3-minute-hand').style.transform = `rotate(${minuteAngle}deg)`;
+      drawClock('canvas-r3', hour, minute);
 
       setTimeout(() => {
-        document.getElementById('clock-display-1').style.display = 'none';
+        document.getElementById('r3-clock-container').style.display = 'none';
         document.getElementById('r3-input-area').style.display = 'block';
-      }, 3200);
+      }, 4000);
     }
 
     function submitR3() {
-      const userAngle = parseFloat(document.getElementById('r3-input').value);
-      if (!isNaN(userAngle) && Math.abs(userAngle - targetR3Angle) <= 15) {
+      const userVal = parseFloat(document.getElementById('r3-input').value);
+      if (!isNaN(userVal) && Math.abs(userVal - targetR3Angle) <= 15) {
         totalScore += 40;
       }
       startRound4();
     }
 
-    // 5. ROUND 4: DUAL CLOCK TIME DIFFERENCE
+    // 5. ROUND 4: DUAL CLOCK DIFFERENCE
     function startRound4() {
       showScreen('screen-r4');
       document.getElementById('r4-input-area').style.display = 'none';
-      document.getElementById('clock-display-2').style.display = 'flex';
+      document.getElementById('r4-clock-container').style.display = 'flex';
 
-      // Clock A
       const hA = Math.floor(Math.random() * 12) + 1;
       const mA = Math.floor(Math.random() * 12) * 5;
-      const minAngleA = mA * 6;
-      const hrAngleA = (hA % 12) * 30 + (mA * 0.5);
-
-      // Clock B
       const hB = Math.floor(Math.random() * 12) + 1;
       const mB = Math.floor(Math.random() * 12) * 5;
-      const minAngleB = mB * 6;
-      const hrAngleB = (hB % 12) * 30 + (mB * 0.5);
 
-      // Total minutes calculation
-      const totalMinA = (hA % 12) * 60 + mA;
-      const totalMinB = (hB % 12) * 60 + mB;
-      targetR4MinuteDiff = Math.abs(totalMinA - totalMinB);
+      const minA = (hA % 12) * 60 + mA;
+      const minB = (hB % 12) * 60 + mB;
+      targetR4MinuteDiff = Math.abs(minA - minB);
 
-      document.getElementById('r4-hour-hand-a').style.transform = `rotate(${hrAngleA}deg)`;
-      document.getElementById('r4-minute-hand-a').style.transform = `rotate(${minAngleA}deg)`;
-      document.getElementById('r4-hour-hand-b').style.transform = `rotate(${hrAngleB}deg)`;
-      document.getElementById('r4-minute-hand-b').style.transform = `rotate(${minAngleB}deg)`;
+      drawClock('canvas-r4-a', hA, mA);
+      drawClock('canvas-r4-b', hB, mB);
 
       setTimeout(() => {
-        document.getElementById('clock-display-2').style.display = 'none';
+        document.getElementById('r4-clock-container').style.display = 'none';
         document.getElementById('r4-input-area').style.display = 'block';
-      }, 4000);
+      }, 5000);
     }
 
     function submitR4() {
-      const userDiff = parseFloat(document.getElementById('r4-input').value);
-      if (!isNaN(userDiff) && Math.abs(userDiff - targetR4MinuteDiff) <= 15) {
+      const userVal = parseFloat(document.getElementById('r4-input').value);
+      if (!isNaN(userVal) && Math.abs(userVal - targetR4MinuteDiff) <= 15) {
         totalScore += 50;
       }
       finishAssessment();
     }
 
-    // 6. FINISH & FETCH LEADERBOARD
+    // 6. RESULTS & LEADERBOARD
     async function finishAssessment() {
       showScreen('screen-results');
       document.getElementById('final-score').textContent = `${totalScore} pts`;
       document.getElementById('res-username').textContent = username;
+      document.getElementById('res-email').textContent = userEmail;
       document.getElementById('res-score').textContent = `${totalScore} pts`;
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(username)}`);
+        const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(userEmail)}`);
         const stats = await res.json();
 
         document.getElementById('top-player-name').textContent = stats.topLeaderName || "Anonymous";
         document.getElementById('top-player-score').textContent = `${stats.topLeaderScore || 0} pts`;
         document.getElementById('player-rank').textContent = `#${stats.playerRank} of ${stats.totalPlayers}`;
       } catch (e) {
-        console.error("Leaderboard fetch error:", e);
+        console.error("Leaderboard Error:", e);
       }
     }
   </script>
