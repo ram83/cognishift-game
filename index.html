@@ -7,29 +7,87 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
-  
-  <!-- EmailJS SDK for Client-Side Emailing -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script type="text/javascript">
-    (function() {
-      // Replace with your EmailJS Public Key from https://dashboard.emailjs.com/
-      emailjs.init("YOUR_PUBLIC_KEY");
-    })();
+
+  <!-- FIREBASE SDKs (v10 Modular via CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut, 
+      sendPasswordResetEmail, 
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      query, 
+      orderBy, 
+      limit, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 🔑 REPLACE WITH YOUR FIREBASE CONFIG KEYS
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
+  authDomain: "mindgames-f116a.firebaseapp.com",
+  projectId: "mindgames-f116a",
+  storageBucket: "mindgames-f116a.firebasestorage.app",
+  messagingSenderId: "296415432842",
+  appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
+  measurementId: "G-HC8N4Y4R49"
+};
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Make Firebase methods globally accessible to UI functions
+    window.fbAuth = auth;
+    window.fbDb = db;
+    window.fbCreateUser = createUserWithEmailAndPassword;
+    window.fbSignIn = signInWithEmailAndPassword;
+    window.fbSignOut = signOut;
+    window.fbResetPassword = sendPasswordResetEmail;
+    window.fbUpdateProfile = updateProfile;
+    window.fbAddDoc = addDoc;
+    window.fbGetDocs = getDocs;
+    window.fbCollection = collection;
+    window.fbQuery = query;
+    window.fbOrderBy = orderBy;
+    window.fbLimit = limit;
+    window.fbTimestamp = serverTimestamp;
+
+    // Monitor Auth State Changes
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.currentUser = user;
+        showDashboard();
+      } else {
+        window.currentUser = null;
+        navigateTo('screen-auth');
+      }
+    });
   </script>
 
   <style>
-    /* STRICT UNIFIED COLOR SYSTEM */
     :root {
-      --bg-dark: #0f172a;       /* Dark Slate Background */
-      --card-bg: #1e293b;       /* Surface Card */
-      --card-border: #334155;   /* Border Line */
-      --primary: #6366f1;       /* Indigo Primary */
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #6366f1;
       --primary-hover: #4f46e5;
-      --accent: #06b6d4;        /* Cyan Highlight */
-      --success: #10b981;       /* Green Match */
-      --danger: #ef4444;        /* Red No-Match */
-      --text-main: #f8fafc;     /* White Heading */
-      --text-muted: #94a3b8;    /* Subtext */
+      --accent: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -86,7 +144,6 @@
     .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
     .link-btn { background: none; border: none; color: var(--accent); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 0.5rem; display: inline-block; }
-
     .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
     .success-msg { color: var(--success); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
 
@@ -117,7 +174,7 @@
     <!-- SCREEN 1: AUTHENTICATION -->
     <div id="screen-auth" class="screen active">
       <h1 class="brand-title">CogniShift</h1>
-      <p class="brand-subtitle">Authentication Portal</p>
+      <p class="brand-subtitle">Firebase Authentication</p>
 
       <div class="auth-tabs">
         <div id="tab-signin" class="auth-tab active" onclick="switchAuthMode('signin')">Sign In</div>
@@ -127,8 +184,8 @@
       <!-- Sign In Form -->
       <form id="form-signin" onsubmit="handleSignIn(event)">
         <div class="form-group">
-          <label class="form-label">Username</label>
-          <input type="text" id="signin-user" class="input-field" required placeholder="Enter username">
+          <label class="form-label">Email</label>
+          <input type="email" id="signin-email" class="input-field" required placeholder="name@example.com">
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
@@ -147,12 +204,12 @@
           <input type="text" id="signup-user" class="input-field" required placeholder="Choose username" maxlength="15">
         </div>
         <div class="form-group">
-          <label class="form-label">Email Address</label>
+          <label class="form-label">Email</label>
           <input type="email" id="signup-email" class="input-field" required placeholder="name@example.com">
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" id="signup-pass" class="input-field" required placeholder="Create password">
+          <input type="password" id="signup-pass" class="input-field" required placeholder="Min. 6 characters">
         </div>
         <button type="submit" class="btn btn-primary">Create Account</button>
       </form>
@@ -169,7 +226,7 @@
       <button class="btn btn-primary" onclick="navigateTo('screen-game'); startNewGame();">Play Stroop Speed Test</button>
 
       <div style="margin-top: 2rem;">
-        <h3 style="font-size: 1rem; color: var(--text-main);">Global Leaderboard</h3>
+        <h3 style="font-size: 1rem; color: var(--text-main);">Global Leaderboard (Firebase)</h3>
         <table class="leader-table">
           <thead>
             <tr><th>Rank</th><th>Player</th><th>Score</th></tr>
@@ -205,11 +262,11 @@
   <div id="modal-forgot" class="modal-overlay">
     <div class="modal-card">
       <h3 style="margin-bottom: 0.5rem; color: var(--text-main);">Reset Password</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Enter your registered username to receive your password via email.</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Enter your email address to receive a secure Firebase reset link.</p>
       
       <div class="form-group">
-        <label class="form-label">Username</label>
-        <input type="text" id="forgot-username" class="input-field" placeholder="Enter username">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="forgot-email" class="input-field" placeholder="name@example.com">
       </div>
 
       <button class="btn btn-primary" onclick="sendPasswordReset()">Send Reset Email</button>
@@ -227,22 +284,13 @@
       { name: 'YELLOW', hex: '#eab308' }
     ];
 
-    let currentSessionUser = sessionStorage.getItem('cognishift_session') || '';
     let currentScore = 0;
     let timer = 30;
     let timerInterval = null;
     let isMatch = false;
 
-    window.onload = () => {
-      if (currentSessionUser) {
-        showDashboard();
-      } else {
-        navigateTo('screen-auth');
-      }
-    };
-
     function navigateTo(screenId) {
-      if ((screenId === 'screen-home' || screenId === 'screen-game') && !currentSessionUser) {
+      if ((screenId === 'screen-home' || screenId === 'screen-game') && !window.currentUser) {
         screenId = 'screen-auth';
       }
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -269,53 +317,67 @@
       document.getElementById('auth-success').style.display = 'none';
     }
 
-    function getUsersDB() {
-      return JSON.parse(localStorage.getItem('cognishift_db_users') || '{}');
-    }
-
-    function handleSignUp(e) {
+    /* FIREBASE AUTH ACTIONS */
+    async function handleSignUp(e) {
       e.preventDefault();
-      const user = document.getElementById('signup-user').value.trim();
+      const userStr = document.getElementById('signup-user').value.trim();
       const email = document.getElementById('signup-email').value.trim();
       const pass = document.getElementById('signup-pass').value.trim();
       const errEl = document.getElementById('auth-error');
 
-      const users = getUsersDB();
-      if (users[user]) {
-        errEl.textContent = 'Username already exists. Please Sign In.';
+      try {
+        const userCred = await window.fbCreateUser(window.fbAuth, email, pass);
+        await window.fbUpdateProfile(userCred.user, { displayName: userStr });
+        window.currentUser = userCred.user;
+        showDashboard();
+      } catch (err) {
+        errEl.textContent = err.message.replace("Firebase: ", "");
         errEl.style.display = 'block';
-        return;
       }
-
-      // Store object with password and email
-      users[user] = { password: pass, email: email };
-      localStorage.setItem('cognishift_db_users', JSON.stringify(users));
-      
-      setSession(user);
     }
 
-    function handleSignIn(e) {
+    async function handleSignIn(e) {
       e.preventDefault();
-      const user = document.getElementById('signin-user').value.trim();
+      const email = document.getElementById('signin-email').value.trim();
       const pass = document.getElementById('signin-pass').value.trim();
       const errEl = document.getElementById('auth-error');
 
-      const users = getUsersDB();
-      const record = users[user];
-
-      // Support legacy string format or new object format
-      const storedPass = typeof record === 'object' ? record.password : record;
-
-      if (!record || storedPass !== pass) {
-        errEl.textContent = 'Invalid username or password.';
+      try {
+        await window.fbSignIn(window.fbAuth, email, pass);
+      } catch (err) {
+        errEl.textContent = "Invalid email or password.";
         errEl.style.display = 'block';
+      }
+    }
+
+    async function sendPasswordReset() {
+      const email = document.getElementById('forgot-email').value.trim();
+      const msgEl = document.getElementById('modal-msg');
+
+      if (!email) {
+        msgEl.textContent = "Please enter your email address.";
+        msgEl.style.display = 'block';
         return;
       }
 
-      setSession(user);
+      try {
+        await window.fbResetPassword(window.fbAuth, email);
+        closeForgotModal();
+        const successEl = document.getElementById('auth-success');
+        successEl.textContent = `Password reset link sent to ${email}`;
+        successEl.style.display = 'block';
+      } catch (err) {
+        msgEl.textContent = err.message.replace("Firebase: ", "");
+        msgEl.style.display = 'block';
+      }
     }
 
-    /* FORGOT PASSWORD WORKFLOW */
+    function handleLogout() {
+      window.fbSignOut(window.fbAuth);
+      stopGame();
+      navigateTo('screen-auth');
+    }
+
     function openForgotModal() {
       document.getElementById('modal-forgot').classList.add('active');
       document.getElementById('modal-msg').style.display = 'none';
@@ -325,65 +387,9 @@
       document.getElementById('modal-forgot').classList.remove('active');
     }
 
-    function sendPasswordReset() {
-      const user = document.getElementById('forgot-username').value.trim();
-      const msgEl = document.getElementById('modal-msg');
-      const users = getUsersDB();
-      const record = users[user];
-
-      if (!record) {
-        msgEl.textContent = 'Username not found.';
-        msgEl.style.color = 'var(--danger)';
-        msgEl.style.display = 'block';
-        return;
-      }
-
-      const email = typeof record === 'object' ? record.email : null;
-      const pass = typeof record === 'object' ? record.password : record;
-
-      if (!email) {
-        msgEl.textContent = `User found. Password: ${pass} (No email on record).`;
-        msgEl.style.color = 'var(--accent)';
-        msgEl.style.display = 'block';
-        return;
-      }
-
-      // Trigger EmailJS dispatch
-      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        to_email: email,
-        to_name: user,
-        user_password: pass
-      })
-      .then(() => {
-        closeForgotModal();
-        const successEl = document.getElementById('auth-success');
-        successEl.textContent = `Password sent to ${email}!`;
-        successEl.style.display = 'block';
-      })
-      .catch((err) => {
-        // Fallback display if EmailJS isn't configured with real keys yet
-        msgEl.textContent = `Email service notice: Password is '${pass}'`;
-        msgEl.style.color = 'var(--accent)';
-        msgEl.style.display = 'block';
-      });
-    }
-
-    function setSession(user) {
-      currentSessionUser = user;
-      sessionStorage.setItem('cognishift_session', user);
-      hideAuthMsgs();
-      showDashboard();
-    }
-
-    function handleLogout() {
-      sessionStorage.removeItem('cognishift_session');
-      currentSessionUser = '';
-      stopGame();
-      navigateTo('screen-auth');
-    }
-
     function showDashboard() {
-      document.getElementById('user-display-name').textContent = currentSessionUser;
+      const name = window.currentUser.displayName || window.currentUser.email.split('@')[0];
+      document.getElementById('user-display-name').textContent = name;
       renderLeaderboard();
       navigateTo('screen-home');
     }
@@ -403,7 +409,7 @@
         document.getElementById('time-val').textContent = `${timer}s`;
         if (timer <= 0) {
           stopGame();
-          saveScore(currentSessionUser, currentScore);
+          saveScore(currentScore);
           alert(`Game Over! Final Score: ${currentScore}`);
           showDashboard();
         }
@@ -436,26 +442,48 @@
       nextQuestion();
     }
 
-    function saveScore(user, score) {
-      const scores = JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
-      scores.push({ user, score, date: new Date().toLocaleDateString() });
-      scores.sort((a, b) => b.score - a.score);
-      localStorage.setItem('cognishift_scores', JSON.stringify(scores.slice(0, 5)));
+    /* FIRESTORE LEADERBOARD ACTIONS */
+    async function saveScore(score) {
+      try {
+        const username = window.currentUser.displayName || window.currentUser.email.split('@')[0];
+        await window.fbAddDoc(window.fbCollection(window.fbDb, "scores"), {
+          user: username,
+          score: score,
+          createdAt: window.fbTimestamp()
+        });
+      } catch (e) {
+        console.error("Error saving score to Firebase: ", e);
+      }
     }
 
-    function renderLeaderboard() {
-      const scores = JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
+    async function renderLeaderboard() {
       const tbody = document.getElementById('leaderboard-body');
-      tbody.innerHTML = scores.length ? '' : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No high scores recorded</td></tr>';
-      
-      scores.forEach((s, idx) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>#${idx + 1}</td>
-            <td>${escapeHTML(s.user)}</td>
-            <td>${s.score}</td>
-          </tr>`;
-      });
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">Loading scores...</td></tr>';
+
+      try {
+        const q = window.fbQuery(
+          window.fbCollection(window.fbDb, "scores"), 
+          window.fbOrderBy("score", "desc"), 
+          window.fbLimit(5)
+        );
+        const querySnapshot = await window.fbGetDocs(q);
+        
+        tbody.innerHTML = querySnapshot.empty ? 
+          '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No high scores recorded</td></tr>' : '';
+
+        let idx = 1;
+        querySnapshot.forEach((doc) => {
+          const s = doc.data();
+          tbody.innerHTML += `
+            <tr>
+              <td>#${idx++}</td>
+              <td>${escapeHTML(s.user)}</td>
+              <td>${s.score}</td>
+            </tr>`;
+        });
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--danger)">Error loading scores</td></tr>';
+      }
     }
 
     function escapeHTML(str) {
