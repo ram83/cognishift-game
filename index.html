@@ -3,663 +3,274 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniShift — Brain Training & Focus Engine</title>
+  <title>CogniShift</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  
   <style>
+    /* STRICT COLOR PALETTE (Locked) */
     :root {
-      --bg-dark: #090d16;
-      --card-bg: rgba(18, 26, 43, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --primary: #6366f1;
+      --bg-dark: #0f172a;       /* Dark Slate Background */
+      --card-bg: #1e293b;       /* Card Surface */
+      --card-border: #334155;   /* Subtle Border */
+      --primary: #6366f1;       /* Indigo Main Action */
       --primary-hover: #4f46e5;
-      --accent: #06b6d4;
-      --accent-glow: rgba(6, 182, 212, 0.35);
-      --danger: #f43f5e;
-      --success: #10b981;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --gold: #fbbf24;
-      --silver: #94a3b8;
-      --bronze: #d97706;
+      --accent: #06b6d4;        /* Cyan Highlights */
+      --success: #10b981;       /* Green Match */
+      --danger: #ef4444;        /* Red No Match */
+      --text-main: #f8fafc;     /* Primary Text */
+      --text-muted: #94a3b8;    /* Secondary Text */
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 
-    body {
-      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #090d16 70%);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      overflow-x: hidden;
-    }
-
-    /* Ambient Background Glow */
-    body::before {
-      content: '';
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      background: var(--primary);
-      filter: blur(140px);
-      opacity: 0.25;
-      top: 10%;
-      left: 20%;
-      border-radius: 50%;
-      z-index: -1;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 900px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    @media (min-width: 850px) {
-      .app-container {
-        grid-template-columns: 1.2fr 0.8fr;
-      }
-    }
-
-    /* Glassmorphism Panels */
-    .panel {
+    /* Container & Cards */
+    .app-card {
       background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 2rem;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      position: relative;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .brand-title {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff 30%, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-subtitle {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
-    }
-
-    /* Game HUD */
-    .hud {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 0.875rem 1.25rem;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      margin-bottom: 1.5rem;
-    }
-
-    .hud-stat {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .hud-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      font-weight: 700;
-    }
-
-    .hud-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    /* Timer Bar */
-    .timer-container {
+      border-radius: 20px;
+      padding: 2.5rem;
       width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 99px;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
+      max-width: 480px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    .timer-bar {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--primary));
-      transition: width 0.1s linear, background 0.3s;
-      border-radius: 99px;
-    }
+    .brand-title { font-size: 2rem; font-weight: 800; color: var(--text-main); text-align: center; }
+    .brand-subtitle { font-size: 0.875rem; color: var(--text-muted); text-align: center; margin-bottom: 2rem; }
 
-    /* Game Stage */
-    .stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 260px;
-      text-align: center;
-    }
+    /* Screen Management */
+    .screen { display: none; }
+    .screen.active { display: block; }
 
-    .target-word {
-      font-size: 3rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      margin-bottom: 1rem;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .prompt-text {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .controls {
-      display: flex;
-      gap: 1rem;
-      width: 100%;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 1rem;
-      border: none;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .btn-match {
-      background: var(--success);
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
-    }
-
-    .btn-match:hover {
-      background: #059669;
-      transform: translateY(-2px);
-    }
-
-    .btn-no-match {
-      background: var(--danger);
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(244, 63, 94, 0.25);
-    }
-
-    .btn-no-match:hover {
-      background: #e11d48;
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      width: 100%;
-      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-    }
-
-    /* Leaderboard Styles */
-    .tabs {
-      display: flex;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 0.25rem;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 0.5rem;
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      border-radius: 8px;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-
-    .tab.active {
-      background: var(--card-bg);
-      color: #fff;
-      border: 1px solid var(--card-border);
-    }
-
-    .leaderboard-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      max-height: 280px;
-      overflow-y: auto;
-      padding-right: 0.25rem;
-    }
-
-    .leaderboard-list::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .leaderboard-list::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-    }
-
-    .leader-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 12px;
-      font-size: 0.875rem;
-    }
-
-    .leader-item.is-user {
-      border-color: var(--accent);
-      background: rgba(6, 182, 212, 0.08);
-    }
-
-    .rank {
-      font-weight: 800;
-      width: 24px;
-      color: var(--text-muted);
-    }
-
-    .rank-1 { color: var(--gold); }
-    .rank-2 { color: var(--silver); }
-    .rank-3 { color: var(--bronze); }
-
-    .leader-name {
-      flex: 1;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
-
-    .leader-score {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .user-rank-card {
-      margin-top: 1rem;
-      padding: 0.875rem;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15));
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-    }
-
-    /* Modal / Overlay screens */
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: var(--bg-dark);
-      border-radius: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      z-index: 10;
-      text-align: center;
-    }
-
+    /* Form Controls & Buttons */
     .input-field {
       width: 100%;
       padding: 0.875rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
+      background: #0f172a;
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: 10px;
       color: #fff;
       font-size: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       outline: none;
-      transition: border 0.2s;
     }
+    .input-field:focus { border-color: var(--primary); }
 
-    .input-field:focus {
-      border-color: var(--primary);
+    .btn {
+      width: 100%;
+      padding: 0.875rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
     }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); margin-top: 0.75rem; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
-    .hidden { display: none !important; }
+    /* HUD */
+    .hud { display: flex; justify-content: space-between; background: #0f172a; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
+    .hud-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+    .hud-val { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; }
+
+    /* Game Stage */
+    .game-target { font-size: 2.75rem; font-weight: 800; text-align: center; margin: 2rem 0; min-height: 60px; }
+    .game-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn-match { background: var(--success); color: #fff; }
+    .btn-no-match { background: var(--danger); color: #fff; }
+
+    /* Leaderboard Table */
+    .leader-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+    .leader-table th { text-align: left; color: var(--text-muted); padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
+    .leader-table td { padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .leader-table td:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700; }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
+  <div class="app-card">
     
-    <!-- MAIN GAME PANEL -->
-    <div class="panel">
-      <div class="header">
-        <h1 class="brand-title">CogniShift</h1>
-        <p class="brand-subtitle">Stroop Effect Focus Test</p>
-      </div>
-
-      <!-- HUD -->
-      <div class="hud">
-        <div class="hud-stat">
-          <span class="hud-label">Score</span>
-          <span class="hud-value" id="score-display">0</span>
-        </div>
-        <div class="hud-stat">
-          <span class="hud-label">Time</span>
-          <span class="hud-value" id="time-display">30s</span>
-        </div>
-        <div class="hud-stat">
-          <span class="hud-label">Streak</span>
-          <span class="hud-value" id="streak-display">0x</span>
-        </div>
-      </div>
-
-      <!-- Timer Bar -->
-      <div class="timer-container">
-        <div class="timer-bar" id="timer-bar"></div>
-      </div>
-
-      <!-- Stage -->
-      <div class="stage">
-        <div class="prompt-text">Does the text meaning match the ink color?</div>
-        <div class="target-word" id="target-word">READY?</div>
-      </div>
-
-      <!-- Game Controls -->
-      <div class="controls" id="game-controls">
-        <button class="btn btn-no-match" onclick="submitAnswer(false)">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-          No Match
-        </button>
-        <button class="btn btn-match" onclick="submitAnswer(true)">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-          Match
-        </button>
-      </div>
-
-      <!-- Start/End Overlay -->
-      <div class="overlay" id="start-overlay">
-        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Train Your Focus</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 300px;">
-          Decide quickly if the text matches its display color before time expires!
-        </p>
-        <input type="text" id="player-name" class="input-field" placeholder="Enter your display name" maxlength="15">
-        <button class="btn btn-primary" onclick="startGame()">Start Session</button>
-      </div>
+    <!-- STEP 1: LOGIN / IDENTITY SCREEN -->
+    <div id="screen-login" class="screen active">
+      <h1 class="brand-title">CogniShift</h1>
+      <p class="brand-subtitle">Enter your profile name to begin</p>
+      
+      <input type="text" id="username-input" class="input-field" placeholder="Username (e.g., Player1)" maxlength="15">
+      <button class="btn btn-primary" onclick="handleLogin()">Continue to Dashboard</button>
     </div>
 
-    <!-- LEADERBOARD PANEL -->
-    <div class="panel">
-      <h2 style="font-size: 1.25rem; margin-bottom: 1rem; font-weight: 700;">Leaderboards</h2>
+    <!-- STEP 2: HOMEPAGE / DASHBOARD SCREEN -->
+    <div id="screen-home" class="screen">
+      <h1 class="brand-title">Dashboard</h1>
+      <p class="brand-subtitle">Welcome back, <span id="user-display-name" style="color: var(--accent);"></span>!</p>
+
+      <button class="btn btn-primary" onclick="navigateTo('screen-game'); startNewGame();">Play Stroop Speed Test</button>
       
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab('global')" id="tab-global">Global</div>
-        <div class="tab" onclick="switchTab('local')" id="tab-local">Local Best</div>
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1rem; color: var(--text-main);">Global High Scores</h3>
+        <table class="leader-table">
+          <thead>
+            <tr><th>Rank</th><th>Player</th><th>Score</th></tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
       </div>
 
-      <ul class="leaderboard-list" id="leaderboard-list">
-        <!-- Rendered via JS -->
-      </ul>
+      <button class="btn btn-secondary" onclick="handleLogout()">Switch Account</button>
+    </div>
 
-      <div class="user-rank-card">
-        <div>
-          <span style="color: var(--text-muted); display: block; font-size: 0.75rem;">YOUR GLOBAL RANK</span>
-          <strong id="user-rank-text">#--</strong>
-        </div>
-        <div style="text-align: right;">
-          <span style="color: var(--text-muted); display: block; font-size: 0.75rem;">HIGH SCORE</span>
-          <strong id="user-best-text" style="color: var(--accent);">0</strong>
-        </div>
+    <!-- STEP 3: GAME SCREEN -->
+    <div id="screen-game" class="screen">
+      <div class="hud">
+        <div><div class="hud-label">Score</div><div class="hud-val" id="score-val">0</div></div>
+        <div><div class="hud-label">Time</div><div class="hud-val" id="time-val" style="color: var(--accent);">30s</div></div>
       </div>
+
+      <p style="text-align: center; color: var(--text-muted); font-size: 0.875rem;">Does text meaning match the ink color?</p>
+      <div class="game-target" id="game-target">---</div>
+
+      <div class="game-controls">
+        <button class="btn btn-no-match" onclick="submitChoice(false)">No Match</button>
+        <button class="btn btn-match" onclick="submitChoice(true)">Match</button>
+      </div>
+
+      <button class="btn btn-secondary" onclick="navigateTo('screen-home')" style="margin-top: 1.5rem;">Quit Session</button>
     </div>
 
   </div>
 
   <script>
-    // Config & State
-    const GAME_DURATION = 30; // Seconds
+    /* STABLE STATE */
     const COLORS = [
-      { name: 'RED', hex: '#f43f5e' },
+      { name: 'RED', hex: '#ef4444' },
       { name: 'BLUE', hex: '#3b82f6' },
       { name: 'GREEN', hex: '#10b981' },
-      { name: 'YELLOW', hex: '#fbbf24' },
-      { name: 'PURPLE', hex: '#a855f7' }
+      { name: 'YELLOW', hex: '#eab308' }
     ];
 
-    // Mock Global Leaderboard Data
-    const mockGlobalLeaders = [
-      { name: "NeuroMaster", score: 2450 },
-      { name: "FocusNinja", score: 2100 },
-      { name: "SynapsePro", score: 1850 },
-      { name: "AlphaBrain", score: 1600 },
-      { name: "CogniChief", score: 1350 }
-    ];
-
-    let score = 0;
-    let streak = 0;
-    let timeRemaining = GAME_DURATION;
+    let currentUser = localStorage.getItem('cognishift_user') || '';
+    let currentScore = 0;
+    let timer = 30;
     let timerInterval = null;
-    let currentMatchState = false;
-    let activeTab = 'global';
-    let playerName = localStorage.getItem('cognishift_player') || '';
+    let isMatch = false;
 
-    // Elements
-    const targetWordEl = document.getElementById('target-word');
-    const scoreDisplay = document.getElementById('score-display');
-    const timeDisplay = document.getElementById('time-display');
-    const streakDisplay = document.getElementById('streak-display');
-    const timerBar = document.getElementById('timer-bar');
-    const startOverlay = document.getElementById('start-overlay');
-    const playerNameInput = document.getElementById('player-name');
-    const leaderboardList = document.getElementById('leaderboard-list');
-
-    // Initialization
-    if (playerName) playerNameInput.value = playerName;
-    renderLeaderboard();
-
-    function startGame() {
-      const inputName = playerNameInput.value.trim();
-      if (!inputName) {
-        alert("Please enter a display name!");
-        return;
+    // Boot Up Check
+    window.onload = () => {
+      if (currentUser) {
+        showDashboard();
+      } else {
+        navigateTo('screen-login');
       }
-      playerName = inputName;
-      localStorage.setItem('cognishift_player', playerName);
+    };
 
-      score = 0;
-      streak = 0;
-      timeRemaining = GAME_DURATION;
+    /* NAVIGATION LOGIC */
+    function navigateTo(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    /* AUTH LOGIC */
+    function handleLogin() {
+      const input = document.getElementById('username-input').value.trim();
+      if (!input) return alert('Please enter a username.');
       
-      scoreDisplay.textContent = score;
-      streakDisplay.textContent = '0x';
-      timeDisplay.textContent = `${timeRemaining}s`;
-      timerBar.style.width = '100%';
+      currentUser = input;
+      localStorage.setItem('cognishift_user', currentUser);
+      showDashboard();
+    }
 
-      startOverlay.classList.add('hidden');
-      nextRound();
+    function handleLogout() {
+      localStorage.removeItem('cognishift_user');
+      currentUser = '';
+      navigateTo('screen-login');
+    }
+
+    function showDashboard() {
+      document.getElementById('user-display-name').textContent = currentUser;
+      renderLeaderboard();
+      navigateTo('screen-home');
+    }
+
+    /* GAME LOGIC */
+    function startNewGame() {
+      currentScore = 0;
+      timer = 30;
+      document.getElementById('score-val').textContent = '0';
+      document.getElementById('time-val').textContent = '30s';
+      
+      nextQuestion();
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        timeRemaining -= 0.1;
-        timeDisplay.textContent = `${Math.max(0, Math.ceil(timeRemaining))}s`;
-        timerBar.style.width = `${(timeRemaining / GAME_DURATION) * 100}%`;
-
-        if (timeRemaining <= 0) {
-          endGame();
+        timer--;
+        document.getElementById('time-val').textContent = `${timer}s`;
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          saveScore(currentUser, currentScore);
+          alert(`Time's up! Final Score: ${currentScore}`);
+          showDashboard();
         }
-      }, 100);
+      }, 1000);
     }
 
-    function nextRound() {
-      // Pick random text and color
+    function nextQuestion() {
       const textObj = COLORS[Math.floor(Math.random() * COLORS.length)];
       const colorObj = COLORS[Math.floor(Math.random() * COLORS.length)];
+      
+      isMatch = Math.random() < 0.5;
+      const targetEl = document.getElementById('game-target');
+      
+      targetEl.textContent = textObj.name;
+      targetEl.style.color = isMatch ? textObj.hex : colorObj.hex;
+    }
 
-      // 50% chance to force a true match
-      currentMatchState = Math.random() < 0.5;
-
-      if (currentMatchState) {
-        targetWordEl.textContent = textObj.name;
-        targetWordEl.style.color = textObj.hex;
+    function submitChoice(userChoice) {
+      if (timer <= 0) return;
+      if (userChoice === isMatch) {
+        currentScore += 100;
       } else {
-        // Ensure they don't match
-        let distinctColor = colorObj;
-        while (distinctColor.name === textObj.name) {
-          distinctColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-        }
-        targetWordEl.textContent = textObj.name;
-        targetWordEl.style.color = distinctColor.hex;
+        currentScore = Math.max(0, currentScore - 50);
       }
-
-      // Quick animation pop
-      targetWordEl.style.transform = 'scale(0.95)';
-      setTimeout(() => targetWordEl.style.transform = 'scale(1)', 50);
+      document.getElementById('score-val').textContent = currentScore;
+      nextQuestion();
     }
 
-    function submitAnswer(userSaysMatch) {
-      if (timeRemaining <= 0) return;
-
-      if (userSaysMatch === currentMatchState) {
-        streak++;
-        score += 100 + (streak * 10); // Streak bonus
-      } else {
-        streak = 0;
-        score = Math.max(0, score - 50);
-      }
-
-      scoreDisplay.textContent = score;
-      streakDisplay.textContent = `${streak}x`;
-      nextRound();
-    }
-
-    function endGame() {
-      clearInterval(timerInterval);
-      saveLocalScore(playerName, score);
-      renderLeaderboard();
-
-      startOverlay.innerHTML = `
-        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Session Complete</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Final Score</p>
-        <div style="font-size: 3rem; font-weight: 800; color: var(--accent); margin-bottom: 1.5rem;">${score}</div>
-        <button class="btn btn-primary" onclick="resetOverlay()">Play Again</button>
-      `;
-      startOverlay.classList.remove('hidden');
-    }
-
-    function resetOverlay() {
-      startOverlay.innerHTML = `
-        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Train Your Focus</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 300px;">
-          Decide quickly if the text matches its display color before time expires!
-        </p>
-        <input type="text" id="player-name" class="input-field" placeholder="Enter your display name" maxlength="15" value="${playerName}">
-        <button class="btn btn-primary" onclick="startGame()">Start Session</button>
-      `;
-    }
-
-    /* Leaderboard Logic */
-    function getLocalScores() {
+    /* DATA PERSISTENCE & LEADERBOARD */
+    function getScores() {
       return JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
     }
 
-    function saveLocalScore(name, score) {
-      const scores = getLocalScores();
-      scores.push({ name, score, date: new Date().toISOString() });
+    function saveScore(user, score) {
+      const scores = getScores();
+      scores.push({ user, score });
       scores.sort((a, b) => b.score - a.score);
-      localStorage.setItem('cognishift_scores', JSON.stringify(scores.slice(0, 10)));
-    }
-
-    function switchTab(tab) {
-      activeTab = tab;
-      document.getElementById('tab-global').classList.toggle('active', tab === 'global');
-      document.getElementById('tab-local').classList.toggle('active', tab === 'local');
-      renderLeaderboard();
+      localStorage.setItem('cognishift_scores', JSON.stringify(scores.slice(0, 5)));
     }
 
     function renderLeaderboard() {
-      leaderboardList.innerHTML = '';
+      const scores = getScores();
+      const tbody = document.getElementById('leaderboard-body');
+      tbody.innerHTML = scores.length ? '' : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No high scores yet</td></tr>';
       
-      let list = activeTab === 'global' ? [...mockGlobalLeaders] : getLocalScores();
-
-      // Insert current player into global view mock if active
-      if (activeTab === 'global' && playerName) {
-        const localBest = getLocalScores()[0]?.score || 0;
-        if (localBest > 0 && !list.some(i => i.name === playerName)) {
-          list.push({ name: playerName, score: localBest });
-          list.sort((a, b) => b.score - a.score);
-        }
-      }
-
-      list.forEach((item, index) => {
-        const isUser = item.name === playerName;
-        const rankClass = index < 3 ? `rank-${index + 1}` : '';
-        
-        const li = document.createElement('li');
-        li.className = `leader-item ${isUser ? 'is-user' : ''}`;
-        li.innerHTML = `
-          <span class="rank ${rankClass}">#${index + 1}</span>
-          <span class="leader-name">${escapeHTML(item.name)}</span>
-          <span class="leader-score">${item.score}</span>
-        `;
-        leaderboardList.appendChild(li);
+      scores.forEach((s, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>#${idx + 1}</td>
+            <td>${escapeHTML(s.user)}</td>
+            <td>${s.score}</td>
+          </tr>`;
       });
-
-      // Update User Rank Card
-      const userBest = getLocalScores()[0]?.score || 0;
-      document.getElementById('user-best-text').textContent = userBest;
-      
-      const allGlobal = [...mockGlobalLeaders];
-      if (userBest > 0 && !allGlobal.some(i => i.name === playerName)) {
-        allGlobal.push({ name: playerName, score: userBest });
-        allGlobal.sort((a, b) => b.score - a.score);
-      }
-      
-      const userRank = allGlobal.findIndex(i => i.name === playerName) + 1;
-      document.getElementById('user-rank-text').textContent = userRank > 0 ? `#${userRank}` : '#--';
     }
 
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
   </script>
 </body>
