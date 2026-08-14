@@ -11,98 +11,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
-  <!-- FIREBASE SDKs (v10 Modular via CDN) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword, 
-      signOut, 
-      sendPasswordResetEmail, 
-      onAuthStateChanged,
-      updateProfile
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      addDoc, 
-      getDocs, 
-      collection, 
-      query, 
-      where, 
-      orderBy, 
-      limit, 
-      serverTimestamp,
-      increment
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // 🔑 REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
-  authDomain: "mindgames-f116a.firebaseapp.com",
-  projectId: "mindgames-f116a",
-  storageBucket: "mindgames-f116a.firebasestorage.app",
-  messagingSenderId: "296415432842",
-  appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
-  measurementId: "G-HC8N4Y4R49"
-};
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Bind Firebase methods globally
-    window.fbAuth = auth;
-    window.fbDb = db;
-    window.fbCreateUser = createUserWithEmailAndPassword;
-    window.fbSignIn = signInWithEmailAndPassword;
-    window.fbSignOut = signOut;
-    window.fbResetPassword = sendPasswordResetEmail;
-    window.fbUpdateProfile = updateProfile;
-    window.fbDoc = doc;
-    window.fbGetDoc = getDoc;
-    window.fbSetDoc = setDoc;
-    window.fbAddDoc = addDoc;
-    window.fbGetDocs = getDocs;
-    window.fbCollection = collection;
-    window.fbQuery = query;
-    window.fbWhere = where;
-    window.fbOrderBy = orderBy;
-    window.fbLimit = limit;
-    window.fbTimestamp = serverTimestamp;
-    window.fbIncrement = increment;
-
-    // Monitor Auth State
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        window.currentUser = user;
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (!userDocSnap.exists() || !userDocSnap.data().profileCompleted) {
-            window.app.renderOnboarding();
-          } else {
-            window.currentUserData = userDocSnap.data();
-            window.app.updateHeader();
-            window.app.navToWelcome();
-          }
-        } catch (e) {
-          console.error("Auth state update error:", e);
-        }
-      } else {
-        window.currentUser = null;
-        window.currentUserData = null;
-        document.getElementById('header-profile').classList.add('hidden');
-        window.app.renderAuth('signin');
-      }
-    });
-  </script>
-
   <script>
     tailwind.config = {
       theme: {
@@ -201,7 +109,7 @@ const firebaseConfig = {
     CogniKids &copy; 2026 • Fun Cognitive Skill Training for Kids
   </footer>
 
-  <!-- Application Logic -->
+  <!-- Application Logic & Firebase Integration -->
   <script>
     // --- AUDIO SYNTHESIZER FOR SFX ---
     const sfx = {
@@ -238,7 +146,6 @@ const firebaseConfig = {
       }
     };
 
-    // --- AVATAR & FUN FACTS DATA ---
     const AVATARS = [
       { id: 'dragon', name: 'Dragon', icon: '🐉' },
       { id: 'mermaid', name: 'Mermaid', icon: '🧜‍♀️' },
@@ -272,7 +179,6 @@ const firebaseConfig = {
       "Look who's back! The legendary {name} is here to break records!"
     ];
 
-    // --- STATE MANAGEMENT ---
     const state = {
       currentSessionScore: 0,
       activeGameIndex: 0,
@@ -290,9 +196,11 @@ const firebaseConfig = {
     }
 
     // --- MAIN APP CONTROLLER ---
-    const app = {
+    window.app = {
       logout() {
-        window.fbSignOut(window.fbAuth);
+        if (window.fbSignOut && window.fbAuth) {
+          window.fbSignOut(window.fbAuth);
+        }
       },
 
       updateHeader() {
@@ -310,7 +218,6 @@ const firebaseConfig = {
         document.getElementById('nav-rank').textContent = `${rank.title} ${rank.badge}`;
       },
 
-      // --- VIEW 1: AUTHENTICATION ---
       renderAuth(mode = 'signin') {
         const container = document.getElementById('app-container');
         container.innerHTML = `
@@ -324,7 +231,6 @@ const firebaseConfig = {
               </p>
             </div>
 
-            <!-- Tab Switcher -->
             ${mode !== 'forgot' ? `
             <div class="flex bg-white/10 p-1 rounded-2xl mb-6">
               <button onclick="sfx.click(); app.renderAuth('signin')" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all ${mode === 'signin' ? 'bg-brand-purple text-white shadow-lg' : 'text-white/60 hover:text-white'}">Sign In</button>
@@ -420,7 +326,6 @@ const firebaseConfig = {
         }
       },
 
-      // --- VIEW 2: FIRST-TIME ONBOARDING ---
       renderOnboarding() {
         const container = document.getElementById('app-container');
         container.innerHTML = `
@@ -528,7 +433,6 @@ const firebaseConfig = {
         }
       },
 
-      // --- VIEW 3: DYNAMIC WELCOME & DYNAMIC FUN FACT ---
       navToWelcome() {
         this.updateHeader();
         const container = document.getElementById('app-container');
@@ -555,7 +459,6 @@ const firebaseConfig = {
         `;
       },
 
-      // --- VIEW 4: MAIN DASHBOARD ---
       navToDashboard() {
         this.updateHeader();
         const container = document.getElementById('app-container');
@@ -602,7 +505,6 @@ const firebaseConfig = {
         `;
       },
 
-      // --- SESSION & GAME ENGINE ---
       startSessionSequence() {
         state.currentSessionScore = 0;
         state.activeGameIndex = 0;
@@ -610,7 +512,6 @@ const firebaseConfig = {
         this.playGame1();
       },
 
-      // --- GAME 1: REVERSE DIGIT MEMORY ---
       playGame1(level = 1) {
         const container = document.getElementById('app-container');
         const digitCount = level + 1;
@@ -760,11 +661,97 @@ const firebaseConfig = {
         `;
       }
     };
+  </script>
 
-    // Initialize on load
-    window.onload = () => {
-      // Auth state listener handles initial view render automatically via Firebase onAuthStateChanged
-    };
+  <!-- FIREBASE SDKs & Auth Listener (Loaded after window.app is defined) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut, 
+      sendPasswordResetEmail, 
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      addDoc, 
+      getDocs, 
+      collection, 
+      query, 
+      where, 
+      orderBy, 
+      limit, 
+      serverTimestamp,
+      increment
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 🔑 REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
+  authDomain: "mindgames-f116a.firebaseapp.com",
+  projectId: "mindgames-f116a",
+  storageBucket: "mindgames-f116a.firebasestorage.app",
+  messagingSenderId: "296415432842",
+  appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
+  measurementId: "G-HC8N4Y4R49"
+};
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+
+    // Bind Firebase methods globally
+    window.fbAuth = auth;
+    window.fbDb = db;
+    window.fbCreateUser = createUserWithEmailAndPassword;
+    window.fbSignIn = signInWithEmailAndPassword;
+    window.fbSignOut = signOut;
+    window.fbResetPassword = sendPasswordResetEmail;
+    window.fbUpdateProfile = updateProfile;
+    window.fbDoc = doc;
+    window.fbGetDoc = getDoc;
+    window.fbSetDoc = setDoc;
+    window.fbAddDoc = addDoc;
+    window.fbGetDocs = getDocs;
+    window.fbCollection = collection;
+    window.fbQuery = query;
+    window.fbWhere = where;
+    window.fbOrderBy = orderBy;
+    window.fbLimit = limit;
+    window.fbTimestamp = serverTimestamp;
+    window.fbIncrement = increment;
+
+    // Monitor Auth State safely now that window.app is fully initialized
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        window.currentUser = user;
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (!userDocSnap.exists() || !userDocSnap.data().profileCompleted) {
+            window.app.renderOnboarding();
+          } else {
+            window.currentUserData = userDocSnap.data();
+            window.app.updateHeader();
+            window.app.navToWelcome();
+          }
+        } catch (e) {
+          console.error("Auth state update error:", e);
+        }
+      } else {
+        window.currentUser = null;
+        window.currentUserData = null;
+        document.getElementById('header-profile').classList.add('hidden');
+        window.app.renderAuth('signin');
+      }
+    });
   </script>
 </body>
 </html>
