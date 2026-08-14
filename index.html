@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniShift | Cognitive Speed Test</title>
+  <title>CogniShift | Cognitive Assessment Platform</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
 
   <!-- FIREBASE SDKs (v10 Modular via CDN) -->
   <script type="module">
@@ -22,13 +23,18 @@
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
       getFirestore, 
-      collection, 
+      doc, 
+      getDoc, 
+      setDoc, 
       addDoc, 
       getDocs, 
+      collection, 
       query, 
+      where, 
       orderBy, 
       limit, 
-      serverTimestamp 
+      serverTimestamp,
+      increment
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // 🔑 REPLACE WITH YOUR FIREBASE CONFIG KEYS
@@ -41,14 +47,14 @@ const firebaseConfig = {
   messagingSenderId: "296415432842",
   appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
   measurementId: "G-HC8N4Y4R49"
-};
+};R_APP_ID"
+    };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Make Firebase methods globally accessible to UI functions
+    // Bind Firebase methods globally
     window.fbAuth = auth;
     window.fbDb = db;
     window.fbCreateUser = createUserWithEmailAndPassword;
@@ -56,21 +62,36 @@ const firebaseConfig = {
     window.fbSignOut = signOut;
     window.fbResetPassword = sendPasswordResetEmail;
     window.fbUpdateProfile = updateProfile;
+    window.fbDoc = doc;
+    window.fbGetDoc = getDoc;
+    window.fbSetDoc = setDoc;
     window.fbAddDoc = addDoc;
     window.fbGetDocs = getDocs;
     window.fbCollection = collection;
     window.fbQuery = query;
+    window.fbWhere = where;
     window.fbOrderBy = orderBy;
     window.fbLimit = limit;
     window.fbTimestamp = serverTimestamp;
+    window.fbIncrement = increment;
 
-    // Monitor Auth State Changes
-    onAuthStateChanged(auth, (user) => {
+    // Monitor Auth State
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         window.currentUser = user;
-        showDashboard();
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (!userDocSnap.exists() || !userDocSnap.data().profileCompleted) {
+          navigateTo('screen-onboarding');
+        } else {
+          window.currentUserData = userDocSnap.data();
+          loadDashboardData();
+          navigateTo('screen-home');
+        }
       } else {
         window.currentUser = null;
+        window.currentUserData = null;
         navigateTo('screen-auth');
       }
     });
@@ -78,227 +99,394 @@ const firebaseConfig = {
 
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --card-border: #334155;
+      --bg-dark: #090d16;
+      --card-bg: #131c2e;
+      --card-border: #22314d;
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.25);
       --success: #10b981;
       --danger: #ef4444;
+      --warning: #f59e0b;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem 1rem; }
 
+    .app-container { width: 100%; max-width: 900px; margin: 0 auto; }
+    
     .app-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 2.5rem;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
       position: relative;
+      overflow: hidden;
     }
 
-    .brand-title { font-size: 2rem; font-weight: 800; color: var(--text-main); text-align: center; }
-    .brand-subtitle { font-size: 0.875rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; }
+    .brand-title { font-size: 2.25rem; font-weight: 800; text-align: center; letter-spacing: -0.025em; background: linear-gradient(135deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand-subtitle { font-size: 0.9rem; color: var(--text-muted); text-align: center; margin-bottom: 2rem; font-weight: 500; }
 
     .screen { display: none; }
     .screen.active { display: block; }
 
-    .auth-tabs { display: flex; background: var(--bg-dark); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; }
-    .auth-tab { flex: 1; text-align: center; padding: 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
-    .auth-tab.active { background: var(--card-bg); color: var(--text-main); }
+    /* Auth & Navigation Layouts */
+    .auth-tabs { display: flex; background: var(--bg-dark); border-radius: 12px; padding: 4px; margin-bottom: 1.5rem; border: 1px solid var(--card-border); }
+    .auth-tab { flex: 1; text-align: center; padding: 0.75rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+    .auth-tab.active { background: var(--card-bg); color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem; }
-    .input-field {
+    .form-group { margin-bottom: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .input-field, .select-field {
       width: 100%;
       padding: 0.875rem 1rem;
       background: var(--bg-dark);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border-radius: 12px;
       color: #fff;
       font-size: 0.95rem;
       outline: none;
+      transition: border-color 0.2s;
     }
-    .input-field:focus { border-color: var(--primary); }
+    .input-field:focus, .select-field:focus { border-color: var(--accent); }
 
     .btn {
       width: 100%;
-      padding: 0.875rem;
+      padding: 0.95rem 1.25rem;
       border: none;
-      border-radius: 10px;
-      font-size: 1rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
-    .btn-primary { background: var(--primary); color: #fff; margin-top: 0.5rem; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); margin-top: 0.75rem; }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35); }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); }
     .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); }
+    .btn-danger { background: var(--danger); color: #fff; }
 
-    .link-btn { background: none; border: none; color: var(--accent); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 0.5rem; display: inline-block; }
-    .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
-    .success-msg { color: var(--success); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+    .link-btn { background: none; border: none; color: var(--accent); font-size: 0.85rem; cursor: pointer; text-decoration: underline; margin-top: 0.75rem; font-weight: 600; }
+    .status-msg { font-size: 0.85rem; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; text-align: center; display: none; }
+    .status-msg.error { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .status-msg.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    /* Modal Styling */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    /* Dashboard & Metrics UI */
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 1.25rem; }
+    .user-welcome { font-size: 1.25rem; font-weight: 800; }
+    .user-tag { display: inline-block; font-size: 0.75rem; background: rgba(6, 182, 212, 0.15); color: var(--accent); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 700; margin-left: 0.5rem; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .stat-card { background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; text-align: center; }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 800; color: var(--accent); }
+
+    .section-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+    
+    /* Game Hub Selection Cards */
+    .game-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2rem; }
+    .game-card { background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; transition: border-color 0.2s; position: relative; }
+    .game-card:hover { border-color: var(--accent); }
+    .game-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .game-title { font-size: 1.15rem; font-weight: 800; color: #fff; }
+    .game-badge { background: rgba(99, 102, 241, 0.2); color: var(--primary); font-size: 0.7rem; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 700; }
+    .game-desc { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.5; }
+    .game-actions { display: flex; gap: 0.75rem; }
+
+    /* Reverse Memory Interactive Stage */
+    .game-hud { display: flex; justify-content: space-between; background: var(--bg-dark); padding: 1rem 1.5rem; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 2rem; }
+    .hud-box { text-align: center; }
+    .hud-lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+    .hud-num { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 800; color: #fff; }
+
+    .memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; max-width: 360px; margin: 0 auto 2rem auto; }
+    .grid-tile {
+      aspect-ratio: 1;
+      background: var(--bg-dark);
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: transparent;
+    }
+    .grid-tile.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); transform: scale(0.96); }
+    .grid-tile.user-click { background: var(--primary); border-color: var(--primary); transform: scale(0.94); }
+    .grid-tile.error-flash { background: var(--danger) !important; border-color: var(--danger) !important; }
+
+    /* Modals & Overlays */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
     .modal-overlay.active { display: flex; }
-    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 400px; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+    .modal-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; }
+    .modal-body ul { margin-left: 1.25rem; margin-top: 0.5rem; }
+    .modal-body li { margin-bottom: 0.5rem; }
 
-    /* Game Stage & HUD */
-    .hud { display: flex; justify-content: space-between; background: var(--bg-dark); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
-    .hud-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
-    .hud-val { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; }
-    .game-target { font-size: 2.75rem; font-weight: 800; text-align: center; margin: 2rem 0; min-height: 60px; }
-    .game-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .btn-match { background: var(--success); color: #fff; }
-    .btn-no-match { background: var(--danger); color: #fff; }
-
-    .leader-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
-    .leader-table th { text-align: left; color: var(--text-muted); padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
-    .leader-table td { padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .leader-table td:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700; }
+    /* Round Summary Card */
+    .round-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+    .round-stat-box { background: var(--bg-dark); padding: 0.75rem; border-radius: 10px; border: 1px solid var(--card-border); text-align: center; }
   </style>
 </head>
 <body>
 
-  <div class="app-card">
-    
-    <!-- SCREEN 1: AUTHENTICATION -->
-    <div id="screen-auth" class="screen active">
-      <h1 class="brand-title">CogniShift</h1>
-      <p class="brand-subtitle">Firebase Authentication</p>
+  <div class="app-container">
+    <div class="app-card">
 
-      <div class="auth-tabs">
-        <div id="tab-signin" class="auth-tab active" onclick="switchAuthMode('signin')">Sign In</div>
-        <div id="tab-signup" class="auth-tab" onclick="switchAuthMode('signup')">Sign Up</div>
+      <!-- SCREEN 1: AUTHENTICATION -->
+      <div id="screen-auth" class="screen active">
+        <h1 class="brand-title">CogniShift</h1>
+        <p class="brand-subtitle">Clinical Cognitive Assessment Suite</p>
+
+        <div class="auth-tabs">
+          <div id="tab-signin" class="auth-tab active" onclick="switchAuthMode('signin')">Sign In</div>
+          <div id="tab-signup" class="auth-tab" onclick="switchAuthMode('signup')">Create Account</div>
+        </div>
+
+        <!-- Sign In Form -->
+        <form id="form-signin" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="signin-email" class="input-field" required placeholder="name@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="signin-pass" class="input-field" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign In to Dashboard</button>
+          <div style="text-align: center;">
+            <button type="button" class="link-btn" onclick="openForgotModal()">Forgot Password?</button>
+          </div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="form-signup" onsubmit="handleSignUp(event)" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Unique Username</label>
+            <input type="text" id="signup-user" class="input-field" required placeholder="Choose a unique handle" maxlength="18">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="signup-email" class="input-field" required placeholder="name@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="signup-pass" class="input-field" required placeholder="Min 6 characters">
+          </div>
+          <button type="submit" class="btn btn-primary">Continue to Profile Setup</button>
+        </form>
+
+        <div id="auth-status" class="status-msg"></div>
       </div>
 
-      <!-- Sign In Form -->
-      <form id="form-signin" onsubmit="handleSignIn(event)">
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" id="signin-email" class="input-field" required placeholder="name@example.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" id="signin-pass" class="input-field" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="btn btn-primary">Sign In</button>
-        <div style="text-align: center;">
-          <button type="button" class="link-btn" onclick="openForgotModal()">Forgot Password?</button>
-        </div>
-      </form>
+      <!-- SCREEN 2: ONBOARDING (DEMOGRAPHICS) -->
+      <div id="screen-onboarding" class="screen">
+        <h1 class="brand-title">Demographics</h1>
+        <p class="brand-subtitle">Required for global rankings and age-normed cognitive baselines.</p>
 
-      <!-- Sign Up Form -->
-      <form id="form-signup" onsubmit="handleSignUp(event)" style="display: none;">
-        <div class="form-group">
-          <label class="form-label">Username</label>
-          <input type="text" id="signup-user" class="input-field" required placeholder="Choose username" maxlength="15">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" id="signup-email" class="input-field" required placeholder="name@example.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" id="signup-pass" class="input-field" required placeholder="Min. 6 characters">
-        </div>
-        <button type="submit" class="btn btn-primary">Create Account</button>
-      </form>
+        <form id="form-onboarding" onsubmit="handleOnboardingSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" id="onboard-dob" class="input-field" required>
+          </div>
 
-      <div id="auth-error" class="error-msg"></div>
-      <div id="auth-success" class="success-msg"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Gender Identity</label>
+              <select id="onboard-gender" class="select-field" required>
+                <option value="">Select</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Non-Binary">Non-Binary</option>
+                <option value="Prefer Not to Say">Prefer Not to Say</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Country / Region</label>
+              <select id="onboard-country" class="select-field" required>
+                <option value="">Select</option>
+                <option value="United States">United States</option>
+                <option value="India">India</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="South Korea">South Korea</option>
+                <option value="Canada">Canada</option>
+                <option value="Germany">Germany</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success">Complete Setup & Launch</button>
+        </form>
+      </div>
+
+      <!-- SCREEN 3: HOMEPAGE / DASHBOARD -->
+      <div id="screen-home" class="screen">
+        <div class="dashboard-header">
+          <div>
+            <div class="user-welcome">Hello, <span id="dash-username" style="color:var(--accent);">--</span><span class="user-tag" id="dash-country">GLOBAL</span></div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem;" id="dash-demographics">Baseline Active</div>
+          </div>
+          <button class="btn btn-secondary" style="width:auto; padding:0.5rem 1rem;" onclick="handleLogout()">Sign Out</button>
+        </div>
+
+        <!-- Global Player Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Sessions</div>
+            <div class="stat-val" id="stat-sessions">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Highest Score</div>
+            <div class="stat-val" id="stat-high-score">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Max Sequence</div>
+            <div class="stat-val" id="stat-max-seq">0</div>
+          </div>
+        </div>
+
+        <!-- Available Games Assessment Suite -->
+        <div class="section-title">
+          <span>Cognitive Tests</span>
+        </div>
+
+        <div class="game-grid">
+          <div class="game-card">
+            <div class="game-card-header">
+              <div class="game-title">Reverse Working Memory</div>
+              <div class="game-badge">Executive Function</div>
+            </div>
+            <div class="game-desc">
+              Evaluates working memory manipulation and visuospatial recall capacity by forcing the brain to reverse spatial sequences under strict error conditions.
+            </div>
+            <div class="game-actions">
+              <button class="btn btn-primary" onclick="initiateReverseMemoryGame()">Start Assessment</button>
+              <button class="btn btn-secondary" style="width:auto;" onclick="openRulesModal('reverse-memory')">View Rules</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: REVERSE MEMORY GAME STAGE -->
+      <div id="screen-game-reverse" class="screen">
+        <div class="game-hud">
+          <div class="hud-box">
+            <div class="hud-lbl">Current Round</div>
+            <div class="hud-num" id="hud-round">1</div>
+          </div>
+          <div class="hud-box">
+            <div class="hud-lbl">Target Length</div>
+            <div class="hud-num" id="hud-length" style="color: var(--accent);">3</div>
+          </div>
+          <div class="hud-box">
+            <div class="hud-lbl">Total Score</div>
+            <div class="hud-num" id="hud-score" style="color: var(--success);">0</div>
+          </div>
+        </div>
+
+        <p id="game-status-text" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; font-weight: 600;">
+          Observe the sequence closely...
+        </p>
+
+        <!-- 3x3 Visuospatial Grid -->
+        <div class="memory-grid" id="memory-grid">
+          <div class="grid-tile" data-index="0">1</div>
+          <div class="grid-tile" data-index="1">2</div>
+          <div class="grid-tile" data-index="2">3</div>
+          <div class="grid-tile" data-index="3">4</div>
+          <div class="grid-tile" data-index="4">5</div>
+          <div class="grid-tile" data-index="5">6</div>
+          <div class="grid-tile" data-index="6">7</div>
+          <div class="grid-tile" data-index="7">8</div>
+          <div class="grid-tile" data-index="8">9</div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="abortEntireGameSession()">Abort Session</button>
+      </div>
+
     </div>
-
-    <!-- SCREEN 2: HOMEPAGE / DASHBOARD -->
-    <div id="screen-home" class="screen">
-      <h1 class="brand-title">Dashboard</h1>
-      <p class="brand-subtitle">Welcome, <span id="user-display-name" style="color: var(--accent);"></span>!</p>
-
-      <button class="btn btn-primary" onclick="navigateTo('screen-game'); startNewGame();">Play Stroop Speed Test</button>
-
-      <div style="margin-top: 2rem;">
-        <h3 style="font-size: 1rem; color: var(--text-main);">Global Leaderboard (Firebase)</h3>
-        <table class="leader-table">
-          <thead>
-            <tr><th>Rank</th><th>Player</th><th>Score</th></tr>
-          </thead>
-          <tbody id="leaderboard-body"></tbody>
-        </table>
-      </div>
-
-      <button class="btn btn-secondary" onclick="handleLogout()">Sign Out</button>
-    </div>
-
-    <!-- SCREEN 3: GAME STAGE -->
-    <div id="screen-game" class="screen">
-      <div class="hud">
-        <div><div class="hud-label">Score</div><div class="hud-val" id="score-val">0</div></div>
-        <div><div class="hud-label">Time</div><div class="hud-val" id="time-val" style="color: var(--accent);">30s</div></div>
-      </div>
-
-      <p style="text-align: center; color: var(--text-muted); font-size: 0.875rem;">Does text meaning match the ink color?</p>
-      <div class="game-target" id="game-target">---</div>
-
-      <div class="game-controls">
-        <button class="btn btn-no-match" onclick="submitChoice(false)">No Match</button>
-        <button class="btn btn-match" onclick="submitChoice(true)">Match</button>
-      </div>
-
-      <button class="btn btn-secondary" onclick="navigateTo('screen-home'); stopGame();" style="margin-top: 1.5rem;">Quit Session</button>
-    </div>
-
   </div>
 
-  <!-- FORGOT PASSWORD MODAL -->
+  <!-- MODAL: FORGOT PASSWORD -->
   <div id="modal-forgot" class="modal-overlay">
     <div class="modal-card">
-      <h3 style="margin-bottom: 0.5rem; color: var(--text-main);">Reset Password</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Enter your email address to receive a secure Firebase reset link.</p>
-      
+      <div class="modal-title">Reset Password</div>
+      <div class="modal-body">Enter your account email address. We will issue a secure reset link via Firebase Authentication.</div>
       <div class="form-group">
-        <label class="form-label">Email Address</label>
         <input type="email" id="forgot-email" class="input-field" placeholder="name@example.com">
       </div>
+      <button class="btn btn-primary" onclick="sendPasswordReset()">Dispatch Reset Email</button>
+      <button class="btn btn-secondary" style="margin-top:0.75rem;" onclick="closeModal('modal-forgot')">Cancel</button>
+      <div id="forgot-status" class="status-msg"></div>
+    </div>
+  </div>
 
-      <button class="btn btn-primary" onclick="sendPasswordReset()">Send Reset Email</button>
-      <button class="btn btn-secondary" onclick="closeForgotModal()">Cancel</button>
+  <!-- MODAL: GAME RULES SHEET -->
+  <div id="modal-rules" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title" id="rules-title">Game Instructions</div>
+      <div class="modal-body" id="rules-content"></div>
+      <button class="btn btn-primary" onclick="closeModal('modal-rules')">Understood</button>
+    </div>
+  </div>
+
+  <!-- MODAL: POST-ROUND DECISION / ERROR BREAKDOWN -->
+  <div id="modal-round-end" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title" id="round-modal-heading" style="color: var(--warning);">Round Mistake Detected</div>
+      <div class="modal-body">
+        <p id="round-modal-msg">You made an error during spatial recall.</p>
+        
+        <div class="round-summary-grid">
+          <div class="round-stat-box">
+            <div class="hud-lbl">Round Reached</div>
+            <div class="hud-num" id="summary-round">1</div>
+          </div>
+          <div class="round-stat-box">
+            <div class="hud-lbl">Round Score</div>
+            <div class="hud-num" id="summary-round-score" style="color:var(--success);">0</div>
+          </div>
+          <div class="round-stat-box">
+            <div class="hud-lbl">Max Length</div>
+            <div class="hud-num" id="summary-length" style="color:var(--accent);">0</div>
+          </div>
+          <div class="round-stat-box">
+            <div class="hud-lbl">Cumulative Score</div>
+            <div class="hud-num" id="summary-total-score">0</div>
+          </div>
+        </div>
+      </div>
       
-      <div id="modal-msg" class="error-msg"></div>
+      <button class="btn btn-success" id="btn-continue-round" onclick="advanceToNextRound()">Continue to Next Round</button>
+      <button class="btn btn-danger" style="margin-top:0.75rem;" onclick="finalizeAndAbortGame()">Abort & Save Session</button>
     </div>
   </div>
 
   <script>
-    const COLORS = [
-      { name: 'RED', hex: '#ef4444' },
-      { name: 'BLUE', hex: '#3b82f6' },
-      { name: 'GREEN', hex: '#10b981' },
-      { name: 'YELLOW', hex: '#eab308' }
-    ];
-
-    let currentScore = 0;
-    let timer = 30;
-    let timerInterval = null;
-    let isMatch = false;
-
+    /* GLOBAL STATE & ROUTING */
     function navigateTo(screenId) {
-      if ((screenId === 'screen-home' || screenId === 'screen-game') && !window.currentUser) {
-        screenId = 'screen-auth';
-      }
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
     }
 
     function switchAuthMode(mode) {
-      hideAuthMsgs();
+      clearAuthStatus();
       if (mode === 'signin') {
         document.getElementById('tab-signin').classList.add('active');
         document.getElementById('tab-signup').classList.remove('active');
@@ -312,182 +500,349 @@ const firebaseConfig = {
       }
     }
 
-    function hideAuthMsgs() {
-      document.getElementById('auth-error').style.display = 'none';
-      document.getElementById('auth-success').style.display = 'none';
+    function showAuthStatus(msg, isError = true) {
+      const el = document.getElementById('auth-status');
+      el.textContent = msg;
+      el.className = `status-msg ${isError ? 'error' : 'success'}`;
+      el.style.display = 'block';
     }
 
-    /* FIREBASE AUTH ACTIONS */
-    async function handleSignUp(e) {
-      e.preventDefault();
-      const userStr = document.getElementById('signup-user').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const pass = document.getElementById('signup-pass').value.trim();
-      const errEl = document.getElementById('auth-error');
-
-      try {
-        const userCred = await window.fbCreateUser(window.fbAuth, email, pass);
-        await window.fbUpdateProfile(userCred.user, { displayName: userStr });
-        window.currentUser = userCred.user;
-        showDashboard();
-      } catch (err) {
-        errEl.textContent = err.message.replace("Firebase: ", "");
-        errEl.style.display = 'block';
-      }
+    function clearAuthStatus() {
+      document.getElementById('auth-status').style.display = 'none';
     }
 
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    /* AUTHENTICATION FLOW */
     async function handleSignIn(e) {
       e.preventDefault();
+      clearAuthStatus();
       const email = document.getElementById('signin-email').value.trim();
       const pass = document.getElementById('signin-pass').value.trim();
-      const errEl = document.getElementById('auth-error');
 
       try {
         await window.fbSignIn(window.fbAuth, email, pass);
       } catch (err) {
-        errEl.textContent = "Invalid email or password.";
-        errEl.style.display = 'block';
+        showAuthStatus("Authentication failed: Invalid credentials provided.");
       }
     }
 
-    async function sendPasswordReset() {
-      const email = document.getElementById('forgot-email').value.trim();
-      const msgEl = document.getElementById('modal-msg');
+    async function handleSignUp(e) {
+      e.preventDefault();
+      clearAuthStatus();
+      const username = document.getElementById('signup-user').value.trim().toLowerCase();
+      const email = document.getElementById('signup-email').value.trim();
+      const pass = document.getElementById('signup-pass').value.trim();
 
-      if (!email) {
-        msgEl.textContent = "Please enter your email address.";
-        msgEl.style.display = 'block';
+      if (username.length < 3) {
+        showAuthStatus("Username must be at least 3 characters.");
         return;
       }
 
       try {
-        await window.fbResetPassword(window.fbAuth, email);
-        closeForgotModal();
-        const successEl = document.getElementById('auth-success');
-        successEl.textContent = `Password reset link sent to ${email}`;
-        successEl.style.display = 'block';
+        // Enforce Unique Username Check via Firestore Index
+        const usernameRef = window.fbDoc(window.fbDb, "usernames", username);
+        const usernameSnap = await window.fbGetDoc(usernameRef);
+
+        if (usernameSnap.exists()) {
+          showAuthStatus("Username is already taken by another user.");
+          return;
+        }
+
+        const userCred = await window.fbCreateUser(window.fbAuth, email, pass);
+        await window.fbUpdateProfile(userCred.user, { displayName: username });
+
+        // Reserve username and construct base document
+        await window.fbSetDoc(usernameRef, { uid: userCred.user.uid });
+        await window.fbSetDoc(window.fbDoc(window.fbDb, "users", userCred.user.uid), {
+          username: username,
+          email: email,
+          profileCompleted: false,
+          createdAt: window.fbTimestamp(),
+          stats: { totalSessions: 0, highestScore: 0, maxSequenceLength: 0 }
+        });
+
       } catch (err) {
-        msgEl.textContent = err.message.replace("Firebase: ", "");
-        msgEl.style.display = 'block';
+        showAuthStatus(err.message.replace("Firebase: ", ""));
+      }
+    }
+
+    async function handleOnboardingSubmit(e) {
+      e.preventDefault();
+      const dob = document.getElementById('onboard-dob').value;
+      const gender = document.getElementById('onboard-gender').value;
+      const country = document.getElementById('onboard-country').value;
+
+      try {
+        const userRef = window.fbDoc(window.fbDb, "users", window.currentUser.uid);
+        await window.fbSetDoc(userRef, {
+          dob: dob,
+          gender: gender,
+          country: country,
+          profileCompleted: true
+        }, { merge: true });
+
+        const updatedSnap = await window.fbGetDoc(userRef);
+        window.currentUserData = updatedSnap.data();
+        loadDashboardData();
+        navigateTo('screen-home');
+      } catch (err) {
+        alert("Failed to save demographics profile: " + err.message);
+      }
+    }
+
+    function openForgotModal() {
+      document.getElementById('forgot-status').style.display = 'none';
+      openModal('modal-forgot');
+    }
+
+    async function sendPasswordReset() {
+      const email = document.getElementById('forgot-email').value.trim();
+      const statusEl = document.getElementById('forgot-status');
+      if (!email) {
+        statusEl.textContent = "Please provide an email address.";
+        statusEl.className = "status-msg error";
+        statusEl.style.display = "block";
+        return;
+      }
+      try {
+        await window.fbResetPassword(window.fbAuth, email);
+        statusEl.textContent = "Reset link dispatched. Check your inbox.";
+        statusEl.className = "status-msg success";
+        statusEl.style.display = "block";
+      } catch (err) {
+        statusEl.textContent = err.message.replace("Firebase: ", "");
+        statusEl.className = "status-msg error";
+        statusEl.style.display = "block";
       }
     }
 
     function handleLogout() {
       window.fbSignOut(window.fbAuth);
-      stopGame();
-      navigateTo('screen-auth');
     }
 
-    function openForgotModal() {
-      document.getElementById('modal-forgot').classList.add('active');
-      document.getElementById('modal-msg').style.display = 'none';
+    /* DASHBOARD LOGIC */
+    function loadDashboardData() {
+      if (!window.currentUserData) return;
+      const data = window.currentUserData;
+      document.getElementById('dash-username').textContent = data.username || 'User';
+      document.getElementById('dash-country').textContent = (data.country || 'GLOBAL').toUpperCase();
+      document.getElementById('dash-demographics').textContent = `Gender: ${data.gender || 'N/A'} | DOB: ${data.dob || 'N/A'}`;
+
+      const stats = data.stats || {};
+      document.getElementById('stat-sessions').textContent = stats.totalSessions || 0;
+      document.getElementById('stat-high-score').textContent = stats.highestScore || 0;
+      document.getElementById('stat-max-seq').textContent = stats.maxSequenceLength || 0;
     }
 
-    function closeForgotModal() {
-      document.getElementById('modal-forgot').classList.remove('active');
+    function openRulesModal(gameKey) {
+      if (gameKey === 'reverse-memory') {
+        document.getElementById('rules-title').textContent = "Reverse Working Memory Rules";
+        document.getElementById('rules-content').innerHTML = `
+          <ul>
+            <li><strong>The Challenge:</strong> A grid of tiles will light up in a specific visual sequence.</li>
+            <li><strong>The Twist:</strong> You must click the tiles back in <strong>EXACT REVERSE ORDER</strong> (from last lit to first lit).</li>
+            <li><strong>Strict Elimination:</strong> Making a single mistake ends that specific round immediately.</li>
+            <li><strong>Progression:</strong> After a mistake, you can choose to Continue to the Next Round (increasing sequence length) or Abort and lock in your session score.</li>
+          </ul>
+        `;
+      }
+      openModal('modal-rules');
     }
 
-    function showDashboard() {
-      const name = window.currentUser.displayName || window.currentUser.email.split('@')[0];
-      document.getElementById('user-display-name').textContent = name;
-      renderLeaderboard();
+    /* REVERSE WORKING MEMORY ENGINE */
+    let gameState = {
+      round: 1,
+      sequenceLength: 3,
+      sequence: [],
+      expectedReverseInput: [],
+      userInputIndex: 0,
+      cumulativeScore: 0,
+      roundScores: [],
+      maxReachedLength: 0,
+      isShowingSequence: false
+    };
+
+    function initiateReverseMemoryGame() {
+      gameState = {
+        round: 1,
+        sequenceLength: 3,
+        sequence: [],
+        expectedReverseInput: [],
+        userInputIndex: 0,
+        cumulativeScore: 0,
+        roundScores: [],
+        maxReachedLength: 3,
+        isShowingSequence: false
+      };
+      
+      bindGridTileEvents();
+      updateGameHUD();
+      navigateTo('screen-game-reverse');
+      startRoundSequence();
+    }
+
+    function bindGridTileEvents() {
+      const tiles = document.querySelectorAll('.grid-tile');
+      tiles.forEach(tile => {
+        tile.onclick = () => {
+          if (gameState.isShowingSequence) return;
+          const index = parseInt(tile.getAttribute('data-index'));
+          handleUserTileClick(tile, index);
+        };
+      });
+    }
+
+    function updateGameHUD() {
+      document.getElementById('hud-round').textContent = gameState.round;
+      document.getElementById('hud-length').textContent = gameState.sequenceLength;
+      document.getElementById('hud-score').textContent = gameState.cumulativeScore;
+    }
+
+    function startRoundSequence() {
+      gameState.isShowingSequence = true;
+      gameState.userInputIndex = 0;
+      gameState.sequence = [];
+
+      document.getElementById('game-status-text').textContent = "Observe the spatial sequence...";
+
+      // Generate random sequence based on target length
+      for (let i = 0; i < gameState.sequenceLength; i++) {
+        gameState.sequence.push(Math.floor(Math.random() * 9));
+      }
+
+      // Reverse sequence mapping for validation
+      gameState.expectedReverseInput = [...gameState.sequence].reverse();
+
+      // Play visual sequence animation
+      let step = 0;
+      const interval = setInterval(() => {
+        if (step >= gameState.sequence.length) {
+          clearInterval(interval);
+          gameState.isShowingSequence = false;
+          document.getElementById('game-status-text').textContent = "Recalled! Click tiles in REVERSE order.";
+          return;
+        }
+
+        const tileIndex = gameState.sequence[step];
+        highlightTile(tileIndex);
+        step++;
+      }, 800);
+    }
+
+    function highlightTile(index) {
+      const tiles = document.querySelectorAll('.grid-tile');
+      const tile = tiles[index];
+      tile.classList.add('active');
+      setTimeout(() => tile.classList.remove('active'), 450);
+    }
+
+    function handleUserTileClick(tileElement, clickedIndex) {
+      tileElement.classList.add('user-click');
+      setTimeout(() => tileElement.classList.remove('user-click'), 200);
+
+      const expectedIndex = gameState.expectedReverseInput[gameState.userInputIndex];
+
+      if (clickedIndex === expectedIndex) {
+        // Correct Click
+        gameState.userInputIndex++;
+        
+        // Check if Round Complete successfully
+        if (gameState.userInputIndex >= gameState.expectedReverseInput.length) {
+          const roundPoints = gameState.sequenceLength * 150;
+          gameState.cumulativeScore += roundPoints;
+          gameState.roundScores.push(roundPoints);
+          gameState.maxReachedLength = Math.max(gameState.maxReachedLength, gameState.sequenceLength);
+          
+          updateGameHUD();
+          document.getElementById('game-status-text').textContent = "Round Cleared Perfect! Advancing...";
+          
+          setTimeout(() => {
+            gameState.round++;
+            gameState.sequenceLength++;
+            updateGameHUD();
+            startRoundSequence();
+          }, 1200);
+        }
+      } else {
+        // MISTAKE MADE - Stop Round Immediately
+        tileElement.classList.add('error-flash');
+        setTimeout(() => tileElement.classList.remove('error-flash'), 600);
+        
+        triggerRoundMistakeBreakdown();
+      }
+    }
+
+    function triggerRoundMistakeBreakdown() {
+      document.getElementById('summary-round').textContent = gameState.round;
+      document.getElementById('summary-round-score').textContent = 0;
+      document.getElementById('summary-length').textContent = gameState.sequenceLength;
+      document.getElementById('summary-total-score').textContent = gameState.cumulativeScore;
+
+      openModal('modal-round-end');
+    }
+
+    function advanceToNextRound() {
+      closeModal('modal-round-end');
+      gameState.round++;
+      gameState.sequenceLength++;
+      updateGameHUD();
+      startRoundSequence();
+    }
+
+    async function finalizeAndAbortGame() {
+      closeModal('modal-round-end');
+      await persistGameSessionToFirestore();
+      loadDashboardData();
       navigateTo('screen-home');
     }
 
-    /* GAME ENGINE */
-    function startNewGame() {
-      currentScore = 0;
-      timer = 30;
-      document.getElementById('score-val').textContent = '0';
-      document.getElementById('time-val').textContent = '30s';
-      
-      nextQuestion();
-
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timer--;
-        document.getElementById('time-val').textContent = `${timer}s`;
-        if (timer <= 0) {
-          stopGame();
-          saveScore(currentScore);
-          alert(`Game Over! Final Score: ${currentScore}`);
-          showDashboard();
-        }
-      }, 1000);
-    }
-
-    function stopGame() {
-      clearInterval(timerInterval);
-    }
-
-    function nextQuestion() {
-      const textObj = COLORS[Math.floor(Math.random() * COLORS.length)];
-      const colorObj = COLORS[Math.floor(Math.random() * COLORS.length)];
-      
-      isMatch = Math.random() < 0.5;
-      const targetEl = document.getElementById('game-target');
-      
-      targetEl.textContent = textObj.name;
-      targetEl.style.color = isMatch ? textObj.hex : colorObj.hex;
-    }
-
-    function submitChoice(userChoice) {
-      if (timer <= 0) return;
-      if (userChoice === isMatch) {
-        currentScore += 100;
-      } else {
-        currentScore = Math.max(0, currentScore - 50);
+    async function abortEntireGameSession() {
+      if (confirm("Are you sure you want to exit? Current progress will be saved.")) {
+        await persistGameSessionToFirestore();
+        loadDashboardData();
+        navigateTo('screen-home');
       }
-      document.getElementById('score-val').textContent = currentScore;
-      nextQuestion();
     }
 
-    /* FIRESTORE LEADERBOARD ACTIONS */
-    async function saveScore(score) {
+    async function persistGameSessionToFirestore() {
+      if (!window.currentUser) return;
+
       try {
-        const username = window.currentUser.displayName || window.currentUser.email.split('@')[0];
-        await window.fbAddDoc(window.fbCollection(window.fbDb, "scores"), {
-          user: username,
-          score: score,
-          createdAt: window.fbTimestamp()
+        // Record complete session metrics
+        await window.fbAddDoc(window.fbCollection(window.fbDb, "game_sessions"), {
+          uid: window.currentUser.uid,
+          username: window.currentUserData.username,
+          gameType: "Reverse Working Memory",
+          roundsCompleted: gameState.round - 1,
+          finalScore: gameState.cumulativeScore,
+          maxSequenceLength: gameState.maxReachedLength,
+          timestamp: window.fbTimestamp()
         });
-      } catch (e) {
-        console.error("Error saving score to Firebase: ", e);
-      }
-    }
 
-    async function renderLeaderboard() {
-      const tbody = document.getElementById('leaderboard-body');
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">Loading scores...</td></tr>';
-
-      try {
-        const q = window.fbQuery(
-          window.fbCollection(window.fbDb, "scores"), 
-          window.fbOrderBy("score", "desc"), 
-          window.fbLimit(5)
-        );
-        const querySnapshot = await window.fbGetDocs(q);
+        // Update aggregate user statistics
+        const userRef = window.fbDoc(window.fbDb, "users", window.currentUser.uid);
+        const currentStats = window.currentUserData.stats || {};
         
-        tbody.innerHTML = querySnapshot.empty ? 
-          '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No high scores recorded</td></tr>' : '';
+        const newHighScore = Math.max(currentStats.highestScore || 0, gameState.cumulativeScore);
+        const newMaxSeq = Math.max(currentStats.maxSequenceLength || 0, gameState.maxReachedLength);
 
-        let idx = 1;
-        querySnapshot.forEach((doc) => {
-          const s = doc.data();
-          tbody.innerHTML += `
-            <tr>
-              <td>#${idx++}</td>
-              <td>${escapeHTML(s.user)}</td>
-              <td>${s.score}</td>
-            </tr>`;
-        });
+        await window.fbSetDoc(userRef, {
+          stats: {
+            totalSessions: window.fbIncrement(1),
+            highestScore: newHighScore,
+            maxSequenceLength: newMaxSeq
+          }
+        }, { merge: true });
+
+        // Refresh local cache
+        const updatedSnap = await window.fbGetDoc(userRef);
+        window.currentUserData = updatedSnap.data();
+
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--danger)">Error loading scores</td></tr>';
+        console.error("Error committing game session: ", e);
       }
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
   </script>
 </body>
