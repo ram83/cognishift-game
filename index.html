@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniShift | Cognitive Assessment Platform</title>
+  <title>CogniShift | Clinical Cognitive Assessment Suite</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,17 +38,14 @@
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // 🔑 REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
-  authDomain: "mindgames-f116a.firebaseapp.com",
-  projectId: "mindgames-f116a",
-  storageBucket: "mindgames-f116a.firebasestorage.app",
-  messagingSenderId: "296415432842",
-  appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
-  measurementId: "G-HC8N4Y4R49"
-};
-
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -103,9 +100,9 @@ const firebaseConfig = {
 
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: #131c2e;
-      --card-border: #22314d;
+      --bg-dark: #070a12;
+      --card-bg: #0f172a;
+      --card-border: #1e293b;
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --accent: #06b6d4;
@@ -120,14 +117,14 @@ const firebaseConfig = {
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem 1rem; }
 
-    .app-container { width: 100%; max-width: 900px; margin: 0 auto; }
+    .app-container { width: 100%; max-width: 920px; margin: 0 auto; }
     
     .app-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 24px;
       padding: 2.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
       position: relative;
       overflow: hidden;
     }
@@ -197,7 +194,7 @@ const firebaseConfig = {
 
     .section-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
     
-    /* Game Hub Selection Cards */
+    /* Assessment Suites */
     .game-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2rem; }
     .game-card { background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; transition: border-color 0.2s; position: relative; }
     .game-card:hover { border-color: var(--accent); }
@@ -224,26 +221,26 @@ const firebaseConfig = {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 800;
-      color: transparent;
+      color: var(--card-border);
     }
-    .grid-tile.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); transform: scale(0.96); }
-    .grid-tile.user-click { background: var(--primary); border-color: var(--primary); transform: scale(0.94); }
-    .grid-tile.error-flash { background: var(--danger) !important; border-color: var(--danger) !important; }
+    .grid-tile.active { background: var(--accent); border-color: var(--accent); color: #000; box-shadow: 0 0 25px var(--accent-glow); transform: scale(0.95); }
+    .grid-tile.user-click { background: var(--primary); border-color: var(--primary); color: #fff; transform: scale(0.93); }
+    .grid-tile.error-flash { background: var(--danger) !important; border-color: var(--danger) !important; color: #fff !important; }
 
     /* Modals & Overlays */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(7, 10, 18, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
     .modal-overlay.active { display: flex; }
-    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9); }
     .modal-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; }
     .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; }
     .modal-body ul { margin-left: 1.25rem; margin-top: 0.5rem; }
     .modal-body li { margin-bottom: 0.5rem; }
 
-    /* Round Summary Card */
+    /* PRD Clinical Round Summary Metrics */
     .round-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
-    .round-stat-box { background: var(--bg-dark); padding: 0.75rem; border-radius: 10px; border: 1px solid var(--card-border); text-align: center; }
+    .round-stat-box { background: var(--bg-dark); padding: 0.85rem; border-radius: 12px; border: 1px solid var(--card-border); text-align: center; }
   </style>
 </head>
 <body>
@@ -300,7 +297,7 @@ const firebaseConfig = {
       <!-- SCREEN 2: ONBOARDING (DEMOGRAPHICS) -->
       <div id="screen-onboarding" class="screen">
         <h1 class="brand-title">Demographics</h1>
-        <p class="brand-subtitle">Required for global rankings and age-normed cognitive baselines.</p>
+        <p class="brand-subtitle">Required for age-normed cognitive percentiles & normative benchmarks.</p>
 
         <form id="form-onboarding" onsubmit="handleOnboardingSubmit(event)">
           <div class="form-group">
@@ -335,7 +332,7 @@ const firebaseConfig = {
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success">Complete Setup & Launch</button>
+          <button type="submit" class="btn btn-success">Complete Setup & Launch Suite</button>
         </form>
       </div>
 
@@ -360,34 +357,34 @@ const firebaseConfig = {
             <div class="stat-val" id="stat-high-score">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Max Sequence</div>
+            <div class="stat-label">Max Span Length</div>
             <div class="stat-val" id="stat-max-seq">0</div>
           </div>
         </div>
 
-        <!-- Available Games Assessment Suite -->
+        <!-- Available Assessment Suite -->
         <div class="section-title">
-          <span>Cognitive Tests</span>
+          <span>Clinical Assessment Batteries</span>
         </div>
 
         <div class="game-grid">
           <div class="game-card">
             <div class="game-card-header">
-              <div class="game-title">Reverse Working Memory</div>
+              <div class="game-title">Reverse Working Memory (Visuospatial)</div>
               <div class="game-badge">Executive Function</div>
             </div>
             <div class="game-desc">
-              Evaluates working memory manipulation and visuospatial recall capacity by forcing the brain to reverse spatial sequences under strict error conditions.
+              Evaluates working memory manipulation and visuospatial recall capacity by forcing the brain to reverse spatial sequences under strict clinical error constraints.
             </div>
             <div class="game-actions">
               <button class="btn btn-primary" onclick="initiateReverseMemoryGame()">Start Assessment</button>
-              <button class="btn btn-secondary" style="width:auto;" onclick="openRulesModal('reverse-memory')">View Rules</button>
+              <button class="btn btn-secondary" style="width:auto;" onclick="openRulesModal()">View Protocol</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- SCREEN 4: REVERSE MEMORY GAME STAGE -->
+      <!-- SCREEN 4: REVERSE WORKING MEMORY ASSESSMENT STAGE -->
       <div id="screen-game-reverse" class="screen">
         <div class="game-hud">
           <div class="hud-box">
@@ -395,17 +392,17 @@ const firebaseConfig = {
             <div class="hud-num" id="hud-round">1</div>
           </div>
           <div class="hud-box">
-            <div class="hud-lbl">Target Length</div>
+            <div class="hud-lbl">Target Span</div>
             <div class="hud-num" id="hud-length" style="color: var(--accent);">3</div>
           </div>
           <div class="hud-box">
-            <div class="hud-lbl">Total Score</div>
+            <div class="hud-lbl">Session Score</div>
             <div class="hud-num" id="hud-score" style="color: var(--success);">0</div>
           </div>
         </div>
 
         <p id="game-status-text" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; font-weight: 600;">
-          Observe the sequence closely...
+          Observe the spatial sequence...
         </p>
 
         <!-- 3x3 Visuospatial Grid -->
@@ -441,21 +438,27 @@ const firebaseConfig = {
     </div>
   </div>
 
-  <!-- MODAL: GAME RULES SHEET -->
+  <!-- MODAL: PROTOCOL RULES SHEET -->
   <div id="modal-rules" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-title" id="rules-title">Game Instructions</div>
-      <div class="modal-body" id="rules-content"></div>
+      <div class="modal-title">Assessment Protocol</div>
+      <div class="modal-body">
+        <ul>
+          <li><strong>Stimulus Phase:</strong> A grid of tiles will light up sequentially in a randomized pattern.</li>
+          <li><strong>Recall Phase:</strong> You must click the tiles back in <strong>EXACT REVERSE ORDER</strong> (from last illuminated to first).</li>
+          <li><strong>Clinical Error Tracking:</strong> Making a single spatial error triggers a round break where you can review your span metrics or proceed to harder difficulties.</li>
+        </ul>
+      </div>
       <button class="btn btn-primary" onclick="closeModal('modal-rules')">Understood</button>
     </div>
   </div>
 
-  <!-- MODAL: POST-ROUND DECISION / ERROR BREAKDOWN -->
+  <!-- MODAL: POST-ROUND CLINICAL BREAKDOWN -->
   <div id="modal-round-end" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-title" id="round-modal-heading" style="color: var(--warning);">Round Mistake Detected</div>
+      <div class="modal-title" style="color: var(--warning);">Round Mistake Detected</div>
       <div class="modal-body">
-        <p id="round-modal-msg">You made an error during spatial recall.</p>
+        <p>An incorrect spatial recall input was registered for this sequence length.</p>
         
         <div class="round-summary-grid">
           <div class="round-stat-box">
@@ -463,27 +466,27 @@ const firebaseConfig = {
             <div class="hud-num" id="summary-round">1</div>
           </div>
           <div class="round-stat-box">
-            <div class="hud-lbl">Round Score</div>
+            <div class="hud-lbl">Span Length</div>
+            <div class="hud-num" id="summary-length" style="color:var(--accent);">3</div>
+          </div>
+          <div class="round-stat-box">
+            <div class="hud-lbl">Round Points</div>
             <div class="hud-num" id="summary-round-score" style="color:var(--success);">0</div>
           </div>
           <div class="round-stat-box">
-            <div class="hud-lbl">Max Length</div>
-            <div class="hud-num" id="summary-length" style="color:var(--accent);">0</div>
-          </div>
-          <div class="round-stat-box">
-            <div class="hud-lbl">Cumulative Score</div>
+            <div class="hud-lbl">Total Cumulative</div>
             <div class="hud-num" id="summary-total-score">0</div>
           </div>
         </div>
       </div>
       
-      <button class="btn btn-success" id="btn-continue-round" onclick="advanceToNextRound()">Continue to Next Round</button>
+      <button class="btn btn-success" onclick="advanceToNextRound()">Continue to Next Round</button>
       <button class="btn btn-danger" style="margin-top:0.75rem;" onclick="finalizeAndAbortGame()">Abort & Save Session</button>
     </div>
   </div>
 
   <script>
-    /* GLOBAL STATE & ROUTING */
+    /* GLOBAL ROUTING & UI HELPERS */
     function navigateTo(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
@@ -518,7 +521,7 @@ const firebaseConfig = {
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    /* AUTHENTICATION FLOW */
+    /* AUTHENTICATION CONTROLLERS */
     async function handleSignIn(e) {
       e.preventDefault();
       clearAuthStatus();
@@ -640,18 +643,7 @@ const firebaseConfig = {
       document.getElementById('stat-max-seq').textContent = stats.maxSequenceLength || 0;
     }
 
-    function openRulesModal(gameKey) {
-      if (gameKey === 'reverse-memory') {
-        document.getElementById('rules-title').textContent = "Reverse Working Memory Rules";
-        document.getElementById('rules-content').innerHTML = `
-          <ul>
-            <li><strong>The Challenge:</strong> A grid of tiles will light up in a specific visual sequence.</li>
-            <li><strong>The Twist:</strong> You must click the tiles back in <strong>EXACT REVERSE ORDER</strong> (from last lit to first lit).</li>
-            <li><strong>Strict Elimination:</strong> Making a single mistake ends that specific round immediately.</li>
-            <li><strong>Progression:</strong> After a mistake, you can choose to Continue to the Next Round (increasing sequence length) or Abort and lock in your session score.</li>
-          </ul>
-        `;
-      }
+    function openRulesModal() {
       openModal('modal-rules');
     }
 
@@ -664,7 +656,7 @@ const firebaseConfig = {
       userInputIndex: 0,
       cumulativeScore: 0,
       roundScores: [],
-      maxReachedLength: 0,
+      maxReachedLength: 3,
       isShowingSequence: false
     };
 
@@ -729,7 +721,7 @@ const firebaseConfig = {
         const tileIndex = gameState.sequence[step];
         highlightTile(tileIndex);
         step++;
-      }, 800);
+      }, 750);
     }
 
     function highlightTile(index) {
@@ -738,7 +730,7 @@ const firebaseConfig = {
       targetTile.classList.add('active');
       setTimeout(() => {
         targetTile.classList.remove('active');
-      }, 400);
+      }, 350);
     }
 
     function handleUserTileClick(tile, index) {
@@ -747,7 +739,7 @@ const firebaseConfig = {
       if (index === expected) {
         // Correct input
         tile.classList.add('user-click');
-        setTimeout(() => tile.classList.remove('user-click'), 200);
+        setTimeout(() => tile.classList.remove('user-click'), 180);
 
         gameState.userInputIndex++;
 
@@ -758,14 +750,14 @@ const firebaseConfig = {
           gameState.roundScores.push(roundScore);
           gameState.maxReachedLength = Math.max(gameState.maxReachedLength, gameState.sequenceLength);
 
-          document.getElementById('game-status-text').textContent = "Round Cleared! Loading next sequence...";
+          document.getElementById('game-status-text').textContent = "Round Cleared Successfully!";
           
           setTimeout(() => {
             gameState.round++;
             gameState.sequenceLength++;
             updateGameHUD();
             startRoundSequence();
-          }, 1000);
+          }, 900);
         }
       } else {
         // Mistake made
@@ -780,8 +772,8 @@ const firebaseConfig = {
       gameState.isShowingSequence = true;
       
       document.getElementById('summary-round').textContent = gameState.round;
-      document.getElementById('summary-round-score').textContent = gameState.sequenceLength * 50;
       document.getElementById('summary-length').textContent = gameState.sequenceLength;
+      document.getElementById('summary-round-score').textContent = gameState.sequenceLength * 50;
       document.getElementById('summary-total-score').textContent = gameState.cumulativeScore;
 
       openModal('modal-round-end');
@@ -801,7 +793,7 @@ const firebaseConfig = {
     }
 
     function abortEntireGameSession() {
-      if (confirm("Are you sure you want to abort the session? Current scores will be saved.")) {
+      if (confirm("Are you sure you want to abort this session? Current metrics will be saved.")) {
         saveGameSessionToFirestore();
       }
     }
@@ -830,7 +822,7 @@ const firebaseConfig = {
           }
         }, { merge: true });
 
-        // Record Detailed Session History Log
+        // Record Detailed Session History Log in Firestore
         await window.fbAddDoc(window.fbCollection(window.fbDb, "sessions"), {
           uid: window.currentUser.uid,
           game: "Reverse Working Memory",
