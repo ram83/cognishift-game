@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniShift</title>
+  <title>CogniShift | Cognitive Speed Test</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
   
   <style>
-    /* STRICT COLOR PALETTE (Locked) */
+    /* STRICT UNIFIED COLOR SYSTEM */
     :root {
       --bg-dark: #0f172a;       /* Dark Slate Background */
-      --card-bg: #1e293b;       /* Card Surface */
-      --card-border: #334155;   /* Subtle Border */
-      --primary: #6366f1;       /* Indigo Main Action */
+      --card-bg: #1e293b;       /* Surface Card */
+      --card-border: #334155;   /* Border Line */
+      --primary: #6366f1;       /* Indigo Primary */
       --primary-hover: #4f46e5;
-      --accent: #06b6d4;        /* Cyan Highlights */
+      --accent: #06b6d4;        /* Cyan Highlight */
       --success: #10b981;       /* Green Match */
-      --danger: #ef4444;        /* Red No Match */
-      --text-main: #f8fafc;     /* Primary Text */
-      --text-muted: #94a3b8;    /* Secondary Text */
+      --danger: #ef4444;        /* Red No-Match */
+      --text-main: #f8fafc;     /* White Heading */
+      --text-muted: #94a3b8;    /* Subtext */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 
-    /* Container & Cards */
+    /* Container Card */
     .app-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -38,22 +38,28 @@
     }
 
     .brand-title { font-size: 2rem; font-weight: 800; color: var(--text-main); text-align: center; }
-    .brand-subtitle { font-size: 0.875rem; color: var(--text-muted); text-align: center; margin-bottom: 2rem; }
+    .brand-subtitle { font-size: 0.875rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; }
 
-    /* Screen Management */
+    /* Screen State Engine */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* Form Controls & Buttons */
+    /* Auth Tab Switcher */
+    .auth-tabs { display: flex; background: var(--bg-dark); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; }
+    .auth-tab { flex: 1; text-align: center; padding: 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+    .auth-tab.active { background: var(--card-bg); color: var(--text-main); }
+
+    /* Forms & Controls */
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem; }
     .input-field {
       width: 100%;
       padding: 0.875rem 1rem;
-      background: #0f172a;
+      background: var(--bg-dark);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       color: #fff;
-      font-size: 1rem;
-      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
       outline: none;
     }
     .input-field:focus { border-color: var(--primary); }
@@ -68,13 +74,15 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary { background: var(--primary); color: #fff; margin-top: 0.5rem; }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); margin-top: 0.75rem; }
     .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
-    /* HUD */
-    .hud { display: flex; justify-content: space-between; background: #0f172a; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
+    .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+
+    /* Heads-Up Display */
+    .hud { display: flex; justify-content: space-between; background: var(--bg-dark); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
     .hud-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
     .hud-val { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; }
 
@@ -84,7 +92,7 @@
     .btn-match { background: var(--success); color: #fff; }
     .btn-no-match { background: var(--danger); color: #fff; }
 
-    /* Leaderboard Table */
+    /* Leaderboard */
     .leader-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
     .leader-table th { text-align: left; color: var(--text-muted); padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
     .leader-table td { padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -95,38 +103,66 @@
 
   <div class="app-card">
     
-    <!-- STEP 1: LOGIN / IDENTITY SCREEN -->
-    <div id="screen-login" class="screen active">
+    <!-- SCREEN 1: AUTHENTICATION (SIGN IN / SIGN UP) -->
+    <div id="screen-auth" class="screen active">
       <h1 class="brand-title">CogniShift</h1>
-      <p class="brand-subtitle">Enter your profile name to begin</p>
-      
-      <input type="text" id="username-input" class="input-field" placeholder="Username (e.g., Player1)" maxlength="15">
-      <button class="btn btn-primary" onclick="handleLogin()">Continue to Dashboard</button>
+      <p class="brand-subtitle">Authentication Portal</p>
+
+      <div class="auth-tabs">
+        <div id="tab-signin" class="auth-tab active" onclick="switchAuthMode('signin')">Sign In</div>
+        <div id="tab-signup" class="auth-tab" onclick="switchAuthMode('signup')">Sign Up</div>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-signin" onsubmit="handleSignIn(event)">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" id="signin-user" class="input-field" required placeholder="Enter username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="signin-pass" class="input-field" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="form-signup" onsubmit="handleSignUp(event)" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" id="signup-user" class="input-field" required placeholder="Choose username" maxlength="15">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="signup-pass" class="input-field" required placeholder="Create password">
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+
+      <div id="auth-error" class="error-msg"></div>
     </div>
 
-    <!-- STEP 2: HOMEPAGE / DASHBOARD SCREEN -->
+    <!-- SCREEN 2: HOMEPAGE / DASHBOARD -->
     <div id="screen-home" class="screen">
       <h1 class="brand-title">Dashboard</h1>
-      <p class="brand-subtitle">Welcome back, <span id="user-display-name" style="color: var(--accent);"></span>!</p>
+      <p class="brand-subtitle">Welcome, <span id="user-display-name" style="color: var(--accent);"></span>!</p>
 
       <button class="btn btn-primary" onclick="navigateTo('screen-game'); startNewGame();">Play Stroop Speed Test</button>
-      
+
       <div style="margin-top: 2rem;">
-        <h3 style="font-size: 1rem; color: var(--text-main);">Global High Scores</h3>
+        <h3 style="font-size: 1rem; color: var(--text-main);">Global Leaderboard</h3>
         <table class="leader-table">
           <thead>
             <tr><th>Rank</th><th>Player</th><th>Score</th></tr>
           </thead>
-          <tbody id="leaderboard-body">
-            <!-- Populated via JS -->
-          </tbody>
+          <tbody id="leaderboard-body"></tbody>
         </table>
       </div>
 
-      <button class="btn btn-secondary" onclick="handleLogout()">Switch Account</button>
+      <button class="btn btn-secondary" onclick="handleLogout()">Sign Out</button>
     </div>
 
-    <!-- STEP 3: GAME SCREEN -->
+    <!-- SCREEN 3: GAME STAGE -->
     <div id="screen-game" class="screen">
       <div class="hud">
         <div><div class="hud-label">Score</div><div class="hud-val" id="score-val">0</div></div>
@@ -141,13 +177,13 @@
         <button class="btn btn-match" onclick="submitChoice(true)">Match</button>
       </div>
 
-      <button class="btn btn-secondary" onclick="navigateTo('screen-home')" style="margin-top: 1.5rem;">Quit Session</button>
+      <button class="btn btn-secondary" onclick="navigateTo('screen-home'); stopGame();" style="margin-top: 1.5rem;">Quit Session</button>
     </div>
 
   </div>
 
   <script>
-    /* STABLE STATE */
+    /* STABLE COLOR DICTIONARY */
     const COLORS = [
       { name: 'RED', hex: '#ef4444' },
       { name: 'BLUE', hex: '#3b82f6' },
@@ -155,50 +191,108 @@
       { name: 'YELLOW', hex: '#eab308' }
     ];
 
-    let currentUser = localStorage.getItem('cognishift_user') || '';
+    let currentSessionUser = sessionStorage.getItem('cognishift_session') || '';
     let currentScore = 0;
     let timer = 30;
     let timerInterval = null;
     let isMatch = false;
 
-    // Boot Up Check
+    // App Initialization Boot
     window.onload = () => {
-      if (currentUser) {
+      if (currentSessionUser) {
         showDashboard();
       } else {
-        navigateTo('screen-login');
+        navigateTo('screen-auth');
       }
     };
 
-    /* NAVIGATION LOGIC */
+    /* SCREEN ROUTER */
     function navigateTo(screenId) {
+      // Guard Check: Block direct navigation to home/game without auth session
+      if ((screenId === 'screen-home' || screenId === 'screen-game') && !currentSessionUser) {
+        screenId = 'screen-auth';
+      }
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
     }
 
-    /* AUTH LOGIC */
-    function handleLogin() {
-      const input = document.getElementById('username-input').value.trim();
-      if (!input) return alert('Please enter a username.');
+    /* AUTHENTICATION ENGINE */
+    function switchAuthMode(mode) {
+      document.getElementById('auth-error').style.display = 'none';
+      if (mode === 'signin') {
+        document.getElementById('tab-signin').classList.add('active');
+        document.getElementById('tab-signup').classList.remove('active');
+        document.getElementById('form-signin').style.display = 'block';
+        document.getElementById('form-signup').style.display = 'none';
+      } else {
+        document.getElementById('tab-signup').classList.add('active');
+        document.getElementById('tab-signin').classList.remove('active');
+        document.getElementById('form-signup').style.display = 'block';
+        document.getElementById('form-signin').style.display = 'none';
+      }
+    }
+
+    function getUsersDB() {
+      return JSON.parse(localStorage.getItem('cognishift_db_users') || '{}');
+    }
+
+    function handleSignUp(e) {
+      e.preventDefault();
+      const user = document.getElementById('signup-user').value.trim();
+      const pass = document.getElementById('signup-pass').value.trim();
+      const errEl = document.getElementById('auth-error');
+
+      const users = getUsersDB();
+      if (users[user]) {
+        errEl.textContent = 'Username already exists. Please Sign In.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      users[user] = pass; // Save user credentials
+      localStorage.setItem('cognishift_db_users', JSON.stringify(users));
       
-      currentUser = input;
-      localStorage.setItem('cognishift_user', currentUser);
+      // Auto-authenticate
+      setSession(user);
+    }
+
+    function handleSignIn(e) {
+      e.preventDefault();
+      const user = document.getElementById('signin-user').value.trim();
+      const pass = document.getElementById('signin-pass').value.trim();
+      const errEl = document.getElementById('auth-error');
+
+      const users = getUsersDB();
+      if (!users[user] || users[user] !== pass) {
+        errEl.textContent = 'Invalid username or password.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      setSession(user);
+    }
+
+    function setSession(user) {
+      currentSessionUser = user;
+      sessionStorage.setItem('cognishift_session', user);
+      document.getElementById('auth-error').style.display = 'none';
       showDashboard();
     }
 
     function handleLogout() {
-      localStorage.removeItem('cognishift_user');
-      currentUser = '';
-      navigateTo('screen-login');
+      sessionStorage.removeItem('cognishift_session');
+      currentSessionUser = '';
+      stopGame();
+      navigateTo('screen-auth');
     }
 
     function showDashboard() {
-      document.getElementById('user-display-name').textContent = currentUser;
+      document.getElementById('user-display-name').textContent = currentSessionUser;
       renderLeaderboard();
       navigateTo('screen-home');
     }
 
-    /* GAME LOGIC */
+    /* STROOP GAME ENGINE */
     function startNewGame() {
       currentScore = 0;
       timer = 30;
@@ -212,12 +306,16 @@
         timer--;
         document.getElementById('time-val').textContent = `${timer}s`;
         if (timer <= 0) {
-          clearInterval(timerInterval);
-          saveScore(currentUser, currentScore);
-          alert(`Time's up! Final Score: ${currentScore}`);
+          stopGame();
+          saveScore(currentSessionUser, currentScore);
+          alert(`Game Over! Final Score: ${currentScore}`);
           showDashboard();
         }
       }, 1000);
+    }
+
+    function stopGame() {
+      clearInterval(timerInterval);
     }
 
     function nextQuestion() {
@@ -242,22 +340,18 @@
       nextQuestion();
     }
 
-    /* DATA PERSISTENCE & LEADERBOARD */
-    function getScores() {
-      return JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
-    }
-
+    /* LEADERBOARD & STORAGE */
     function saveScore(user, score) {
-      const scores = getScores();
-      scores.push({ user, score });
+      const scores = JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
+      scores.push({ user, score, date: new Date().toLocaleDateString() });
       scores.sort((a, b) => b.score - a.score);
       localStorage.setItem('cognishift_scores', JSON.stringify(scores.slice(0, 5)));
     }
 
     function renderLeaderboard() {
-      const scores = getScores();
+      const scores = JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
       const tbody = document.getElementById('leaderboard-body');
-      tbody.innerHTML = scores.length ? '' : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No high scores yet</td></tr>';
+      tbody.innerHTML = scores.length ? '' : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No high scores recorded</td></tr>';
       
       scores.forEach((s, idx) => {
         tbody.innerHTML += `
