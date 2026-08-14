@@ -8,6 +8,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
   
+  <!-- EmailJS SDK for Client-Side Emailing -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function() {
+      // Replace with your EmailJS Public Key from https://dashboard.emailjs.com/
+      emailjs.init("YOUR_PUBLIC_KEY");
+    })();
+  </script>
+
   <style>
     /* STRICT UNIFIED COLOR SYSTEM */
     :root {
@@ -26,7 +35,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 
-    /* Container Card */
     .app-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -35,21 +43,19 @@
       width: 100%;
       max-width: 480px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      position: relative;
     }
 
     .brand-title { font-size: 2rem; font-weight: 800; color: var(--text-main); text-align: center; }
     .brand-subtitle { font-size: 0.875rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; }
 
-    /* Screen State Engine */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* Auth Tab Switcher */
     .auth-tabs { display: flex; background: var(--bg-dark); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; }
     .auth-tab { flex: 1; text-align: center; padding: 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
     .auth-tab.active { background: var(--card-bg); color: var(--text-main); }
 
-    /* Forms & Controls */
     .form-group { margin-bottom: 1rem; }
     .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem; }
     .input-field {
@@ -79,20 +85,25 @@
     .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); margin-top: 0.75rem; }
     .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
-    .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+    .link-btn { background: none; border: none; color: var(--accent); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 0.5rem; display: inline-block; }
 
-    /* Heads-Up Display */
+    .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+    .success-msg { color: var(--success); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+
+    /* Modal Styling */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 400px; }
+
+    /* Game Stage & HUD */
     .hud { display: flex; justify-content: space-between; background: var(--bg-dark); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
     .hud-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
     .hud-val { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; }
-
-    /* Game Stage */
     .game-target { font-size: 2.75rem; font-weight: 800; text-align: center; margin: 2rem 0; min-height: 60px; }
     .game-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .btn-match { background: var(--success); color: #fff; }
     .btn-no-match { background: var(--danger); color: #fff; }
 
-    /* Leaderboard */
     .leader-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
     .leader-table th { text-align: left; color: var(--text-muted); padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
     .leader-table td { padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -103,7 +114,7 @@
 
   <div class="app-card">
     
-    <!-- SCREEN 1: AUTHENTICATION (SIGN IN / SIGN UP) -->
+    <!-- SCREEN 1: AUTHENTICATION -->
     <div id="screen-auth" class="screen active">
       <h1 class="brand-title">CogniShift</h1>
       <p class="brand-subtitle">Authentication Portal</p>
@@ -124,6 +135,9 @@
           <input type="password" id="signin-pass" class="input-field" required placeholder="••••••••">
         </div>
         <button type="submit" class="btn btn-primary">Sign In</button>
+        <div style="text-align: center;">
+          <button type="button" class="link-btn" onclick="openForgotModal()">Forgot Password?</button>
+        </div>
       </form>
 
       <!-- Sign Up Form -->
@@ -133,6 +147,10 @@
           <input type="text" id="signup-user" class="input-field" required placeholder="Choose username" maxlength="15">
         </div>
         <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="signup-email" class="input-field" required placeholder="name@example.com">
+        </div>
+        <div class="form-group">
           <label class="form-label">Password</label>
           <input type="password" id="signup-pass" class="input-field" required placeholder="Create password">
         </div>
@@ -140,6 +158,7 @@
       </form>
 
       <div id="auth-error" class="error-msg"></div>
+      <div id="auth-success" class="success-msg"></div>
     </div>
 
     <!-- SCREEN 2: HOMEPAGE / DASHBOARD -->
@@ -182,8 +201,25 @@
 
   </div>
 
+  <!-- FORGOT PASSWORD MODAL -->
+  <div id="modal-forgot" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="margin-bottom: 0.5rem; color: var(--text-main);">Reset Password</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Enter your registered username to receive your password via email.</p>
+      
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" id="forgot-username" class="input-field" placeholder="Enter username">
+      </div>
+
+      <button class="btn btn-primary" onclick="sendPasswordReset()">Send Reset Email</button>
+      <button class="btn btn-secondary" onclick="closeForgotModal()">Cancel</button>
+      
+      <div id="modal-msg" class="error-msg"></div>
+    </div>
+  </div>
+
   <script>
-    /* STABLE COLOR DICTIONARY */
     const COLORS = [
       { name: 'RED', hex: '#ef4444' },
       { name: 'BLUE', hex: '#3b82f6' },
@@ -197,7 +233,6 @@
     let timerInterval = null;
     let isMatch = false;
 
-    // App Initialization Boot
     window.onload = () => {
       if (currentSessionUser) {
         showDashboard();
@@ -206,9 +241,7 @@
       }
     };
 
-    /* SCREEN ROUTER */
     function navigateTo(screenId) {
-      // Guard Check: Block direct navigation to home/game without auth session
       if ((screenId === 'screen-home' || screenId === 'screen-game') && !currentSessionUser) {
         screenId = 'screen-auth';
       }
@@ -216,9 +249,8 @@
       document.getElementById(screenId).classList.add('active');
     }
 
-    /* AUTHENTICATION ENGINE */
     function switchAuthMode(mode) {
-      document.getElementById('auth-error').style.display = 'none';
+      hideAuthMsgs();
       if (mode === 'signin') {
         document.getElementById('tab-signin').classList.add('active');
         document.getElementById('tab-signup').classList.remove('active');
@@ -232,6 +264,11 @@
       }
     }
 
+    function hideAuthMsgs() {
+      document.getElementById('auth-error').style.display = 'none';
+      document.getElementById('auth-success').style.display = 'none';
+    }
+
     function getUsersDB() {
       return JSON.parse(localStorage.getItem('cognishift_db_users') || '{}');
     }
@@ -239,6 +276,7 @@
     function handleSignUp(e) {
       e.preventDefault();
       const user = document.getElementById('signup-user').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
       const pass = document.getElementById('signup-pass').value.trim();
       const errEl = document.getElementById('auth-error');
 
@@ -249,10 +287,10 @@
         return;
       }
 
-      users[user] = pass; // Save user credentials
+      // Store object with password and email
+      users[user] = { password: pass, email: email };
       localStorage.setItem('cognishift_db_users', JSON.stringify(users));
       
-      // Auto-authenticate
       setSession(user);
     }
 
@@ -263,7 +301,12 @@
       const errEl = document.getElementById('auth-error');
 
       const users = getUsersDB();
-      if (!users[user] || users[user] !== pass) {
+      const record = users[user];
+
+      // Support legacy string format or new object format
+      const storedPass = typeof record === 'object' ? record.password : record;
+
+      if (!record || storedPass !== pass) {
         errEl.textContent = 'Invalid username or password.';
         errEl.style.display = 'block';
         return;
@@ -272,10 +315,63 @@
       setSession(user);
     }
 
+    /* FORGOT PASSWORD WORKFLOW */
+    function openForgotModal() {
+      document.getElementById('modal-forgot').classList.add('active');
+      document.getElementById('modal-msg').style.display = 'none';
+    }
+
+    function closeForgotModal() {
+      document.getElementById('modal-forgot').classList.remove('active');
+    }
+
+    function sendPasswordReset() {
+      const user = document.getElementById('forgot-username').value.trim();
+      const msgEl = document.getElementById('modal-msg');
+      const users = getUsersDB();
+      const record = users[user];
+
+      if (!record) {
+        msgEl.textContent = 'Username not found.';
+        msgEl.style.color = 'var(--danger)';
+        msgEl.style.display = 'block';
+        return;
+      }
+
+      const email = typeof record === 'object' ? record.email : null;
+      const pass = typeof record === 'object' ? record.password : record;
+
+      if (!email) {
+        msgEl.textContent = `User found. Password: ${pass} (No email on record).`;
+        msgEl.style.color = 'var(--accent)';
+        msgEl.style.display = 'block';
+        return;
+      }
+
+      // Trigger EmailJS dispatch
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        to_email: email,
+        to_name: user,
+        user_password: pass
+      })
+      .then(() => {
+        closeForgotModal();
+        const successEl = document.getElementById('auth-success');
+        successEl.textContent = `Password sent to ${email}!`;
+        successEl.style.display = 'block';
+      })
+      .catch((err) => {
+        // Fallback display if EmailJS isn't configured with real keys yet
+        msgEl.textContent = `Email service notice: Password is '${pass}'`;
+        msgEl.style.color = 'var(--accent)';
+        msgEl.style.display = 'block';
+      });
+    }
+
     function setSession(user) {
       currentSessionUser = user;
       sessionStorage.setItem('cognishift_session', user);
-      document.getElementById('auth-error').style.display = 'none';
+      hideAuthMsgs();
       showDashboard();
     }
 
@@ -292,7 +388,7 @@
       navigateTo('screen-home');
     }
 
-    /* STROOP GAME ENGINE */
+    /* GAME ENGINE */
     function startNewGame() {
       currentScore = 0;
       timer = 30;
@@ -340,7 +436,6 @@
       nextQuestion();
     }
 
-    /* LEADERBOARD & STORAGE */
     function saveScore(user, score) {
       const scores = JSON.parse(localStorage.getItem('cognishift_scores') || '[]');
       scores.push({ user, score, date: new Date().toLocaleDateString() });
