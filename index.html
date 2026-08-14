@@ -78,7 +78,7 @@
       doc, 
       getDoc, 
       setDoc, 
-      updateProfile as fsUpdateProfile, 
+      updateDoc,
       collection, 
       getDocs, 
       query, 
@@ -97,12 +97,11 @@
   appId: "1:296415432842:web:b97e2e2710f1c75ee89d73",
   measurementId: "G-HC8N4Y4R49"
 };
-    // Initialize Firebase
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Export to window for global app logic
     window.fbAuth = auth;
     window.fbDb = db;
     window.fbSignIn = signInWithEmailAndPassword;
@@ -113,6 +112,7 @@
     window.fbDoc = doc;
     window.fbGetDoc = getDoc;
     window.fbSetDoc = setDoc;
+    window.fbUpdateDoc = updateDoc;
     window.fbCollection = collection;
     window.fbGetDocs = getDocs;
     window.fbQuery = query;
@@ -120,7 +120,6 @@
     window.fbLimit = limit;
     window.fbTimestamp = serverTimestamp;
 
-    // Auth State Listener
     onAuthStateChanged(auth, async (user) => {
       window.currentUser = user;
       if (user) {
@@ -181,7 +180,8 @@
   </footer>
 
   <script>
-    const TOTAL_ROUNDS = 9; // Fixed to 9 rounds
+    const TOTAL_ROUNDS = 9;
+    const MAX_LEVELS = 12; // Capped strictly at 12 levels max per round
 
     const sfx = {
       ctx: null,
@@ -237,8 +237,8 @@
         this.updateHeader();
         document.getElementById('app-container').innerHTML = `
           <div class="glass-card p-8 rounded-3xl text-center space-y-4">
-            <h2 class="font-heading text-3xl font-bold text-yellow-300">Dashboard Loaded!</h2>
-            <button onclick="alert('Ready!')" class="px-6 py-3 bg-yellow-400 text-slate-900 font-bold rounded-xl">Start Circuit</button>
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">Dashboard Loaded</h2>
+            <p class="text-sm text-white/70">Round 9 replaced with <strong class="text-cyan-300">Word Category Match</strong> (Max ${MAX_LEVELS} levels).</p>
           </div>
         `;
       },
@@ -246,7 +246,7 @@
         document.getElementById('app-container').innerHTML = `
           <div class="glass-card p-8 rounded-3xl text-center">
             <h2 class="text-2xl text-yellow-300 mb-4">Please Sign In</h2>
-            <p class="text-sm text-white/60">Firebase authentication is connected and waiting for input.</p>
+            <p class="text-sm text-white/60">Firebase authentication active.</p>
           </div>
         `;
       },
