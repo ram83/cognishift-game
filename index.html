@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniKids - Train Your Brain!</title>
+  <title>CogniKids - Professional Brain Gym for Kids</title>
   <!-- Google Fonts & Tailwind CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
@@ -26,18 +26,18 @@
               yellow: '#F59E0B',
               green: '#10B981',
               blue: '#06B6D4',
-              bg: '#0F172A'
+              bg: '#0B0F19'
             }
           },
           animation: {
-            'bounce-slow': 'bounce 2s infinite',
-            'pulse-fast': 'pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'float': 'float 3s ease-in-out infinite',
+            'bounce-slow': 'bounce 2.5s infinite',
+            'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 3.5s ease-in-out infinite',
           },
           keyframes: {
             float: {
               '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-10px)' },
+              '50%': { transform: 'translateY(-12px)' },
             }
           }
         }
@@ -47,7 +47,7 @@
   <style>
     body {
       font-family: 'Nunito', sans-serif;
-      background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #311042);
+      background: radial-gradient(circle at top left, #1e1b4b, #090d16, #2d123d);
       min-height: 100vh;
       color: #f8fafc;
       user-select: none;
@@ -56,54 +56,54 @@
       font-family: 'Fredoka', sans-serif;
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.07);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
     }
     .btn-3d {
-      transition: all 0.1s ease;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+      transition: all 0.15s ease;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.3);
     }
     .btn-3d:active {
       transform: translateY(4px);
-      box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.3);
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen overflow-x-hidden">
 
   <!-- Header Bar -->
-  <header class="w-full py-4 px-6 flex justify-between items-center glass-card border-b border-white/10 z-50 sticky top-0">
+  <header class="w-full py-4 px-8 flex justify-between items-center glass-card border-b border-white/10 z-50 sticky top-0">
     <div class="flex items-center gap-3 cursor-pointer" onclick="app.navToDashboard()">
       <div class="text-3xl animate-bounce-slow">🧠</div>
       <span class="font-heading text-2xl font-bold bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 bg-clip-text text-transparent">
-        CogniKids
+        CogniKids Gym
       </span>
     </div>
 
     <!-- Right Profile Status Widget -->
     <div id="header-profile" class="hidden flex items-center gap-4">
-      <div class="flex items-center gap-3 bg-white/10 py-1.5 px-4 rounded-full border border-white/20">
+      <div class="flex items-center gap-3 bg-white/10 py-1.5 px-5 rounded-full border border-white/20 shadow-inner">
         <span id="nav-avatar" class="text-2xl animate-float">🐉</span>
         <div>
           <p id="nav-username" class="font-bold text-sm text-yellow-300 leading-tight">Kiddo</p>
-          <p id="nav-rank" class="text-xs text-cyan-200 font-semibold">Diligent 🥉</p>
+          <p id="nav-rank" class="text-xs text-cyan-200 font-semibold">Trainee 🥉</p>
         </div>
       </div>
-      <button onclick="app.logout()" class="text-xs text-white/60 hover:text-white underline">Sign Out</button>
+      <button onclick="app.logout()" class="text-xs text-white/50 hover:text-white underline">Sign Out</button>
     </div>
   </header>
 
   <!-- Main Container -->
-  <main id="app-container" class="flex-grow flex items-center justify-center p-4">
+  <main id="app-container" class="flex-grow flex items-center justify-center p-6">
     <!-- Views rendered dynamically -->
   </main>
 
   <!-- Footer -->
-  <footer class="py-4 text-center text-xs text-white/40">
-    CogniKids &copy; 2026 • Fun Cognitive Skill Training for Kids
+  <footer class="py-4 text-center text-xs text-white/40 tracking-wider">
+    CogniKids Professional Cognitive Training Suite &copy; 2026
   </footer>
 
   <!-- Application Logic & Firebase Integration -->
@@ -120,8 +120,8 @@
           const gain = this.ctx.createGain();
           osc.type = type;
           osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start();
@@ -129,16 +129,16 @@
         } catch(e) {}
       },
       correct() {
-        this.playTone(523.25, 'triangle', 0.1);
-        setTimeout(() => this.playTone(659.25, 'triangle', 0.1), 100);
-        setTimeout(() => this.playTone(783.99, 'triangle', 0.2), 200);
+        this.playTone(523.25, 'triangle', 0.12);
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.12), 120);
+        setTimeout(() => this.playTone(783.99, 'triangle', 0.25), 240);
       },
       wrong() {
-        this.playTone(220, 'sawtooth', 0.15);
-        setTimeout(() => this.playTone(180, 'sawtooth', 0.25), 150);
+        this.playTone(200, 'sawtooth', 0.2);
+        setTimeout(() => this.playTone(150, 'sawtooth', 0.3), 150);
       },
       click() {
-        this.playTone(400, 'sine', 0.05);
+        this.playTone(440, 'sine', 0.05);
       }
     };
 
@@ -169,31 +169,28 @@
     ];
 
     const FUNNY_GREETINGS = [
-      "Welcome back, Captain {name}! Ready to flex those super-brain muscles?",
-      "Hey {name}! Did you know your brain is 100x cooler today?",
-      "Greetings, Mastermind {name}! Your neural pathways are shining!",
-      "Look who's back! The legendary {name} is here to break records!"
+      "Welcome back, Captain {name}! Ready for your cognitive workout?",
+      "Hey {name}! Your brain neurons are primed and ready for action!",
+      "Greetings, Mastermind {name}! Let's set some new high scores today!",
+      "Look who's back! The legendary {name} is ready to train!"
     ];
 
     const state = {
       currentSessionScore: 0,
       currentGameId: 1,
-      gameStats: {
-        game1: { score: 0 },
-        game2: { score: 0 },
-        game3: { score: 0 },
-        game4: { score: 0 },
-        game5: { score: 0 }
-      },
+      currentLevel: 1,
       activeTimer: null,
-      g3State: {}
+      g3State: {},
+      g4State: {},
+      g6State: {},
+      g7State: {}
     };
 
     function calculateRank(highScore) {
-      if (highScore >= 600) return { title: 'Gifted', badge: '🏆', class: 'text-amber-300' };
-      if (highScore >= 350) return { title: 'Genius', badge: '🥇', class: 'text-yellow-400' };
-      if (highScore >= 150) return { title: 'Smart', badge: '🥈', class: 'text-slate-300' };
-      return { title: 'Diligent', badge: '🥉', class: 'text-amber-600' };
+      if (highScore >= 800) return { title: 'Master Mind', badge: '🏆', class: 'text-amber-300' };
+      if (highScore >= 500) return { title: 'Genius', badge: '🥇', class: 'text-yellow-400' };
+      if (highScore >= 250) return { title: 'Sharp', badge: '🥈', class: 'text-cyan-300' };
+      return { title: 'Trainee', badge: '🥉', class: 'text-slate-300' };
     }
 
     window.app = {
@@ -221,13 +218,13 @@
       renderAuth(mode = 'signin') {
         const container = document.getElementById('app-container');
         container.innerHTML = `
-          <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/20 shadow-2xl relative overflow-hidden">
+          <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/20 shadow-2xl">
             <div class="text-center mb-6">
               <h2 class="font-heading text-3xl font-bold text-yellow-300 mb-2">
                 ${mode === 'signin' ? 'Welcome Back!' : mode === 'signup' ? 'Create Account' : 'Reset Password'}
               </h2>
               <p class="text-sm text-cyan-200">
-                ${mode === 'signin' ? 'Ready to play and train your brain?' : mode === 'signup' ? 'Join CogniKids and start your adventure!' : 'Enter your email to recover your account.'}
+                ${mode === 'signin' ? 'Sign in to access your brain training gym.' : mode === 'signup' ? 'Join CogniKids and start your cognitive journey.' : 'Enter your email to recover your account.'}
               </p>
             </div>
 
@@ -262,7 +259,7 @@
               </div>
               ` : ''}
 
-              <button type="submit" class="w-full py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-lg font-bold rounded-xl btn-3d hover:brightness-110">
+              <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-lg font-bold rounded-xl btn-3d hover:brightness-110">
                 ${mode === 'signin' ? 'Sign In 🚀' : mode === 'signup' ? 'Continue to Onboarding 🎨' : 'Send Reset Link 📧'}
               </button>
             </form>
@@ -329,8 +326,8 @@
       renderOnboarding() {
         const container = document.getElementById('app-container');
         container.innerHTML = `
-          <div class="glass-card w-full max-w-2xl p-8 rounded-3xl border border-white/20 shadow-2xl my-8">
-            <h2 class="font-heading text-3xl font-bold text-center text-yellow-300 mb-2">Tell Us About Yourself! 🎉</h2>
+          <div class="glass-card w-full max-w-xl p-8 rounded-3xl border border-white/20 shadow-2xl my-8">
+            <h2 class="font-heading text-3xl font-bold text-center text-yellow-300 mb-2">Profile Setup 🎉</h2>
             <p class="text-center text-sm text-cyan-200 mb-6">Customize your profile to kickstart your cognitive journey.</p>
 
             <form onsubmit="app.handleOnboardingSubmit(event)" class="space-y-6">
@@ -388,7 +385,7 @@
               <input type="hidden" id="selected-avatar-val" value="${AVATARS[0].icon}">
 
               <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110">
-                Ready to Explore! 🌟
+                Save & Continue 🌟
               </button>
             </form>
           </div>
@@ -442,18 +439,18 @@
         const fact = FUN_FACTS[Math.floor(Math.random() * FUN_FACTS.length)];
 
         container.innerHTML = `
-          <div class="glass-card w-full max-w-xl p-8 rounded-3xl border border-white/20 text-center shadow-2xl animate-fade-in my-8">
-            <div class="text-7xl mb-4 animate-bounce-slow inline-block">${window.currentUserData.avatarIcon || '🐉'}</div>
+          <div class="glass-card w-full max-w-xl p-8 rounded-3xl border border-white/20 text-center shadow-2xl animate-fade-in my-8 space-y-6">
+            <div class="text-7xl mb-2 animate-bounce-slow inline-block">${window.currentUserData.avatarIcon || '🐉'}</div>
             
-            <h2 class="font-heading text-3xl font-bold text-yellow-300 mb-3">${greeting}</h2>
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">${greeting}</h2>
             
-            <div class="bg-gradient-to-r from-purple-900/60 to-pink-900/60 p-5 rounded-2xl border border-pink-500/30 mb-6 text-left relative">
-              <span class="text-xs font-bold tracking-wider text-pink-300 uppercase block mb-1">💡 Age-Adapted Fun Fact:</span>
+            <div class="bg-gradient-to-r from-purple-900/60 to-pink-900/60 p-5 rounded-2xl border border-pink-500/35 text-left relative">
+              <span class="text-xs font-bold tracking-wider text-pink-300 uppercase block mb-1">💡 Brain Fun Fact:</span>
               <p class="text-base font-semibold text-white/90">${fact}</p>
             </div>
 
-            <button onclick="sfx.click(); app.navToDashboard()" class="w-full py-4 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110">
-              Go to Headquarters 🚀
+            <button onclick="sfx.click(); app.navToDashboard()" class="w-full py-4 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Enter Training Gym 🚀
             </button>
           </div>
         `;
@@ -467,38 +464,38 @@
 
         container.innerHTML = `
           <div class="w-full max-w-4xl space-y-6">
-            <div class="glass-card p-6 rounded-3xl border border-white/20 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div class="flex items-center gap-5">
-                <div class="text-6xl p-3 bg-white/10 rounded-2xl border border-white/20 animate-float">${window.currentUserData?.avatarIcon || '🐉'}</div>
+            <div class="glass-card p-8 rounded-3xl border border-white/20 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div class="flex items-center gap-6">
+                <div class="text-7xl p-4 bg-white/10 rounded-2xl border border-white/20 animate-float shadow-inner">${window.currentUserData?.avatarIcon || '🐉'}</div>
                 <div>
                   <h2 class="font-heading text-3xl font-bold text-white">${window.currentUserData?.firstName || ''} ${window.currentUserData?.lastName || ''}</h2>
                   <p class="text-sm text-yellow-300 font-bold">@${window.currentUserData?.username || ''} • ${window.currentUserData?.country || 'GLOBAL'}</p>
-                  <div class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/20 text-xs font-bold ${rank.class}">
-                    <span>Standing:</span> <span>${rank.title}</span> <span>${rank.badge}</span>
+                  <div class="mt-3 inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full border border-white/20 text-xs font-bold ${rank.class}">
+                    <span>Rank:</span> <span>${rank.title}</span> <span>${rank.badge}</span>
                   </div>
                 </div>
               </div>
 
               <div class="flex gap-4 text-center">
-                <div class="bg-black/30 py-3 px-5 rounded-2xl border border-white/10">
-                  <p class="text-2xl font-bold text-cyan-300 font-heading">${stats.totalSessions || 0}</p>
-                  <p class="text-xs text-white/60 font-semibold">Sessions</p>
+                <div class="bg-black/30 py-4 px-6 rounded-2xl border border-white/10 shadow-inner">
+                  <p class="text-3xl font-bold text-cyan-300 font-heading">${stats.totalSessions || 0}</p>
+                  <p class="text-xs text-white/60 font-semibold tracking-wide">Sessions</p>
                 </div>
-                <div class="bg-black/30 py-3 px-5 rounded-2xl border border-white/10">
-                  <p class="text-2xl font-bold text-yellow-400 font-heading">${stats.highestScore || 0}</p>
-                  <p class="text-xs text-white/60 font-semibold">Best Score</p>
+                <div class="bg-black/30 py-4 px-6 rounded-2xl border border-white/10 shadow-inner">
+                  <p class="text-3xl font-bold text-yellow-400 font-heading">${stats.highestScore || 0}</p>
+                  <p class="text-xs text-white/60 font-semibold tracking-wide">Best Score</p>
                 </div>
               </div>
             </div>
 
-            <div class="glass-card p-8 rounded-3xl border border-white/20 text-center space-y-4">
-              <h3 class="font-heading text-2xl font-bold text-cyan-300">5-Stage Cognitive Challenge Sequence</h3>
-              <p class="text-sm text-white/70 max-w-lg mx-auto">
-                Test your working memory, visual reflexes, pattern sequencing, spatial tracking, and speed math in one continuous run!
+            <div class="glass-card p-10 rounded-3xl border border-white/20 text-center space-y-6">
+              <h3 class="font-heading text-3xl font-bold text-yellow-300">Cognitive Circuit Challenge</h3>
+              <p class="text-base text-white/80 max-w-xl mx-auto leading-relaxed">
+                Progress through 6 continuous rounds of memory, reflexes, pattern matching, spatial navigation, calculation, and clock reading. The challenge continues until a mistake is made!
               </p>
               
-              <button onclick="sfx.click(); app.startSessionSequence()" class="px-10 py-5 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500 text-slate-900 font-heading text-2xl font-extrabold rounded-2xl btn-3d shadow-xl hover:scale-105 transform transition">
-                START 5-STAGE CHALLENGE 🎮
+              <button onclick="sfx.click(); app.startSessionSequence()" class="px-12 py-5 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500 text-slate-900 font-heading text-2xl font-extrabold rounded-2xl btn-3d shadow-2xl hover:scale-105 transform transition">
+                START TRAINING CIRCUIT 🎮
               </button>
             </div>
           </div>
@@ -508,17 +505,139 @@
       startSessionSequence() {
         state.currentSessionScore = 0;
         state.currentGameId = 1;
-        state.gameStats = { game1: { score: 0 }, game2: { score: 0 }, game3: { score: 0 }, game4: { score: 0 }, game5: { score: 0 } };
-        this.playGame1(1);
+        state.currentLevel = 1;
+        this.showTutorial(1);
       },
 
-      // --- GAME 1: REVERSE DIGITS ---
+      // --- TUTORIAL & DEMO SYSTEM (30 Seconds Explanations) ---
+      showTutorial(gameId) {
+        state.currentGameId = gameId;
+        const container = document.getElementById('app-container');
+
+        const tutorials = {
+          1: {
+            title: "Round 1: Reverse Digits",
+            desc: "Watch the numbers flash on screen. When they disappear, type them in **reverse order** (backwards) and press **Enter**! (e.g. if you see 489, type 984).",
+            demoHTML: `
+              <div class="flex items-center justify-center gap-3 py-6">
+                <span class="px-4 py-3 bg-yellow-400/20 border border-yellow-400 rounded-xl text-2xl font-bold text-yellow-300 animate-pulse">4</span>
+                <span class="px-4 py-3 bg-yellow-400/20 border border-yellow-400 rounded-xl text-2xl font-bold text-yellow-300 animate-pulse">8</span>
+                <span class="px-4 py-3 bg-yellow-400/20 border border-yellow-400 rounded-xl text-2xl font-bold text-yellow-300 animate-pulse">9</span>
+                <span class="text-xl text-white/60">➔</span>
+                <span class="px-4 py-3 bg-emerald-500/20 border border-emerald-400 rounded-xl text-2xl font-bold text-emerald-300">984</span>
+              </div>
+            `
+          },
+          2: {
+            title: "Round 2: Color Match Reaction",
+            desc: "Check the ink color of the word shown on screen. If the ink color matches the written word name, click **YES**; otherwise, click **NO**! Take your time, don't rush.",
+            demoHTML: `
+              <div class="py-6 text-center">
+                <span class="font-heading text-4xl font-extrabold text-cyan-400 tracking-wider">RED</span>
+                <p class="text-xs text-white/60 mt-2">Ink is Blue, Word says Red ➔ Click <strong>NO ✖️</strong></p>
+              </div>
+            `
+          },
+          3: {
+            title: "Round 3: Pattern Matrix",
+            desc: "Observe the tiles light up in a sequence. Once the flashing stops, click the exact same tiles in the **same order** to progress!",
+            demoHTML: `
+              <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto py-4">
+                <div class="aspect-square bg-yellow-400/50 rounded-lg border border-yellow-300"></div>
+                <div class="aspect-square bg-white/10 rounded-lg border border-white/20"></div>
+                <div class="aspect-square bg-yellow-400/50 rounded-lg border border-yellow-300"></div>
+              </div>
+            `
+          },
+          4: {
+            title: "Round 4: Spatial Maze",
+            desc: "Navigate step-by-step from the **Start (🟩)** to the **Goal (⭐)** by clicking adjacent connected cells in order.",
+            demoHTML: `
+              <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto py-4 text-xl">
+                <div class="aspect-square bg-emerald-500/30 border border-emerald-400 rounded-lg flex items-center justify-center">🟩</div>
+                <div class="aspect-square bg-white/10 border border-white/20 rounded-lg flex items-center justify-center">✔️</div>
+                <div class="aspect-square bg-white/10 border border-white/20 rounded-lg flex items-center justify-center">⭐</div>
+              </div>
+            `
+          },
+          5: {
+            title: "Round 5: Speed Math Blitz",
+            desc: "Quickly solve simple addition and subtraction math equations by selecting the correct answer option before time expires.",
+            demoHTML: `
+              <div class="py-6 text-center">
+                <span class="font-heading text-3xl font-extrabold text-yellow-300">7 + 4 = ?</span>
+                <p class="text-xs text-emerald-300 font-bold mt-2">Correct Choice: 11</p>
+              </div>
+            `
+          },
+          6: {
+            title: "Round 6: Reverse Spatial Memory",
+            desc: "Just like the Pattern Matrix, but with a twist! Watch the tiles flash, and then click them in **REVERSE order** (last tile first!).",
+            demoHTML: `
+              <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto py-4">
+                <div class="aspect-square bg-white/10 rounded-lg border border-white/20"></div>
+                <div class="aspect-square bg-purple-500/40 rounded-lg border border-purple-400 flex items-center justify-center text-xs font-bold">1st click</div>
+                <div class="aspect-square bg-white/10 rounded-lg border border-white/20"></div>
+              </div>
+            `
+          },
+          7: {
+            title: "Round 7: Clock Master",
+            desc: "Read the analog clock face shown on screen and select the correct digital time matching the hour and minute hands!",
+            demoHTML: `
+              <div class="py-4 text-center">
+                <div class="text-4xl">🕒</div>
+                <p class="text-xs text-cyan-300 mt-2">Short hand on 3, Long on 12 ➔ 3:00</p>
+              </div>
+            `
+          }
+        };
+
+        const t = tutorials[gameId];
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6 animate-fade-in">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>TRAINING TUTORIAL</span>
+              <span>ROUND ${gameId}/7</span>
+            </div>
+
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">${t.title}</h2>
+            <p class="text-sm text-white/80 leading-relaxed">${t.desc}</p>
+
+            ${t.demoHTML}
+
+            <div class="bg-black/30 p-4 rounded-2xl border border-white/10 text-xs text-cyan-200">
+              ⏱️ Take your time! Ample time is provided for each exercise.
+            </div>
+
+            <button onclick="sfx.click(); app.loadGame(${gameId}, state.currentLevel)" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Start Round 🚀
+            </button>
+          </div>
+        `;
+      },
+
+      loadGame(gameId, level) {
+        state.currentGameId = gameId;
+        state.currentLevel = level;
+        if(gameId === 1) this.playGame1(level);
+        else if(gameId === 2) this.playGame2(level);
+        else if(gameId === 3) this.playGame3(level);
+        else if(gameId === 4) this.playGame4(level);
+        else if(gameId === 5) this.playGame5(level);
+        else if(gameId === 6) this.playGame6(level);
+        else if(gameId === 7) this.playGame7(level);
+        else this.saveAndFinishSession();
+      },
+
+      // --- GAME 1: REVERSE DIGITS (Enter Key + Slowed Down) ---
       playGame1(level = 1) {
         const container = document.getElementById('app-container');
-        const digitCount = level + 1;
-        // Increased display time (+2s) and input time (+2s)
-        const displayTime = 3.0 + (level - 1) * 0.5;
-        const inputTime = 7.0 + (level - 1) * 1.0;
+        const digitCount = Math.min(2 + level, 7);
+        // Generous display time and input time (+ slow pacing)
+        const displayTime = 3.5 + (level * 0.5);
+        const inputTime = 12.0 + (level * 1.5);
 
         let digits = '';
         for (let i = 0; i < digitCount; i++) {
@@ -529,22 +648,22 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
             <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
-              <span>GAME 1: REVERSE DIGITS</span>
-              <span>LEVEL ${level}/3</span>
+              <span>ROUND 1: REVERSE DIGITS</span>
+              <span>LEVEL ${level}</span>
             </div>
 
-            <p class="text-sm text-white/80">Memorize digits, then type in <strong class="text-yellow-300 underline">REVERSE order</strong>!</p>
+            <p class="text-sm text-white/80">Memorize digits, then type in <strong class="text-yellow-300 underline">REVERSE order</strong> and press <kbd class="px-2 py-1 bg-white/10 rounded border border-white/20 text-xs">Enter</kbd>!</p>
 
-            <div id="g1-stage" class="min-h-[120px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10">
-              <span id="g1-digits" class="font-heading text-6xl font-extrabold tracking-widest text-yellow-400 animate-pulse-fast">${digits}</span>
+            <div id="g1-stage" class="min-h-[125px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              <span id="g1-digits" class="font-heading text-6xl font-extrabold tracking-widest text-yellow-400 animate-pulse">${digits}</span>
             </div>
 
             <div id="g1-input-zone" class="hidden space-y-4">
-              <input id="g1-user-input" type="number" autofocus placeholder="Type reversed digits..." class="w-full text-center text-3xl font-bold py-3 rounded-xl bg-white/10 border border-yellow-400 text-yellow-300 focus:outline-none">
-              <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+              <input id="g1-user-input" type="number" autofocus placeholder="Type reversed digits & press Enter" onkeydown="if(event.key==='Enter') app.submitGame1('${reversedAnswer}', ${level})" class="w-full text-center text-3xl font-bold py-3.5 rounded-xl bg-white/10 border border-yellow-400 text-yellow-300 focus:outline-none shadow-inner">
+              <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
                 <div id="g1-timer-bar" class="bg-yellow-400 h-full w-full transition-all duration-100 linear"></div>
               </div>
-              <button onclick="app.submitGame1('${reversedAnswer}', ${level})" class="w-full py-3 bg-yellow-400 text-slate-900 font-heading font-bold rounded-xl btn-3d">Submit Answer</button>
+              <button onclick="app.submitGame1('${reversedAnswer}', ${level})" class="w-full py-3.5 bg-yellow-400 text-slate-900 font-heading font-bold rounded-xl btn-3d">Submit Answer</button>
             </div>
           </div>
         `;
@@ -562,7 +681,7 @@
           const timerBar = document.getElementById('g1-timer-bar');
           if(timerBar) {
             timerBar.style.transitionDuration = `${inputTime}s`;
-            setTimeout(() => timerBar.style.width = '0%', 20);
+            setTimeout(() => timerBar.style.width = '0%', 30);
           }
 
           state.activeTimer = setTimeout(() => {
@@ -579,31 +698,25 @@
           sfx.correct();
           const points = level * 20;
           state.currentSessionScore += points;
-          state.gameStats.game1.score += points;
           
-          if (level < 3) {
-            this.playGame1(level + 1);
-          } else {
-            this.showTransitionModal(2, 'Color Match Reaction');
-          }
+          this.showTransitionModal(1, level + 1, 'Color Match Reaction', 2);
         } else {
           sfx.wrong();
           this.showDecisionModal({
-            gameName: 'Game 1: Reverse Digits',
-            score: state.gameStats.game1.score,
+            gameName: 'Round 1: Reverse Digits',
+            score: state.currentSessionScore,
             rightAnswer: correctReversed,
             userAnswer: userInput || (isTimeout ? 'Time Expired' : 'Empty'),
-            nextGameId: 2,
-            nextGameName: 'Color Match Reaction'
+            nextGameId: 2
           });
         }
       },
 
-      // --- GAME 2: COLOR MATCH REACTION ---
+      // --- GAME 2: COLOR MATCH REACTION (Slowed Down) ---
       playGame2(level = 1) {
         const container = document.getElementById('app-container');
-        // Increased time limit by 2 seconds
-        const timeLimit = 7.0 + (level - 1) * 1.0;
+        // Generous time limit
+        const timeLimit = 10.0 + (level * 1.0);
 
         const colors = [
           { name: 'RED', class: 'text-red-400' },
@@ -619,22 +732,22 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
             <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
-              <span>GAME 2: COLOR MATCH</span>
-              <span>LEVEL ${level}/3</span>
+              <span>ROUND 2: COLOR MATCH</span>
+              <span>LEVEL ${level}</span>
             </div>
 
             <p class="text-sm text-white/80">Does the <strong class="text-yellow-300">INK COLOR</strong> match the word text?</p>
 
-            <div class="min-h-[140px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10">
+            <div class="min-h-[140px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
               <span class="font-heading text-6xl font-extrabold ${displayColor.class}">${targetColor.name}</span>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-              <button onclick="app.submitGame2(true, ${isMatch}, ${level})" class="py-4 bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-400 text-emerald-300 font-heading text-lg font-bold rounded-2xl btn-3d">YES ✔️</button>
-              <button onclick="app.submitGame2(false, ${isMatch}, ${level})" class="py-4 bg-rose-500/30 hover:bg-rose-500/50 border border-rose-400 text-rose-300 font-heading text-lg font-bold rounded-2xl btn-3d">NO ✖️</button>
+              <button onclick="app.submitGame2(true, ${isMatch}, ${level})" class="py-4 bg-emerald-500/25 hover:bg-emerald-500/40 border border-emerald-400 text-emerald-300 font-heading text-lg font-bold rounded-2xl btn-3d">YES ✔️</button>
+              <button onclick="app.submitGame2(false, ${isMatch}, ${level})" class="py-4 bg-rose-500/25 hover:bg-rose-500/40 border border-rose-400 text-rose-300 font-heading text-lg font-bold rounded-2xl btn-3d">NO ✖️</button>
             </div>
 
-            <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
               <div id="g2-timer-bar" class="bg-cyan-400 h-full w-full transition-all duration-100 linear"></div>
             </div>
           </div>
@@ -643,7 +756,7 @@
         const timerBar = document.getElementById('g2-timer-bar');
         if (timerBar) {
           timerBar.style.transitionDuration = `${timeLimit}s`;
-          setTimeout(() => timerBar.style.width = '0%', 20);
+          setTimeout(() => timerBar.style.width = '0%', 30);
         }
 
         state.activeTimer = setTimeout(() => {
@@ -658,31 +771,25 @@
           sfx.correct();
           const points = level * 25;
           state.currentSessionScore += points;
-          state.gameStats.game2.score += points;
           
-          if (level < 3) {
-            this.playGame2(level + 1);
-          } else {
-            this.showTransitionModal(3, 'Pattern Matrix');
-          }
+          this.showTransitionModal(2, level + 1, 'Pattern Matrix', 3);
         } else {
           sfx.wrong();
           this.showDecisionModal({
-            gameName: 'Game 2: Color Match',
-            score: state.gameStats.game2.score,
+            gameName: 'Round 2: Color Match',
+            score: state.currentSessionScore,
             rightAnswer: correctMatch ? 'YES' : 'NO',
             userAnswer: isTimeout ? 'Time Expired' : (userChoice ? 'YES' : 'NO'),
-            nextGameId: 3,
-            nextGameName: 'Pattern Matrix'
+            nextGameId: 3
           });
         }
       },
 
-      // --- GAME 3: PATTERN MATRIX (SEQUENCE MEMORY) ---
+      // --- GAME 3: PATTERN MATRIX (Slowed down flash speed) ---
       playGame3(level = 1) {
         const container = document.getElementById('app-container');
-        const gridSize = level === 1 ? 3 : (level === 2 ? 4 : 4);
-        const tileCount = level + 2; 
+        const gridSize = level <= 2 ? 3 : 4;
+        const tileCount = Math.min(2 + level, 8);
 
         let sequence = [];
         while(sequence.length < tileCount) {
@@ -700,37 +807,36 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
             <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
-              <span>GAME 3: PATTERN MATRIX</span>
-              <span>LEVEL ${level}/3</span>
+              <span>ROUND 3: PATTERN MATRIX</span>
+              <span>LEVEL ${level}</span>
             </div>
 
-            <p class="text-sm text-white/80">Watch the flashing pattern, then repeat it!</p>
+            <p class="text-sm text-white/80">Watch the flashing pattern carefully...</p>
 
-            <div id="g3-grid" class="grid grid-cols-${gridSize} gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10">
+            <div id="g3-grid" class="grid grid-cols-${gridSize} gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10 shadow-inner">
               ${Array.from({length: gridSize * gridSize}).map((_, i) => `
                 <div id="g3-tile-${i}" class="aspect-square bg-white/10 rounded-xl border border-white/20 transition-all"></div>
               `).join('')}
             </div>
-            <p id="g3-status" class="text-xs font-bold text-yellow-300 animate-pulse">Memorize pattern...</p>
+            <p id="g3-status" class="text-xs font-bold text-yellow-300 animate-pulse">Memorizing pattern...</p>
           </div>
         `;
 
-        // Increased flash interval delay from 700ms to 900ms (+200ms per step slower)
-        let step = 0;
+        // Slowed down flash delay to 1100ms per step (+ comfortable pacing)
         sequence.forEach((tileIdx, idx) => {
           setTimeout(() => {
-            sfx.playTone(300 + idx * 100, 'sine', 0.25);
+            sfx.playTone(320 + idx * 80, 'sine', 0.3);
             const tile = document.getElementById(`g3-tile-${tileIdx}`);
             if(tile) tile.classList.add('bg-yellow-400', 'scale-105', 'shadow-lg');
             setTimeout(() => {
               if(tile) tile.classList.remove('bg-yellow-400', 'scale-105', 'shadow-lg');
-            }, 700);
-          }, (idx + 1) * 900);
+            }, 800);
+          }, (idx + 1) * 1100);
         });
 
         setTimeout(() => {
           const statusEl = document.getElementById('g3-status');
-          if(statusEl) statusEl.textContent = "Your turn! Click the tiles in order.";
+          if(statusEl) statusEl.textContent = "Your turn! Click tiles in order.";
           
           const gridEl = document.getElementById('g3-grid');
           gridEl.innerHTML = `
@@ -738,7 +844,7 @@
               <button onclick="app.submitGame3Tile(${i})" id="g3-tile-${i}" class="aspect-square bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 transition-all btn-3d"></button>
             `).join('')}
           `;
-        }, (sequence.length + 1) * 900);
+        }, (sequence.length + 1) * 1100);
       },
 
       submitGame3Tile(tileIdx) {
@@ -748,31 +854,25 @@
 
         if(tileIdx === correctTile) {
           tileEl.classList.add('bg-emerald-400');
-          setTimeout(() => tileEl.classList.remove('bg-emerald-400'), 200);
+          setTimeout(() => tileEl.classList.remove('bg-emerald-400'), 250);
           state.g3State.userIndex++;
 
           if(state.g3State.userIndex === state.g3State.sequence.length) {
             sfx.correct();
             const points = state.g3State.level * 30;
             state.currentSessionScore += points;
-            state.gameStats.game3.score += points;
 
-            if(state.g3State.level < 3) {
-              this.playGame3(state.g3State.level + 1);
-            } else {
-              this.showTransitionModal(4, 'Spatial Maze');
-            }
+            this.showTransitionModal(3, state.g3State.level + 1, 'Spatial Maze', 4);
           }
         } else {
           sfx.wrong();
           tileEl.classList.add('bg-rose-500');
           this.showDecisionModal({
-            gameName: 'Game 3: Pattern Matrix',
-            score: state.gameStats.game3.score,
+            gameName: 'Round 3: Pattern Matrix',
+            score: state.currentSessionScore,
             rightAnswer: 'Complete sequence',
             userAnswer: 'Wrong tile clicked',
-            nextGameId: 4,
-            nextGameName: 'Spatial Maze'
+            nextGameId: 4
           });
         }
       },
@@ -781,7 +881,7 @@
       playGame4(level = 1) {
         const container = document.getElementById('app-container');
         const size = 3; 
-        const pathLen = level + 2; 
+        const pathLen = Math.min(3 + level, 7); 
 
         let path = [{r: 0, c: 0}];
         let curr = {r: 0, c: 0};
@@ -801,13 +901,13 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
             <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
-              <span>GAME 4: SPATIAL MAZE</span>
-              <span>LEVEL ${level}/3</span>
+              <span>ROUND 4: SPATIAL MAZE</span>
+              <span>LEVEL ${level}</span>
             </div>
 
             <p class="text-sm text-white/80">Navigate from <strong class="text-emerald-300">Start (🟩)</strong> to <strong class="text-yellow-300">Goal (⭐)</strong> step-by-step!</p>
 
-            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10">
+            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10 shadow-inner">
               ${Array.from({length: size * size}).map((_, i) => {
                 const r = Math.floor(i / size);
                 const c = i % size;
@@ -820,7 +920,7 @@
                 `;
               }).join('')}
             </div>
-            <p class="text-xs text-white/60">Click adjacent cells from Start to Goal.</p>
+            <p class="text-xs text-white/60">Click adjacent connected cells correctly.</p>
           </div>
         `;
       },
@@ -839,37 +939,30 @@
             sfx.correct();
             const points = state.g4State.level * 35;
             state.currentSessionScore += points;
-            state.gameStats.game4.score += points;
 
-            if(state.g4State.level < 3) {
-              this.playGame4(state.g4State.level + 1);
-            } else {
-              this.showTransitionModal(5, 'Speed Math Blitz');
-            }
+            this.showTransitionModal(4, state.g4State.level + 1, 'Speed Math Blitz', 5);
           }
         } else {
           sfx.wrong();
           cellEl.textContent = '❌';
           cellEl.classList.add('bg-rose-500/30', 'border-rose-400');
           this.showDecisionModal({
-            gameName: 'Game 4: Spatial Maze',
-            score: state.gameStats.game4.score,
+            gameName: 'Round 4: Spatial Maze',
+            score: state.currentSessionScore,
             rightAnswer: 'Correct path sequence',
             userAnswer: `Wrong cell (${r},${c})`,
-            nextGameId: 5,
-            nextGameName: 'Speed Math Blitz'
+            nextGameId: 5
           });
         }
       },
 
-      // --- GAME 5: SPEED MATH BLITZ ---
+      // --- GAME 5: SPEED MATH BLITZ (Slowed Down) ---
       playGame5(level = 1) {
         const container = document.getElementById('app-container');
-        // Increased time limit by 2 seconds
-        const timeLimit = 8.0 + (level - 1) * 1.0;
+        const timeLimit = 12.0 + (level * 1.5);
 
-        let num1 = Math.floor(Math.random() * (level * 5)) + 2;
-        let num2 = Math.floor(Math.random() * (level * 5)) + 2;
+        let num1 = Math.floor(Math.random() * (level * 6)) + 3;
+        let num2 = Math.floor(Math.random() * (level * 6)) + 2;
         const ops = ['+', '-'];
         const op = ops[Math.floor(Math.random() * ops.length)];
         if(op === '-' && num1 < num2) { let temp = num1; num1 = num2; num2 = temp; }
@@ -878,7 +971,7 @@
         
         let choices = [correctAnswer];
         while(choices.length < 3) {
-          let offset = Math.floor(Math.random() * 5) - 2;
+          let offset = Math.floor(Math.random() * 6) - 3;
           let distractor = correctAnswer + offset;
           if(distractor !== correctAnswer && !choices.includes(distractor) && distractor >= 0) {
             choices.push(distractor);
@@ -889,23 +982,23 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
             <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
-              <span>GAME 5: SPEED MATH BLITZ</span>
-              <span>LEVEL ${level}/3</span>
+              <span>ROUND 5: SPEED MATH BLITZ</span>
+              <span>LEVEL ${level}</span>
             </div>
 
-            <p class="text-sm text-white/80">Solve the equation instantly before time runs out!</p>
+            <p class="text-sm text-white/80">Solve the equation before time runs out!</p>
 
-            <div class="min-h-[120px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10">
+            <div class="min-h-[125px] flex items-center justify-center bg-black/30 rounded-2xl border border-white/10 shadow-inner">
               <span class="font-heading text-5xl font-extrabold text-yellow-300">${num1} ${op} ${num2} = ?</span>
             </div>
 
             <div class="grid grid-cols-3 gap-4">
               ${choices.map(ans => `
-                <button onclick="app.submitGame5(${ans}, ${correctAnswer}, ${level})" class="py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-2xl font-bold rounded-2xl btn-3d">${ans}</button>
+                <button onclick="app.submitGame5(${ans}, ${correctAnswer}, ${level})" class="py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-2xl font-bold rounded-2xl btn-3d shadow-inner">${ans}</button>
               `).join('')}
             </div>
 
-            <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
               <div id="g5-timer-bar" class="bg-yellow-400 h-full w-full transition-all duration-100 linear"></div>
             </div>
           </div>
@@ -914,7 +1007,7 @@
         const timerBar = document.getElementById('g5-timer-bar');
         if(timerBar) {
           timerBar.style.transitionDuration = `${timeLimit}s`;
-          setTimeout(() => timerBar.style.width = '0%', 20);
+          setTimeout(() => timerBar.style.width = '0%', 30);
         }
 
         state.activeTimer = setTimeout(() => {
@@ -929,48 +1022,224 @@
           sfx.correct();
           const points = level * 40;
           state.currentSessionScore += points;
-          state.gameStats.game5.score += points;
 
-          if(level < 3) {
-            this.playGame5(level + 1);
-          } else {
-            this.saveAndFinishSession();
-          }
+          this.showTransitionModal(5, level + 1, 'Reverse Spatial Memory', 6);
         } else {
           sfx.wrong();
           this.showDecisionModal({
-            gameName: 'Game 5: Speed Math Blitz',
-            score: state.gameStats.game5.score,
+            gameName: 'Round 5: Speed Math Blitz',
+            score: state.currentSessionScore,
             rightAnswer: correctAnswer,
             userAnswer: isTimeout ? 'Time Expired' : userChoice,
-            nextGameId: 6,
-            nextGameName: 'Complete'
+            nextGameId: 6
           });
         }
       },
 
-      showTransitionModal(nextGameId, nextGameName) {
+      // --- NEW GAME 6: REVERSE SPATIAL MEMORY ---
+      playGame6(level = 1) {
+        const container = document.getElementById('app-container');
+        const gridSize = 3;
+        const tileCount = Math.min(2 + level, 6);
+
+        let sequence = [];
+        while(sequence.length < tileCount) {
+          let rand = Math.floor(Math.random() * (gridSize * gridSize));
+          if(!sequence.includes(rand)) sequence.push(rand);
+        }
+
+        const reversedSequence = [...sequence].reverse();
+
+        state.g6State = {
+          gridSize,
+          sequence,
+          reversedSequence,
+          userIndex: 0,
+          level
+        };
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 6: REVERSE SPATIAL MEMORY</span>
+              <span>LEVEL ${level}</span>
+            </div>
+
+            <p class="text-sm text-white/80">Memorize flashing tiles, then click them in <strong class="text-yellow-300 underline">REVERSE order</strong>!</p>
+
+            <div id="g6-grid" class="grid grid-cols-3 gap-3 max-w-xs mx-auto p-4 bg-black/30 rounded-2xl border border-white/10 shadow-inner">
+              ${Array.from({length: 9}).map((_, i) => `
+                <div id="g6-tile-${i}" class="aspect-square bg-white/10 rounded-xl border border-white/20 transition-all"></div>
+              `).join('')}
+            </div>
+            <p id="g6-status" class="text-xs font-bold text-yellow-300 animate-pulse">Memorizing pattern...</p>
+          </div>
+        `;
+
+        sequence.forEach((tileIdx, idx) => {
+          setTimeout(() => {
+            sfx.playTone(350 + idx * 70, 'sine', 0.3);
+            const tile = document.getElementById(`g6-tile-${tileIdx}`);
+            if(tile) tile.classList.add('bg-purple-500', 'scale-105', 'shadow-lg');
+            setTimeout(() => {
+              if(tile) tile.classList.remove('bg-purple-500', 'scale-105', 'shadow-lg');
+            }, 800);
+          }, (idx + 1) * 1100);
+        });
+
+        setTimeout(() => {
+          const statusEl = document.getElementById('g6-status');
+          if(statusEl) statusEl.textContent = "Your turn! Click in REVERSE order.";
+          
+          const gridEl = document.getElementById('g6-grid');
+          gridEl.innerHTML = `
+            ${Array.from({length: 9}).map((_, i) => `
+              <button onclick="app.submitGame6Tile(${i})" id="g6-tile-${i}" class="aspect-square bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 transition-all btn-3d"></button>
+            `).join('')}
+          `;
+        }, (sequence.length + 1) * 1100);
+      },
+
+      submitGame6Tile(tileIdx) {
+        sfx.click();
+        const correctTile = state.g6State.reversedSequence[state.g6State.userIndex];
+        const tileEl = document.getElementById(`g6-tile-${tileIdx}`);
+
+        if(tileIdx === correctTile) {
+          tileEl.classList.add('bg-emerald-400');
+          setTimeout(() => tileEl.classList.remove('bg-emerald-400'), 250);
+          state.g6State.userIndex++;
+
+          if(state.g6State.userIndex === state.g6State.reversedSequence.length) {
+            sfx.correct();
+            const points = state.g6State.level * 45;
+            state.currentSessionScore += points;
+
+            this.showTransitionModal(6, state.g6State.level + 1, 'Clock Master', 7);
+          }
+        } else {
+          sfx.wrong();
+          tileEl.classList.add('bg-rose-500');
+          this.showDecisionModal({
+            gameName: 'Round 6: Reverse Spatial Memory',
+            score: state.currentSessionScore,
+            rightAnswer: 'Reverse sequence',
+            userAnswer: 'Wrong tile clicked',
+            nextGameId: 7
+          });
+        }
+      },
+
+      // --- NEW GAME 7: CLOCK MASTER ---
+      playGame7(level = 1) {
+        const container = document.getElementById('app-container');
+        const timeLimit = 12.0 + (level * 1.5);
+
+        // Generate clean hour and minute combinations (e.g. 3:00, 4:30, 7:15, 10:45)
+        const hours = Math.floor(Math.random() * 12) + 1;
+        const minuteOptions = [0, 15, 30, 45];
+        const minutes = minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
+
+        const correctStr = `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+
+        // Generate choices
+        let choices = [correctStr];
+        while(choices.length < 3) {
+          const randH = Math.floor(Math.random() * 12) + 1;
+          const randM = minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
+          const distStr = `${randH}:${randM < 10 ? '0' : ''}${randM}`;
+          if(!choices.includes(distStr)) choices.push(distStr);
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        // Calculate SVG clock hand rotations
+        const hourDeg = (hours % 12) * 30 + minutes * 0.5;
+        const minDeg = minutes * 6;
+
+        container.innerHTML = `
+          <div class="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/20 text-center space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+              <span>ROUND 7: CLOCK MASTER</span>
+              <span>LEVEL ${level}</span>
+            </div>
+
+            <p class="text-sm text-white/80">What time does the analog clock show?</p>
+
+            <div class="flex justify-center my-4">
+              <div class="relative w-40 h-40 bg-slate-900 rounded-full border-4 border-yellow-400 flex items-center justify-center shadow-inner">
+                <!-- Clock Numbers -->
+                <span class="absolute top-2 text-xs font-bold text-white/80">12</span>
+                <span class="absolute right-3 text-xs font-bold text-white/80">3</span>
+                <span class="absolute bottom-2 text-xs font-bold text-white/80">6</span>
+                <span class="absolute left-3 text-xs font-bold text-white/80">9</span>
+                
+                <!-- Center Dot -->
+                <div class="w-3 h-3 bg-yellow-400 rounded-full z-20"></div>
+
+                <!-- Hour Hand -->
+                <div class="absolute w-1 h-10 bg-white rounded-full origin-bottom z-10" style="bottom: 50%; transform: rotate(${hourDeg}deg)"></div>
+
+                <!-- Minute Hand -->
+                <div class="absolute w-0.5 h-14 bg-cyan-400 rounded-full origin-bottom z-10" style="bottom: 50%; transform: rotate(${minDeg}deg)"></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              ${choices.map(c => `
+                <button onclick="app.submitGame7('${c}', '${correctStr}', ${level})" class="py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-heading text-xl font-bold rounded-2xl btn-3d shadow-inner">${c}</button>
+              `).join('')}
+            </div>
+
+            <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+              <div id="g7-timer-bar" class="bg-cyan-400 h-full w-full transition-all duration-100 linear"></div>
+            </div>
+          </div>
+        `;
+
+        const timerBar = document.getElementById('g7-timer-bar');
+        if(timerBar) {
+          timerBar.style.transitionDuration = `${timeLimit}s`;
+          setTimeout(() => timerBar.style.width = '0%', 30);
+        }
+
+        state.activeTimer = setTimeout(() => {
+          app.submitGame7(null, correctStr, level, true);
+        }, timeLimit * 1000);
+      },
+
+      submitGame7(userChoice, correctStr, level, isTimeout = false) {
+        clearTimeout(state.activeTimer);
+
+        if(!isTimeout && userChoice === correctStr) {
+          sfx.correct();
+          const points = level * 50;
+          state.currentSessionScore += points;
+
+          this.showTransitionModal(7, level + 1, 'Next Challenge Level', 7);
+        } else {
+          sfx.wrong();
+          this.showDecisionModal({
+            gameName: 'Round 7: Clock Master',
+            score: state.currentSessionScore,
+            rightAnswer: correctStr,
+            userAnswer: isTimeout ? 'Time Expired' : userChoice,
+            nextGameId: 8 //triggers finish
+          });
+        }
+      },
+
+      showTransitionModal(currentGameId, nextLevel, nextGameName, nextGameId) {
         const container = document.getElementById('app-container');
         container.innerHTML = `
           <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/20 text-center space-y-6 animate-fade-in">
             <div class="text-7xl animate-bounce-slow">🌟</div>
-            <h2 class="font-heading text-3xl font-bold text-yellow-300">Stage Cleared!</h2>
-            <p class="text-sm text-cyan-200">Get ready for <strong class="text-white">${nextGameName}</strong>!</p>
-            <button onclick="sfx.click(); app.loadGame(${nextGameId}, 1)" class="w-full py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110">
-              Continue Challenge 🚀
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">Level Cleared!</h2>
+            <p class="text-sm text-cyan-200">Advancing to <strong class="text-white">${nextGameName} (Level ${nextLevel})</strong>!</p>
+            <button onclick="sfx.click(); app.loadGame(${nextGameId}, ${nextLevel})" class="w-full py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Continue Circuit 🚀
             </button>
           </div>
         `;
-      },
-
-      loadGame(gameId, level) {
-        state.currentGameId = gameId;
-        if(gameId === 1) this.playGame1(level);
-        else if(gameId === 2) this.playGame2(level);
-        else if(gameId === 3) this.playGame3(level);
-        else if(gameId === 4) this.playGame4(level);
-        else if(gameId === 5) this.playGame5(level);
-        else this.saveAndFinishSession();
       },
 
       showDecisionModal(data) {
@@ -978,17 +1247,17 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-red-500/30 text-center space-y-6 animate-fade-in">
             <div class="text-6xl">⚠️</div>
-            <h3 class="font-heading text-2xl font-bold text-red-400">Round Mistake Detected</h3>
-            <p class="text-sm text-white/80">${data.gameName} ended here.</p>
+            <h3 class="font-heading text-2xl font-bold text-red-400">Circuit Mistake Recorded</h3>
+            <p class="text-sm text-white/80">${data.gameName} session concluded.</p>
 
-            <div class="bg-black/30 p-4 rounded-2xl border border-white/10 text-left space-y-2 text-sm">
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/10 text-left space-y-2.5 text-sm shadow-inner">
               <div class="flex justify-between"><span class="text-white/60">Your Answer:</span> <span class="text-red-300 font-bold">${data.userAnswer}</span></div>
               <div class="flex justify-between"><span class="text-white/60">Correct Answer:</span> <span class="text-green-300 font-bold">${data.rightAnswer}</span></div>
-              <div class="flex justify-between border-t border-white/10 pt-2"><span class="text-white/60">Game Score:</span> <span class="text-yellow-300 font-bold">${data.score} pts</span></div>
+              <div class="flex justify-between border-t border-white/10 pt-2"><span class="text-white/60">Total Score:</span> <span class="text-yellow-300 font-bold">${data.score} pts</span></div>
             </div>
 
-            <button onclick="sfx.click(); ${data.nextGameId <= 5 ? `app.loadGame(${data.nextGameId}, 1)` : 'app.saveAndFinishSession()'}" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110">
-              ${data.nextGameId <= 5 ? `Proceed to ${data.nextGameName} ➡️` : 'Save & Finish Session 🏁'}
+            <button onclick="sfx.click(); app.saveAndFinishSession()" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Save & View Score Summary 🏁
             </button>
           </div>
         `;
@@ -1021,6 +1290,7 @@
 
             const updatedSnap = await window.fbGetDoc(userRef);
             window.currentUserData = updatedSnap.data();
+            this.updateHeader();
           } catch (err) {
             console.error("Failed to save session:", err);
           }
@@ -1030,16 +1300,16 @@
         container.innerHTML = `
           <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/20 text-center space-y-6 animate-fade-in">
             <div class="text-7xl animate-bounce-slow">🎉</div>
-            <h2 class="font-heading text-3xl font-bold text-yellow-300">5-Stage Challenge Completed!</h2>
-            <p class="text-sm text-cyan-200">Fantastic brain training performance!</p>
+            <h2 class="font-heading text-3xl font-bold text-yellow-300">Training Circuit Complete!</h2>
+            <p class="text-sm text-cyan-200">Fantastic cognitive training performance!</p>
 
-            <div class="bg-black/30 p-6 rounded-2xl border border-white/10">
-              <p class="text-xs text-white/60 uppercase font-bold mb-1">Total Session Score</p>
+            <div class="bg-black/30 p-6 rounded-2xl border border-white/10 shadow-inner">
+              <p class="text-xs text-white/60 uppercase font-bold tracking-wider mb-1">Final Session Score</p>
               <p class="font-heading text-5xl font-extrabold text-yellow-400">${state.currentSessionScore}</p>
             </div>
 
-            <button onclick="sfx.click(); app.navToDashboard()" class="w-full py-4 bg-gradient-to-r from-green-400 to-teal-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110">
-              Back to Headquarters 🏠
+            <button onclick="sfx.click(); app.navToDashboard()" class="w-full py-4 bg-gradient-to-r from-green-400 to-teal-500 text-slate-900 font-heading text-xl font-bold rounded-2xl btn-3d hover:brightness-110 shadow-lg">
+              Return to Headquarters 🏠
             </button>
           </div>
         `;
@@ -1075,8 +1345,7 @@
       increment
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyAwqb-RlbUQxrIfaROPXhGeLXzPMM9Cnxg",
   authDomain: "mindgames-f116a.firebaseapp.com",
   projectId: "mindgames-f116a",
