@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CogniShift | Mind Games</title>
   <style>
     :root {
@@ -32,64 +32,32 @@
     .container {
       background: var(--card-bg);
       border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       padding: 2.5rem 2rem;
       text-align: center;
     }
 
-    h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
+    h1 { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem; }
+    .subtitle { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 2rem; }
 
-    .subtitle {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-    }
+    .screen { display: none; }
+    .screen.active { display: block; }
 
-    .game-area {
-      min-height: 200px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .number-display {
-      font-size: 3.5rem;
-      font-weight: 800;
-      letter-spacing: 0.25rem;
-      color: var(--primary);
-      margin: 1.5rem 0;
-    }
-
-    .instruction {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    input[type="text"] {
+    input[type="text"], input[type="number"] {
       width: 100%;
-      max-width: 280px;
-      padding: 0.75rem 1rem;
-      font-size: 1.25rem;
+      max-width: 300px;
+      padding: 0.85rem 1rem;
+      font-size: 1.1rem;
       text-align: center;
       border: 2px solid #e2e8f0;
       border-radius: 8px;
       outline: none;
       margin-bottom: 1.25rem;
-      transition: border-color 0.2s;
     }
 
-    input[type="text"]:focus {
-      border-color: var(--primary);
-    }
+    input:focus { border-color: var(--primary); }
 
     .btn {
       background-color: var(--primary);
@@ -100,213 +68,300 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
       width: 100%;
-      max-width: 280px;
+      max-width: 300px;
     }
 
     .btn:hover { background-color: var(--primary-hover); }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .status-msg {
-      margin-top: 1rem;
-      font-weight: 600;
-      min-height: 24px;
+    .number-display {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: 0.3rem;
+      color: var(--primary);
+      margin: 1.5rem 0;
     }
 
-    .status-msg.correct { color: var(--success); }
-    .status-msg.incorrect { color: var(--error); }
+    /* Clock Styling for Round 3 */
+    .clock-container {
+      width: 180px;
+      height: 180px;
+      border: 6px solid var(--text-main);
+      border-radius: 50%;
+      margin: 1.5rem auto;
+      position: relative;
+      background: #fff;
+    }
+
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      background: var(--text-main);
+      border-radius: 4px;
+    }
+
+    .hour-hand { width: 6px; height: 50px; }
+    .minute-hand { width: 4px; height: 70px; background: var(--primary); }
 
     .leaderboard-card {
       background: #f1f5f9;
       border-radius: 12px;
       padding: 1.25rem;
       margin-top: 1.5rem;
-      width: 100%;
       text-align: left;
     }
 
-    .leaderboard-card h3 {
-      font-size: 1rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.75rem;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.4rem 0;
-      font-size: 1rem;
-    }
-
-    .stat-row strong { color: var(--text-main); }
+    .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0; }
+    .stat-row:last-child { border-bottom: none; }
+    .status-msg { margin-top: 1rem; font-weight: 600; color: var(--error); min-height: 24px; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h1>CogniShift</h1>
-    <p class="subtitle">Working Memory & Cognitive Flexibility Test</p>
+    <p class="subtitle">Cognitive Assessment & Working Memory</p>
 
-    <div id="game-box" class="game-area">
-      <p class="instruction">Test your digit span memory in reverse sequence.</p>
-      <button id="start-btn" class="btn" onclick="startRound()">Start Game</button>
+    <!-- SCREEN 1: LOGIN -->
+    <div id="screen-login" class="screen active">
+      <h2>Player Registration</h2>
+      <p style="margin: 1rem 0; color: var(--text-muted);">Enter your handle to track your global score.</p>
+      <input type="text" id="username-input" placeholder="Enter Username / Player ID" />
+      <br/>
+      <button class="btn" onclick="registerUser()">Start Assessment</button>
     </div>
 
-    <div id="status" class="status-msg"></div>
+    <!-- SCREEN 2: ROUND 1 (FORWARD DIGITS) -->
+    <div id="screen-r1" class="screen">
+      <h3>Round 1: Forward Memory</h3>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">Memorize the sequence in FORWARD order.</p>
+      <div id="r1-display" class="number-display">---</div>
+      <div id="r1-input-area" style="display:none;">
+        <input type="text" id="r1-input" placeholder="Type digits in forward order" />
+        <br/>
+        <button class="btn" onclick="submitR1()">Submit</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: ROUND 2 (REVERSE DIGITS) -->
+    <div id="screen-r2" class="screen">
+      <h3>Round 2: Reverse Memory</h3>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">Memorize and enter digits in REVERSE order.</p>
+      <div id="r2-display" class="number-display">---</div>
+      <div id="r2-input-area" style="display:none;">
+        <input type="text" id="r2-input" placeholder="Type digits in REVERSE order" />
+        <br/>
+        <button class="btn" onclick="submitR2()">Submit</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: ROUND 3 (CLOCK ANGLE MEMORY) -->
+    <div id="screen-r3" class="screen">
+      <h3>Round 3: Analog Clock Angles</h3>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">Memorize the clock time shown.</p>
+      
+      <div id="clock-display" class="clock-container">
+        <div id="hour-hand" class="hand hour-hand"></div>
+        <div id="minute-hand" class="hand minute-hand"></div>
+      </div>
+
+      <div id="r3-input-area" style="display:none;">
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">What was the angle (in degrees) between the hands?</p>
+        <input type="number" id="r3-input" placeholder="e.g. 90, 180" />
+        <br/>
+        <button class="btn" onclick="submitR3()">Submit Answer</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: GAME OVER & LEADERBOARD -->
+    <div id="screen-results" class="screen">
+      <h2>Assessment Complete!</h2>
+      <div id="final-score" class="number-display" style="font-size: 2.8rem; margin: 0.5rem 0;">0 pts</div>
+
+      <div class="leaderboard-card">
+        <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Global Leaderboard</h3>
+        <div class="stat-row">
+          <span>Global #1 Player:</span>
+          <strong id="top-player-name">---</strong>
+        </div>
+        <div class="stat-row">
+          <span>#1 High Score:</span>
+          <strong id="top-player-score">0 pts</strong>
+        </div>
+        <div class="stat-row">
+          <span>Your Global Rank:</span>
+          <strong id="player-rank">#--</strong>
+        </div>
+      </div>
+
+      <button class="btn" style="margin-top: 1.5rem;" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <div id="status-msg" class="status-msg"></div>
   </div>
 
   <script>
-    // Live Render Private Backend URL
     const BACKEND_URL = "https://cognishift-game.onrender.com";
 
+    let username = "";
+    let totalScore = 0;
     let currentSessionId = "";
-    let currentDigits = 3;
-    let score = 0;
+    let targetClockAngle = 0;
 
-    const gameBox = document.getElementById('game-box');
-    const statusDiv = document.getElementById('status');
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      document.getElementById('status-msg').textContent = "";
+    }
 
-    // 1. Request sequence from Render server
-    async function startRound() {
-      statusDiv.textContent = "";
-      gameBox.innerHTML = `<p class="instruction">Preparing round...</p>`;
+    // 1. REGISTER USER
+    function registerUser() {
+      const input = document.getElementById('username-input').value.trim();
+      if (!input) {
+        document.getElementById('status-msg').textContent = "Please enter a valid username.";
+        return;
+      }
+      username = input;
+      startRound1();
+    }
+
+    // 2. ROUND 1: FORWARD DIGITS
+    async function startRound1() {
+      showScreen('screen-r1');
+      document.getElementById('r1-input-area').style.display = 'none';
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/start-r1`, {
+        const res = await fetch(`${BACKEND_URL}/api/start-r1`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ digits: currentDigits })
+          body: JSON.stringify({ digits: 3 })
         });
-
-        if (!response.ok) throw new Error("Server communication failed.");
-
-        const data = await response.json();
+        const data = await res.json();
         currentSessionId = data.sessionId;
 
-        // Flash target sequence on screen
-        gameBox.innerHTML = `
-          <p class="instruction">Memorize the digits:</p>
-          <div class="number-display">${data.sequence}</div>
-        `;
+        document.getElementById('r1-display').textContent = data.sequence;
 
-        // Hide sequence after 2 seconds and request reverse input
         setTimeout(() => {
-          renderInputScreen();
+          document.getElementById('r1-display').textContent = "???";
+          document.getElementById('r1-input-area').style.display = 'block';
         }, 2000);
 
-      } catch (err) {
-        gameBox.innerHTML = `
-          <p class="instruction" style="color: var(--error);">Could not connect to server.</p>
-          <button class="btn" onclick="startRound()">Retry</button>
-        `;
-        console.error(err);
+      } catch (e) {
+        document.getElementById('status-msg').textContent = "Error connecting to server.";
       }
     }
 
-    // 2. Render input box
-    function renderInputScreen() {
-      gameBox.innerHTML = `
-        <p class="instruction">Enter the sequence in REVERSE:</p>
-        <input type="text" id="user-input" maxlength="${currentDigits}" placeholder="e.g. 321" autofocus autocomplete="off" />
-        <button id="submit-btn" class="btn" onclick="submitAnswer()">Submit Answer</button>
-      `;
-
-      // Allow pressing 'Enter' to submit
-      document.getElementById('user-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') submitAnswer();
+    async function submitR1() {
+      const val = document.getElementById('r1-input').value.trim();
+      const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
       });
+      const data = await res.json();
+
+      if (data.success) {
+        totalScore += 20;
+        startRound2();
+      } else {
+        finishAssessment();
+      }
     }
 
-    // 3. Send answer to server for verification
-    async function submitAnswer() {
-      const inputEl = document.getElementById('user-input');
-      const submitBtn = document.getElementById('submit-btn');
-      const userInput = inputEl.value.trim();
-
-      if (!userInput) return;
-
-      submitBtn.disabled = true;
-      statusDiv.textContent = "Verifying...";
+    // 3. ROUND 2: REVERSE DIGITS
+    async function startRound2() {
+      showScreen('screen-r2');
+      document.getElementById('r2-input-area').style.display = 'none';
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/verify-r1`, {
+        const res = await fetch(`${BACKEND_URL}/api/start-r1`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: currentSessionId,
-            userInput: userInput
-          })
+          body: JSON.stringify({ digits: 4 })
         });
+        const data = await res.json();
+        currentSessionId = data.sessionId;
 
-        const result = await response.json();
+        document.getElementById('r2-display').textContent = data.sequence;
 
-        if (result.success) {
-          score += 10;
-          currentDigits += 1; // Increase difficulty
-          statusDiv.className = "status-msg correct";
-          statusDiv.textContent = "Correct! Difficulty increasing...";
-          
-          setTimeout(() => {
-            startRound();
-          }, 1200);
+        setTimeout(() => {
+          document.getElementById('r2-display').textContent = "???";
+          document.getElementById('r2-input-area').style.display = 'block';
+        }, 2500);
 
-        } else {
-          statusDiv.className = "status-msg incorrect";
-          statusDiv.textContent = "Incorrect!";
-          endGame();
-        }
-
-      } catch (err) {
-        statusDiv.className = "status-msg incorrect";
-        statusDiv.textContent = "Error verifying answer.";
-        submitBtn.disabled = false;
+      } catch (e) {
+        document.getElementById('status-msg').textContent = "Error connecting to server.";
       }
     }
 
-    // 4. End Game & Fetch Global Stats from Server
-    async function endGame() {
-      gameBox.innerHTML = `<p class="instruction">Calculating score & rank...</p>`;
+    async function submitR2() {
+      const val = document.getElementById('r2-input').value.trim();
+      const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        totalScore += 30;
+        startRound3();
+      } else {
+        finishAssessment();
+      }
+    }
+
+    // 4. ROUND 3: CLOCK ANGLE MEMORY
+    function startRound3() {
+      showScreen('screen-r3');
+      document.getElementById('r3-input-area').style.display = 'none';
+      document.getElementById('clock-display').style.display = 'block';
+
+      // Pick random time
+      const hour = Math.floor(Math.random() * 12) + 1;
+      const minute = Math.floor(Math.random() * 12) * 5;
+
+      // Calculate angles
+      const minuteAngle = minute * 6; // 360 / 60
+      const hourAngle = (hour % 12) * 30 + (minute * 0.5); // 360 / 12 + minute fraction
+
+      let diff = Math.abs(hourAngle - minuteAngle);
+      targetClockAngle = Math.min(diff, 360 - diff);
+
+      document.getElementById('hour-hand').style.transform = `rotate(${hourAngle}deg)`;
+      document.getElementById('minute-hand').style.transform = `rotate(${minuteAngle}deg)`;
+
+      setTimeout(() => {
+        document.getElementById('clock-display').style.display = 'none';
+        document.getElementById('r3-input-area').style.display = 'block';
+      }, 3000);
+    }
+
+    function submitR3() {
+      const userAngle = parseFloat(document.getElementById('r3-input').value);
+      if (!isNaN(userAngle) && Math.abs(userAngle - targetClockAngle) <= 15) {
+        totalScore += 50;
+      }
+      finishAssessment();
+    }
+
+    // 5. FINISH & FETCH LEADERBOARD STATS
+    async function finishAssessment() {
+      showScreen('screen-results');
+      document.getElementById('final-score').textContent = `${totalScore} pts`;
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${score}`);
-        const stats = await response.json();
+        const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(username)}`);
+        const stats = await res.json();
 
-        gameBox.innerHTML = `
-          <p class="instruction">Game Over!</p>
-          <div class="number-display" style="font-size: 2.5rem; margin: 0.5rem 0;">${score} pts</div>
-
-          <div class="leaderboard-card">
-            <h3>Global Standings</h3>
-            <div class="stat-row">
-              <span>Your Rank:</span>
-              <strong>#${stats.playerRank} of ${stats.totalPlayers}</strong>
-            </div>
-            <div class="stat-row">
-              <span>#1 Leader (${stats.topLeaderName}):</span>
-              <strong>${stats.topLeaderScore} pts</strong>
-            </div>
-          </div>
-
-          <button class="btn" style="margin-top: 1.5rem;" onclick="resetGame()">Play Again</button>
-        `;
-      } catch (err) {
-        gameBox.innerHTML = `
-          <p class="instruction">Game Over! Final Score: ${score}</p>
-          <button class="btn" onclick="resetGame()">Play Again</button>
-        `;
+        document.getElementById('top-player-name').textContent = stats.topLeaderName || "Anonymous";
+        document.getElementById('top-player-score').textContent = `${stats.topLeaderScore || 0} pts`;
+        document.getElementById('player-rank').textContent = `#${stats.playerRank} of ${stats.totalPlayers}`;
+      } catch (e) {
+        console.error(e);
       }
-    }
-
-    // Reset game state
-    function resetGame() {
-      score = 0;
-      currentDigits = 3;
-      statusDiv.textContent = "";
-      startRound();
     }
   </script>
 </body>
