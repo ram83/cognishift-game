@@ -45,10 +45,10 @@
       letter-spacing: -0.02em;
     }
 
-    .tagline {
+    .user-badge {
       font-size: 0.95rem;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     main {
@@ -166,10 +166,20 @@
       font-weight: 800;
       letter-spacing: 0.4rem;
       color: var(--primary);
-      margin: 2rem 0;
+      margin: 1.5rem 0;
     }
 
-    /* BOX GRID STYLES (ORIGINAL ROUND 3 & ROUND 4 BOXES) */
+    .level-indicator {
+      display: inline-block;
+      background: #e0e7ff;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    /* ORIGINAL BOX GRID STYLES */
     .box-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -239,11 +249,11 @@
 
   <header>
     <div class="logo">CogniShift</div>
-    <div class="tagline">Cognitive Performance & Memory Assessment</div>
+    <div class="user-badge" id="header-user">Not Signed In</div>
   </header>
 
   <main>
-    <!-- SCREEN 1: AUTHENTICATION / SIGN UP -->
+    <!-- SCREEN 1: SIGN UP / SIGN IN -->
     <div id="screen-auth" class="screen active">
       <div class="form-container">
         <div class="auth-toggle">
@@ -263,60 +273,60 @@
       </div>
     </div>
 
-    <!-- SCREEN 2: ROUND 1 (FORWARD DIGITS) -->
+    <!-- SCREEN 2: ROUND 1 (FORWARD DIGITS - ADAPTIVE) -->
     <div id="screen-r1" class="screen">
+      <div class="level-indicator" id="r1-level">Level 1 (3 Digits)</div>
       <h2>Round 1: Forward Digit Span</h2>
-      <p class="description">Memorize the numbers shown below. Re-enter them in <strong>FORWARD</strong> order.</p>
+      <p class="description">Memorize the numbers shown below. Enter them in <strong>FORWARD</strong> order. Increases until a mistake is made.</p>
       <div id="r1-display" class="number-display">---</div>
       <div id="r1-input-area" style="display:none; max-width: 400px; margin: 0 auto;">
         <div class="form-group">
-          <input type="text" id="r1-input" placeholder="Enter sequence in forward order" />
+          <input type="text" id="r1-input" placeholder="Enter sequence" autofocus />
         </div>
-        <button class="btn" onclick="submitR1()">Submit Sequence</button>
+        <button class="btn" onclick="submitR1()">Submit Answer</button>
       </div>
     </div>
 
-    <!-- SCREEN 3: ROUND 2 (REVERSE DIGITS) -->
+    <!-- SCREEN 3: ROUND 2 (REVERSE DIGITS - ADAPTIVE) -->
     <div id="screen-r2" class="screen">
+      <div class="level-indicator" id="r2-level">Level 1 (3 Digits)</div>
       <h2>Round 2: Reverse Digit Span</h2>
-      <p class="description">Memorize the numbers shown below. Re-enter them in <strong>REVERSE</strong> order.</p>
+      <p class="description">Memorize the numbers shown below. Enter them in <strong>REVERSE</strong> order. Increases until a mistake is made.</p>
       <div id="r2-display" class="number-display">---</div>
       <div id="r2-input-area" style="display:none; max-width: 400px; margin: 0 auto;">
         <div class="form-group">
-          <input type="text" id="r2-input" placeholder="Enter sequence in REVERSE order" />
+          <input type="text" id="r2-input" placeholder="Enter in REVERSE order" autofocus />
         </div>
-        <button class="btn" onclick="submitR2()">Submit Sequence</button>
+        <button class="btn" onclick="submitR2()">Submit Answer</button>
       </div>
     </div>
 
-    <!-- SCREEN 4: ROUND 3 (CLOCK BOXES MEMORY MATCH) -->
+    <!-- SCREEN 4: ROUND 3 (CLOCK BOX RECALL - ADAPTIVE) -->
     <div id="screen-r3" class="screen">
-      <h2>Round 3: Clock Box Recall</h2>
-      <p class="description" id="r3-prompt">Memorize the positions of the target time boxes!</p>
+      <div class="level-indicator" id="r3-level">Level 1</div>
+      <h2>Round 3: Time Box Recall</h2>
+      <p class="description" id="r3-prompt">Memorize the target box locations!</p>
       
-      <div id="r3-box-grid" class="box-grid">
-        <!-- Dynamically populated boxes -->
-      </div>
+      <div id="r3-box-grid" class="box-grid"></div>
 
-      <button id="r3-submit-btn" class="btn" style="display:none; max-width: 300px; margin-top: 1rem;" onclick="submitR3()">Submit Selections</button>
+      <button id="r3-submit-btn" class="btn" style="display:none; max-width: 300px; margin-top: 1rem;" onclick="submitR3()">Submit Selection</button>
     </div>
 
-    <!-- SCREEN 5: ROUND 4 (CLOCK BOX SHIFT) -->
+    <!-- SCREEN 5: ROUND 4 (TIME BOX SHIFT - ADAPTIVE) -->
     <div id="screen-r4" class="screen">
+      <div class="level-indicator" id="r4-level">Level 1</div>
       <h2>Round 4: Time Box Shift</h2>
-      <p class="description" id="r4-prompt">Select the box that shows the time shifted forward by 15 minutes.</p>
+      <p class="description" id="r4-prompt">Select the box that matches the shifted time.</p>
       
-      <div id="r4-box-grid" class="box-grid">
-        <!-- Dynamically populated boxes -->
-      </div>
+      <div id="r4-box-grid" class="box-grid"></div>
 
       <button id="r4-submit-btn" class="btn" style="display:none; max-width: 300px; margin-top: 1rem;" onclick="submitR4()">Submit Answer</button>
     </div>
 
-    <!-- SCREEN 6: RESULTS -->
+    <!-- SCREEN 6: RESULTS (SESSION REMAINS LOGGED IN) -->
     <div id="screen-results" class="screen">
       <h2>Assessment Complete!</h2>
-      <p class="description">Your results have been recorded.</p>
+      <p class="description">Here is your overall cognitive breakdown.</p>
 
       <div id="final-score" class="number-display" style="font-size: 4rem; margin: 0.5rem 0;">0 pts</div>
 
@@ -326,20 +336,31 @@
           <strong id="res-username">---</strong>
         </div>
         <div class="stat-row">
-          <span>Email:</span>
-          <strong id="res-email">---</strong>
+          <span>Forward Digit Max:</span>
+          <strong id="res-r1-score">0 digits</strong>
         </div>
         <div class="stat-row">
-          <span>Final Score:</span>
+          <span>Reverse Digit Max:</span>
+          <strong id="res-r2-score">0 digits</strong>
+        </div>
+        <div class="stat-row">
+          <span>Time Box Max Level:</span>
+          <strong id="res-r3-score">Level 0</strong>
+        </div>
+        <div class="stat-row">
+          <span>Time Shift Max Level:</span>
+          <strong id="res-r4-score">Level 0</strong>
+        </div>
+        <div class="stat-row">
+          <span>Total Score:</span>
           <strong id="res-score">0 pts</strong>
-        </div>
-        <div class="stat-row">
-          <span>Global Leader Rank:</span>
-          <strong id="player-rank">#--</strong>
         </div>
       </div>
 
-      <button class="btn" style="max-width: 250px; margin-top: 1rem;" onclick="location.reload()">Play Again</button>
+      <div style="display: flex; gap: 1rem; justify-content: center; max-width: 400px; margin: 1.5rem auto 0 auto;">
+        <button class="btn" onclick="restartAssessment()">Play Again</button>
+        <button class="btn" style="background: var(--text-muted);" onclick="signOut()">Sign Out</button>
+      </div>
     </div>
 
     <div id="status-msg" class="status-msg"></div>
@@ -349,13 +370,26 @@
     const BACKEND_URL = "https://cognishift-game.onrender.com";
 
     let authMode = "signup";
-    let currentUser = { username: "", email: "" };
-    let totalScore = 0;
-    let currentSessionId = "";
+    let currentUser = null;
 
-    let selectedBoxes = [];
-    let r3TargetTimes = [];
-    let r4CorrectTime = "";
+    // Progressive game states
+    let totalScore = 0;
+    
+    let r1Digits = 3;
+    let r1CurrentSeq = "";
+    let r1MaxPassed = 0;
+
+    let r2Digits = 3;
+    let r2CurrentSeq = "";
+    let r2MaxPassed = 0;
+
+    let r3Level = 1;
+    let r3TargetIndex = null;
+    let r3SelectedIndex = null;
+
+    let r4Level = 1;
+    let r4TargetIndex = null;
+    let r4SelectedIndex = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -371,155 +405,164 @@
       document.getElementById('auth-btn').textContent = mode === 'signup' ? 'Create Account & Start' : 'Sign In & Start';
     }
 
-    async function handleAuth() {
+    function handleAuth() {
       const uInput = document.getElementById('auth-username').value.trim();
       const eInput = document.getElementById('auth-email').value.trim();
-      const pInput = document.getElementById('auth-password').value.trim();
 
-      if (!uInput || !eInput || !pInput) {
-        document.getElementById('status-msg').textContent = "Please fill in all fields.";
+      if (!uInput || !eInput) {
+        document.getElementById('status-msg').textContent = "Please enter both your username and email.";
         return;
       }
 
       currentUser = { username: uInput, email: eInput };
-      startRound1();
+      document.getElementById('header-user').textContent = `Player: ${currentUser.username}`;
+      
+      startRound1Sequence();
     }
 
-    // 1. ROUND 1: FORWARD DIGITS
-    async function startRound1() {
+    function generateSequence(len) {
+      let seq = "";
+      for (let i = 0; i < len; i++) {
+        seq += Math.floor(Math.random() * 10);
+      }
+      return seq;
+    }
+
+    // --- ROUND 1: FORWARD DIGITS (PROGRESSIVE) ---
+    function startRound1Sequence() {
       showScreen('screen-r1');
       document.getElementById('r1-input-area').style.display = 'none';
+      document.getElementById('r1-level').textContent = `Level ${r1Digits - 2} (${r1Digits} Digits)`;
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/start-r1`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ digits: 3 })
-        });
-        const data = await res.json();
-        currentSessionId = data.sessionId;
+      r1CurrentSeq = generateSequence(r1Digits);
+      document.getElementById('r1-display').textContent = r1CurrentSeq;
 
-        document.getElementById('r1-display').textContent = data.sequence;
+      setTimeout(() => {
+        document.getElementById('r1-display').textContent = "???";
+        document.getElementById('r1-input').value = "";
+        document.getElementById('r1-input-area').style.display = 'block';
+        document.getElementById('r1-input').focus();
+      }, 1000 + (r1Digits * 600));
+    }
 
-        setTimeout(() => {
-          document.getElementById('r1-display').textContent = "???";
-          document.getElementById('r1-input-area').style.display = 'block';
-        }, 3000);
-      } catch (e) {
-        document.getElementById('status-msg').textContent = "Error connecting to backend.";
+    function submitR1() {
+      const val = document.getElementById('r1-input').value.trim();
+      if (val === r1CurrentSeq) {
+        // Correct answer -> increase digit count and continue
+        r1MaxPassed = r1Digits;
+        r1Digits++;
+        startRound1Sequence();
+      } else {
+        // Incorrect answer -> move to Round 2
+        startRound2Sequence();
       }
     }
 
-    async function submitR1() {
-      const val = document.getElementById('r1-input').value.trim();
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
-        });
-        const data = await res.json();
-        if (data.success) totalScore += 25;
-      } catch (e) {}
-      startRound2();
-    }
-
-    // 2. ROUND 2: REVERSE DIGITS
-    async function startRound2() {
+    // --- ROUND 2: REVERSE DIGITS (PROGRESSIVE) ---
+    function startRound2Sequence() {
       showScreen('screen-r2');
       document.getElementById('r2-input-area').style.display = 'none';
+      document.getElementById('r2-level').textContent = `Level ${r2Digits - 2} (${r2Digits} Digits)`;
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/start-r1`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ digits: 4 })
-        });
-        const data = await res.json();
-        currentSessionId = data.sessionId;
+      r2CurrentSeq = generateSequence(r2Digits);
+      document.getElementById('r2-display').textContent = r2CurrentSeq;
 
-        document.getElementById('r2-display').textContent = data.sequence;
+      setTimeout(() => {
+        document.getElementById('r2-display').textContent = "???";
+        document.getElementById('r2-input').value = "";
+        document.getElementById('r2-input-area').style.display = 'block';
+        document.getElementById('r2-input').focus();
+      }, 1000 + (r2Digits * 600));
+    }
 
-        setTimeout(() => {
-          document.getElementById('r2-display').textContent = "???";
-          document.getElementById('r2-input-area').style.display = 'block';
-        }, 3500);
-      } catch (e) {
-        document.getElementById('status-msg').textContent = "Error connecting to backend.";
+    function submitR2() {
+      const val = document.getElementById('r2-input').value.trim();
+      const expectedReverse = r2CurrentSeq.split('').reverse().join('');
+      
+      if (val === expectedReverse) {
+        // Correct answer -> increase digit count and continue
+        r2MaxPassed = r2Digits;
+        r2Digits++;
+        startRound2Sequence();
+      } else {
+        // Incorrect answer -> move to Round 3
+        startRound3Level();
       }
     }
 
-    async function submitR2() {
-      const val = document.getElementById('r2-input').value.trim();
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/verify-r1`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: currentSessionId, userInput: val })
-        });
-        const data = await res.json();
-        if (data.success) totalScore += 35;
-      } catch (e) {}
-      startRound3();
-    }
-
-    // 3. ROUND 3: ORIGINAL BOX TILES GAME
-    function startRound3() {
+    // --- ROUND 3: TIME BOX RECALL (PROGRESSIVE) ---
+    function startRound3Level() {
       showScreen('screen-r3');
+      document.getElementById('r3-level').textContent = `Level ${r3Level}`;
       const grid = document.getElementById('r3-box-grid');
       grid.innerHTML = "";
-      selectedBoxes = [];
       document.getElementById('r3-submit-btn').style.display = 'none';
+      r3SelectedIndex = null;
 
-      const times = ["02:15", "04:30", "07:45", "10:00", "01:20", "06:10"];
-      r3TargetTimes = ["04:30", "10:00"];
+      const numBoxes = Math.min(4 + (r3Level - 1), 8);
+      r3TargetIndex = Math.floor(Math.random() * numBoxes);
 
-      times.forEach((t) => {
+      const baseTimes = ["02:15", "04:30", "07:45", "10:00", "01:20", "06:10", "08:25", "11:50"];
+
+      for (let i = 0; i < numBoxes; i++) {
         const box = document.createElement('div');
         box.className = 'clock-box';
-        box.textContent = t;
+        box.textContent = baseTimes[i];
+        if (i === r3TargetIndex) {
+          box.style.borderColor = "var(--primary)";
+        }
         grid.appendChild(box);
-      });
+      }
 
-      document.getElementById('r3-prompt').textContent = "Memorize the boxes! They will hide in 3 seconds.";
+      document.getElementById('r3-prompt').textContent = `Memorize box #${r3TargetIndex + 1}! Hiding in 3s...`;
 
       setTimeout(() => {
         const boxes = grid.querySelectorAll('.clock-box');
-        boxes.forEach((box) => {
-          box.textContent = "??:??";
+        boxes.forEach((box, index) => {
+          box.style.borderColor = "var(--border-color)";
+          box.textContent = `Box ${index + 1}`;
           box.onclick = () => {
-            box.classList.toggle('selected');
+            boxes.forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
+            r3SelectedIndex = index;
           };
         });
-        document.getElementById('r3-prompt').textContent = "Select the 2 boxes that showed 04:30 and 10:00:";
+        document.getElementById('r3-prompt').textContent = `Select the target box location:`;
         document.getElementById('r3-submit-btn').style.display = 'block';
       }, 3000);
     }
 
     function submitR3() {
-      totalScore += 40;
-      startRound4();
+      if (r3SelectedIndex === r3TargetIndex) {
+        r3Level++;
+        startRound3Level();
+      } else {
+        startRound4Level();
+      }
     }
 
-    // 4. ROUND 4: BOX SHIFT GAME
-    function startRound4() {
+    // --- ROUND 4: TIME BOX SHIFT (PROGRESSIVE) ---
+    function startRound4Level() {
       showScreen('screen-r4');
+      document.getElementById('r4-level').textContent = `Level ${r4Level}`;
       const grid = document.getElementById('r4-box-grid');
       grid.innerHTML = "";
       document.getElementById('r4-submit-btn').style.display = 'none';
+      r4SelectedIndex = null;
 
       const times = ["03:15", "03:30", "03:45", "04:00"];
-      r4CorrectTime = "03:30"; // Original time 03:15 + 15 min shift
+      r4TargetIndex = 1; // 03:30 (+15 mins)
 
       document.getElementById('r4-prompt').textContent = "Base Time: 03:15. Pick the box shifted forward by 15 minutes.";
 
-      times.forEach((t) => {
+      times.forEach((t, i) => {
         const box = document.createElement('div');
         box.className = 'clock-box';
         box.textContent = t;
         box.onclick = () => {
           grid.querySelectorAll('.clock-box').forEach(b => b.classList.remove('selected'));
           box.classList.add('selected');
+          r4SelectedIndex = i;
         };
         grid.appendChild(box);
       });
@@ -528,25 +571,45 @@
     }
 
     function submitR4() {
-      totalScore += 50;
-      finishAssessment();
+      if (r4SelectedIndex === r4TargetIndex) {
+        r4Level++;
+        startRound4Level();
+      } else {
+        finishAssessment();
+      }
     }
 
-    // 5. RESULTS
-    async function finishAssessment() {
+    // --- RESULTS (USER STAYS LOGGED IN) ---
+    function finishAssessment() {
       showScreen('screen-results');
-      document.getElementById('final-score').textContent = `${totalScore} pts`;
-      document.getElementById('res-username').textContent = currentUser.username;
-      document.getElementById('res-email').textContent = currentUser.email;
-      document.getElementById('res-score').textContent = `${totalScore} pts`;
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(currentUser.username)}&email=${encodeURIComponent(currentUser.email)}`);
-        const stats = await res.json();
-        document.getElementById('player-rank').textContent = `#${stats.playerRank || 1} of ${stats.totalPlayers || 1}`;
-      } catch (e) {
-        document.getElementById('player-rank').textContent = "#1";
-      }
+      totalScore = (r1MaxPassed * 10) + (r2MaxPassed * 15) + ((r3Level - 1) * 20) + ((r4Level - 1) * 25);
+
+      document.getElementById('final-score').textContent = `${totalScore} pts`;
+      document.getElementById('res-username').textContent = currentUser ? currentUser.username : "Player";
+      document.getElementById('res-r1-score').textContent = `${r1MaxPassed} digits`;
+      document.getElementById('res-r2-score').textContent = `${r2MaxPassed} digits`;
+      document.getElementById('res-r3-score').textContent = `Level ${r3Level - 1}`;
+      document.getElementById('res-r4-score').textContent = `Level ${r4Level - 1}`;
+      document.getElementById('res-score').textContent = `${totalScore} pts`;
+    }
+
+    function restartAssessment() {
+      totalScore = 0;
+      r1Digits = 3;
+      r1MaxPassed = 0;
+      r2Digits = 3;
+      r2MaxPassed = 0;
+      r3Level = 1;
+      r4Level = 1;
+
+      startRound1Sequence();
+    }
+
+    function signOut() {
+      currentUser = null;
+      document.getElementById('header-user').textContent = "Not Signed In";
+      showScreen('screen-auth');
     }
   </script>
 </body>
