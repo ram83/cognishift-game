@@ -2,447 +2,989 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Speed Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CogniShift | Mind Games & Memory Assessment</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --success: #10b981;
-      --danger: #ef4444;
-      --text: #f8fafc;
-      --subtext: #94a3b8;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f0f9ff;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --success: #16a34a;
+      --error: #dc2626;
+      --accent-yellow: #f59e0b;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
       min-height: 100vh;
-      padding: 1rem;
+      display: flex;
+      flex-direction: column;
     }
 
-    .container {
-      background-color: var(--card-bg);
+    header {
       width: 100%;
-      max-width: 480px;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      padding: 1rem 2rem;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      font-size: 1.75rem;
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.02em;
     }
 
-    .difficulty-selector {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
+    .user-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    .btn-diff {
-      background: #334155;
-      border: 2px solid transparent;
-      color: var(--text);
-      padding: 0.6rem 0.2rem;
+    .user-badge {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
       border-radius: 8px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.85rem;
-    }
-
-    .btn-diff.active {
-      border-color: var(--accent);
-      background-color: rgba(59, 130, 246, 0.2);
-    }
-
-    .custom-panel {
-      background: #334155;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
       display: none;
-      flex-direction: column;
-      gap: 0.75rem;
+      transition: all 0.2s;
     }
 
-    .custom-panel.visible {
-      display: flex;
+    .btn-logout:hover {
+      background: #fee2e2;
+      color: var(--error);
+      border-color: #fca5a5;
     }
 
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      font-size: 0.85rem;
-      color: var(--subtext);
-    }
-
-    .control-group label span {
-      color: var(--text);
-      font-weight: bold;
-    }
-
-    input[type="range"] {
+    main {
+      flex: 1;
       width: 100%;
-      accent-color: var(--accent);
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .op-checks {
+    .screen {
+      display: none;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    p.description {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-container {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 420px;
+      margin: 0 auto;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .auth-toggle {
       display: flex;
       gap: 1rem;
-      margin-top: 0.25rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
     }
 
-    .op-checks label {
-      color: var(--text);
+    .auth-toggle button {
+      background: none;
+      border: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-muted);
       cursor: pointer;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .auth-toggle button.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+
+    .form-group {
       display: flex;
-      align-items: center;
-      gap: 0.25rem;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"], input[type="email"], input[type="number"] {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1.1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      outline: none;
+      background: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: var(--primary); }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 0.85rem 2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      width: 100%;
+    }
+
+    .btn:hover { background-color: var(--primary-hover); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+
+    .number-display {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: 0.3rem;
+      color: var(--primary);
+      margin: 1rem 0;
+    }
+
+    .level-indicator {
+      display: inline-block;
+      background: #e0e7ff;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    /* GAME HUB SELECTION GRID */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+      width: 100%;
+    }
+
+    .game-card {
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .game-card:hover:not(.disabled) {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+    }
+
+    .game-card.disabled {
+      opacity: 0.6;
+      background: #f1f5f9;
+      cursor: not-allowed;
+      border-color: #cbd5e1;
+    }
+
+    .game-card h3 {
+      font-size: 1.2rem;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+
+    .game-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .badge-played {
+      position: absolute;
+      top: 10rem;
+      right: 1rem;
+      background: var(--success);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+    }
+
+    /* BOX GRID STYLES */
+    .box-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 550px;
+      margin: 1.5rem auto;
+    }
+
+    .clock-box {
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem 0.75rem;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clock-box:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .clock-box.selected {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* COLOR BLITZ BUTTONS */
+    .color-btn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      max-width: 360px;
+      margin: 1.5rem auto;
+    }
+
+    .color-btn {
+      padding: 1rem;
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      background: white;
+      transition: transform 0.1s;
+    }
+
+    .color-btn:active { transform: scale(0.96); }
+
+    /* RESULTS & LEADERBOARD */
+    .results-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      max-width: 500px;
+      margin: 1.25rem auto;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      text-align: left;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.95rem;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+
+    .status-msg {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--error);
+      min-height: 22px;
     }
 
     .timer-bar-container {
       width: 100%;
       height: 8px;
-      background: #334155;
+      background: #e2e8f0;
       border-radius: 4px;
       overflow: hidden;
-      margin-bottom: 1.5rem;
+      margin: 1rem 0;
     }
 
     .timer-bar {
       height: 100%;
       width: 100%;
-      background: var(--accent);
+      background: var(--primary);
       transition: width 0.1s linear;
     }
-
-    .stats {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      color: var(--subtext);
-    }
-
-    .stats span {
-      color: var(--text);
-    }
-
-    .problem-box {
-      font-size: 3rem;
-      font-weight: bold;
-      text-align: center;
-      margin: 1.5rem 0;
-      min-height: 4.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    input[type="number"] {
-      flex: 1;
-      padding: 0.8rem;
-      border-radius: 8px;
-      border: 2px solid #334155;
-      background: #0f172a;
-      color: var(--text);
-      font-size: 1.25rem;
-      text-align: center;
-      outline: none;
-    }
-
-    input[type="number"]:focus {
-      border-color: var(--accent);
-    }
-
-    button.action-btn {
-      background: var(--accent);
-      color: var(--text);
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    button.action-btn:hover {
-      background: var(--accent-hover);
-    }
-
-    .feedback {
-      text-align: center;
-      height: 1.5rem;
-      margin-top: 1rem;
-      font-weight: 600;
-    }
-
-    .feedback.correct { color: var(--success); }
-    .feedback.wrong { color: var(--danger); }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Math Speed Test</h1>
-
-  <div class="difficulty-selector">
-    <button class="btn-diff active" data-mode="easy">Easy<br><small>(5-7 yr)</small></button>
-    <button class="btn-diff" data-mode="medium">Medium<br><small>(8-11 yr)</small></button>
-    <button class="btn-diff" data-mode="hard">Hard<br><small>(12+ yr)</small></button>
-    <button class="btn-diff" data-mode="custom">Custom</button>
-  </div>
-
-  <div class="custom-panel" id="customPanel">
-    <div class="control-group">
-      <label>Max Number: <span id="maxNumVal">20</span></label>
-      <input type="range" id="maxNumInput" min="5" max="200" value="20" />
+  <header>
+    <div class="logo">CogniShift 🧠</div>
+    <div class="user-nav">
+      <span class="user-badge" id="header-user">Not Signed In</span>
+      <button class="btn-logout" id="logout-btn" onclick="signOut()">Log Out</button>
     </div>
-    <div class="control-group">
-      <label>Time per question: <span id="timerVal">10</span>s</label>
-      <input type="range" id="timerInput" min="2" max="30" value="10" />
-    </div>
-    <div class="control-group">
-      <label>Operations:</label>
-      <div class="op-checks">
-        <label><input type="checkbox" class="op-check" value="+" checked /> +</label>
-        <label><input type="checkbox" class="op-check" value="-" checked /> -</label>
-        <label><input type="checkbox" class="op-check" value="*" /> ×</label>
-        <label><input type="checkbox" class="op-check" value="/" /> ÷</label>
+  </header>
+
+  <main>
+    <!-- SCREEN 1: AUTHENTICATION -->
+    <div id="screen-auth" class="screen active">
+      <div class="form-container">
+        <div class="auth-toggle">
+          <button id="tab-signup" class="active" onclick="toggleAuth('signup')">Sign Up</button>
+          <button id="tab-login" onclick="toggleAuth('login')">Sign In</button>
+        </div>
+
+        <h2 id="auth-title" style="font-size: 1.35rem; text-align: left; margin-bottom: 1rem;">Create Your Account</h2>
+        
+        <div class="form-group">
+          <input type="text" id="auth-username" placeholder="Player Name / Nickname" autofocus />
+          <input type="email" id="auth-email" placeholder="Email Address" />
+        </div>
+        
+        <button class="btn" id="auth-btn" onclick="handleAuth()">Create Account & Start</button>
       </div>
     </div>
-  </div>
 
-  <div class="timer-bar-container">
-    <div class="timer-bar" id="timerBar"></div>
-  </div>
+    <!-- SCREEN 2: HOMEPAGE GAME DASHBOARD -->
+    <div id="screen-welcome" class="screen">
+      <h2 id="welcome-title">Welcome Back!</h2>
+      <p class="description">Select a game to test your brain! Complete games to build your final score.</p>
+      
+      <div style="margin-bottom: 1rem; font-weight: 700; color: var(--primary);">
+        Session Total: <span id="session-score">0</span> pts
+      </div>
 
-  <div class="stats">
-    <div>Score: <span id="score">0</span></div>
-    <div>Streak: <span id="streak">0</span></div>
-  </div>
+      <div class="game-grid" id="game-menu">
+        <div class="game-card" id="card-r1" onclick="launchGame('r1')">
+          <div>
+            <h3>🔢 Forward Digits</h3>
+            <p>Memorize and recall numbers in the same order shown.</p>
+          </div>
+          <button class="btn" id="btn-card-r1">Play Game</button>
+        </div>
 
-  <div class="problem-box" id="problem">Press Start</div>
+        <div class="game-card" id="card-r2" onclick="launchGame('r2')">
+          <div>
+            <h3>🔄 Reverse Digits</h3>
+            <p>Memorize digits and enter them backwards!</p>
+          </div>
+          <button class="btn" id="btn-card-r2">Play Game</button>
+        </div>
 
-  <form id="gameForm" class="input-group">
-    <input type="number" id="answerInput" placeholder="?" disabled autocomplete="off" />
-    <button type="submit" class="action-btn" id="startSubmitBtn">Start</button>
-  </form>
+        <div class="game-card" id="card-r3" onclick="launchGame('r3')">
+          <div>
+            <h3>📦 Time Box Recall</h3>
+            <p>Memorize box positions and find target locations.</p>
+          </div>
+          <button class="btn" id="btn-card-r3">Play Game</button>
+        </div>
 
-  <div class="feedback" id="feedback"></div>
-</div>
+        <div class="game-card" id="card-r4" onclick="launchGame('r4')">
+          <div>
+            <h3>⏰ Time Box Shift</h3>
+            <p>Calculate target time offsets and pick the box.</p>
+          </div>
+          <button class="btn" id="btn-card-r4">Play Game</button>
+        </div>
 
-<script>
-  const presets = {
-    easy: { maxNum: 10, timeLimit: 15, ops: ['+', '-'] },
-    medium: { maxNum: 50, timeLimit: 10, ops: ['+', '-', '*'] },
-    hard: { maxNum: 100, timeLimit: 5, ops: ['+', '-', '*', '/'] }
-  };
+        <div class="game-card" id="card-r5" onclick="launchGame('r5')">
+          <div>
+            <h3>⚡ Quick Math Rush</h3>
+            <p>Solve +, -, ×, ÷ problems before time runs out!</p>
+          </div>
+          <button class="btn" id="btn-card-r5">Play Game</button>
+        </div>
 
-  let currentMode = 'easy';
-  let isPlaying = false;
-  let score = 0;
-  let streak = 0;
-  let currentProblem = null;
-  let timerInterval = null;
-  let timeRemaining = 0;
-  let totalTime = 15;
+        <div class="game-card" id="card-r6" onclick="launchGame('r6')">
+          <div>
+            <h3>🎨 Color Word Blitz</h3>
+            <p>Match the text color, not the word text!</p>
+          </div>
+          <button class="btn" id="btn-card-r6">Play Game</button>
+        </div>
+      </div>
 
-  // DOM Elements
-  const diffBtns = document.querySelectorAll('.btn-diff');
-  const customPanel = document.getElementById('customPanel');
-  const maxNumInput = document.getElementById('maxNumInput');
-  const maxNumVal = document.getElementById('maxNumVal');
-  const timerInput = document.getElementById('timerInput');
-  const timerVal = document.getElementById('timerVal');
-  const opChecks = document.querySelectorAll('.op-check');
-  const timerBar = document.getElementById('timerBar');
-  const scoreEl = document.getElementById('score');
-  const streakEl = document.getElementById('streak');
-  const problemEl = document.getElementById('problem');
-  const gameForm = document.getElementById('gameForm');
-  const answerInput = document.getElementById('answerInput');
-  const startSubmitBtn = document.getElementById('startSubmitBtn');
-  const feedbackEl = document.getElementById('feedback');
+      <div style="display: flex; gap: 1rem; max-width: 400px; margin: 1.5rem auto 0 auto;">
+        <button class="btn" style="background:#64748b;" onclick="resetSession()">Start New Session</button>
+        <button class="btn" onclick="finishAssessment()">View Final Scorecard</button>
+      </div>
+    </div>
 
-  // Mode Selection
-  diffBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      diffBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentMode = btn.dataset.mode;
+    <!-- SCREEN 3: ROUND 1 (FORWARD DIGITS) -->
+    <div id="screen-r1" class="screen">
+      <div class="level-indicator" id="r1-level">Level 1 (3 Digits)</div>
+      <h2>Forward Digit Span</h2>
+      <p class="description">Memorize the numbers shown below. Re-enter them in <strong>FORWARD</strong> order once hidden.</p>
+      <div id="r1-display" class="number-display">---</div>
+      <div id="r1-input-area" style="display:none; max-width: 380px; margin: 0 auto;">
+        <div class="form-group">
+          <input type="text" id="r1-input" placeholder="Enter sequence" autofocus />
+        </div>
+        <button class="btn" onclick="submitR1()">Submit Answer</button>
+      </div>
+    </div>
 
-      if (currentMode === 'custom') {
-        customPanel.classList.add('visible');
+    <!-- SCREEN 4: ROUND 2 (REVERSE DIGITS) -->
+    <div id="screen-r2" class="screen">
+      <div class="level-indicator" id="r2-level">Level 1 (3 Digits)</div>
+      <h2>Reverse Digit Span</h2>
+      <p class="description">Memorize the numbers shown below. Re-enter them in <strong>REVERSE</strong> order once hidden.</p>
+      <div id="r2-display" class="number-display">---</div>
+      <div id="r2-input-area" style="display:none; max-width: 380px; margin: 0 auto;">
+        <div class="form-group">
+          <input type="text" id="r2-input" placeholder="Enter sequence in REVERSE" autofocus />
+        </div>
+        <button class="btn" onclick="submitR2()">Submit Answer</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: ROUND 3 (TIME BOX RECALL) -->
+    <div id="screen-r3" class="screen">
+      <div class="level-indicator" id="r3-level">Level 1</div>
+      <h2>Time Box Recall</h2>
+      <p class="description" id="r3-prompt">Memorize the target box locations!</p>
+      <div id="r3-box-grid" class="box-grid"></div>
+      <button id="r3-submit-btn" class="btn" style="display:none; max-width: 280px; margin-top: 1rem;" onclick="submitR3()">Submit Selection</button>
+    </div>
+
+    <!-- SCREEN 6: ROUND 4 (TIME BOX SHIFT) -->
+    <div id="screen-r4" class="screen">
+      <div class="level-indicator" id="r4-level">Level 1</div>
+      <h2>Time Box Shift</h2>
+      <p class="description" id="r4-prompt">Select the box that matches the shifted time.</p>
+      <div id="r4-box-grid" class="box-grid"></div>
+      <button id="r4-submit-btn" class="btn" style="display:none; max-width: 280px; margin-top: 1rem;" onclick="submitR4()">Submit Answer</button>
+    </div>
+
+    <!-- SCREEN 7: ROUND 5 (QUICK MATH RUSH) -->
+    <div id="screen-r5" class="screen">
+      <div class="level-indicator" id="r5-level">Question 1/5</div>
+      <h2>Quick Math Rush ⚡</h2>
+      <p class="description">Solve the problem before time expires!</p>
+      <div class="timer-bar-container"><div class="timer-bar" id="r5-timer"></div></div>
+      <div id="r5-display" class="number-display">? + ?</div>
+      <div style="max-width: 300px; margin: 0 auto;">
+        <input type="number" id="r5-input" placeholder="Your Answer" autofocus />
+        <button class="btn" style="margin-top: 1rem;" onclick="submitR5()">Submit</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 8: ROUND 6 (COLOR WORD BLITZ) -->
+    <div id="screen-r6" class="screen">
+      <div class="level-indicator" id="r6-level">Question 1/5</div>
+      <h2>Color Word Blitz 🎨</h2>
+      <p class="description">Select the button matching the <strong>TEXT COLOR</strong>, not the word!</p>
+      <div id="r6-display" class="number-display" style="font-size: 3.5rem;">WORD</div>
+      <div class="color-btn-grid" id="r6-options"></div>
+    </div>
+
+    <!-- SCREEN 9: RESULTS & LEADERBOARD -->
+    <div id="screen-results" class="screen">
+      <h2>Session Complete! 🎉</h2>
+      <p class="description">Your cumulative total score breakdown across all games played.</p>
+
+      <div id="final-score" class="number-display" style="font-size: 3.5rem; margin: 0.5rem 0;">0 pts</div>
+
+      <div class="results-card">
+        <div class="stat-row"><span>Player:</span><strong id="res-username">---</strong></div>
+        <div class="stat-row"><span>Forward Digit Max:</span><strong id="res-r1-score">Not Played</strong></div>
+        <div class="stat-row"><span>Reverse Digit Max:</span><strong id="res-r2-score">Not Played</strong></div>
+        <div class="stat-row"><span>Time Box Max Level:</span><strong id="res-r3-score">Not Played</strong></div>
+        <div class="stat-row"><span>Time Shift Max Level:</span><strong id="res-r4-score">Not Played</strong></div>
+        <div class="stat-row"><span>Math Rush Points:</span><strong id="res-r5-score">Not Played</strong></div>
+        <div class="stat-row"><span>Color Blitz Points:</span><strong id="res-r6-score">Not Played</strong></div>
+        <div class="stat-row" style="background: #e0e7ff; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
+          <span><strong>Total Session Score:</strong></span><strong id="res-score" style="color:var(--primary);">0 pts</strong>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: center; max-width: 400px; margin: 1.25rem auto 0 auto;">
+        <button class="btn" onclick="resetSession()">Start New Session</button>
+        <button class="btn" style="background:#64748b;" onclick="showScreen('screen-welcome')">Home Hub</button>
+      </div>
+    </div>
+
+    <div id="status-msg" class="status-msg"></div>
+  </main>
+
+  <script>
+    const BACKEND_URL = "https://cognishift-game.onrender.com";
+
+    let authMode = "signup";
+    let currentUser = null;
+
+    // Track state of played games in session
+    let playedGames = { r1: false, r2: false, r3: false, r4: false, r5: false, r6: false };
+
+    // Game variables
+    let totalScore = 0;
+
+    let r1Digits = 3;
+    let r1CurrentSeq = "";
+    let r1MaxPassed = 0;
+
+    let r2Digits = 3;
+    let r2CurrentSeq = "";
+    let r2MaxPassed = 0;
+
+    let r3Level = 1;
+    let r3TargetIndex = null;
+    let r3SelectedIndex = null;
+
+    let r4Level = 1;
+    let r4TargetIndex = null;
+    let r4SelectedIndex = null;
+
+    // R5: Quick Math
+    let r5QCount = 0;
+    let r5Score = 0;
+    let r5CurrentAns = 0;
+    let r5TimerInt = null;
+
+    // R6: Color Blitz
+    let r6QCount = 0;
+    let r6Score = 0;
+    let r6TargetColor = "";
+
+    const colorList = [
+      { name: "RED", hex: "#dc2626" },
+      { name: "BLUE", hex: "#2563eb" },
+      { name: "GREEN", hex: "#16a34a" },
+      { name: "YELLOW", hex: "#d97706" }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('r1-input').addEventListener('keypress', e => { if (e.key === 'Enter') submitR1(); });
+      document.getElementById('r2-input').addEventListener('keypress', e => { if (e.key === 'Enter') submitR2(); });
+      document.getElementById('r5-input').addEventListener('keypress', e => { if (e.key === 'Enter') submitR5(); });
+
+      const savedUser = localStorage.getItem('cognishift_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        updateUserUI();
+        showScreen('screen-welcome');
       } else {
-        customPanel.classList.remove('visible');
+        showScreen('screen-auth');
       }
-      if (isPlaying) stopGame();
     });
-  });
 
-  // Custom Controls Event Listeners
-  maxNumInput.addEventListener('input', (e) => maxNumVal.textContent = e.target.value);
-  timerInput.addEventListener('input', (e) => timerVal.textContent = e.target.value);
-
-  function getActiveSettings() {
-    if (currentMode !== 'custom') {
-      return presets[currentMode];
-    }
-    const selectedOps = Array.from(opChecks)
-      .filter(c => c.checked)
-      .map(c => c.value);
-    
-    return {
-      maxNum: parseInt(maxNumInput.value, 10),
-      timeLimit: parseInt(timerInput.value, 10),
-      ops: selectedOps.length > 0 ? selectedOps : ['+']
-    };
-  }
-
-  function generateProblem() {
-    const settings = getActiveSettings();
-    const op = settings.ops[Math.floor(Math.random() * settings.ops.length)];
-    let a, b, answer;
-
-    switch (op) {
-      case '+':
-        a = Math.floor(Math.random() * settings.maxNum) + 1;
-        b = Math.floor(Math.random() * settings.maxNum) + 1;
-        answer = a + b;
-        break;
-      case '-':
-        a = Math.floor(Math.random() * settings.maxNum) + 1;
-        b = Math.floor(Math.random() * a) + 1; // Ensure non-negative output
-        answer = a - b;
-        break;
-      case '*':
-        const maxMult = Math.min(settings.maxNum, 12); // Keep multiplication sensible
-        a = Math.floor(Math.random() * maxMult) + 1;
-        b = Math.floor(Math.random() * settings.maxNum) + 1;
-        answer = a * b;
-        break;
-      case '/':
-        b = Math.floor(Math.random() * 10) + 1;
-        answer = Math.floor(Math.random() * (settings.maxNum / 2)) + 1;
-        a = b * answer; // Ensure whole integer division
-        break;
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      document.getElementById('status-msg').textContent = "";
+      updateHubUI();
     }
 
-    const symbolMap = { '+': '+', '-': '-', '*': '×', '/': '÷' };
-    return { question: `${a} ${symbolMap[op]} ${b}`, answer };
-  }
-
-  function startTimer() {
-    clearInterval(timerInterval);
-    const settings = getActiveSettings();
-    totalTime = settings.timeLimit * 1000;
-    timeRemaining = totalTime;
-    
-    const tickRate = 50;
-    timerInterval = setInterval(() => {
-      timeRemaining -= tickRate;
-      const percentage = Math.max(0, (timeRemaining / totalTime) * 100);
-      timerBar.style.width = percentage + '%';
-
-      if (timeRemaining <= 0) {
-        clearInterval(timerInterval);
-        handleTimeout();
+    function updateUserUI() {
+      if (currentUser) {
+        document.getElementById('header-user').textContent = currentUser.username;
+        document.getElementById('welcome-title').textContent = `Welcome, ${currentUser.username}!`;
+        document.getElementById('logout-btn').style.display = 'inline-block';
+      } else {
+        document.getElementById('header-user').textContent = "Not Signed In";
+        document.getElementById('logout-btn').style.display = 'none';
       }
-    }, tickRate);
-  }
-
-  function nextQuestion() {
-    currentProblem = generateProblem();
-    problemEl.textContent = currentProblem.question;
-    answerInput.value = '';
-    answerInput.focus();
-    startTimer();
-  }
-
-  function handleTimeout() {
-    streak = 0;
-    streakEl.textContent = streak;
-    showFeedback('Time\'s up!', false);
-    nextQuestion();
-  }
-
-  function showFeedback(msg, isCorrect) {
-    feedbackEl.textContent = msg;
-    feedbackEl.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
-  }
-
-  function startGame() {
-    isPlaying = true;
-    score = 0;
-    streak = 0;
-    scoreEl.textContent = score;
-    streakEl.textContent = streak;
-    feedbackEl.textContent = '';
-    
-    startSubmitBtn.textContent = 'Submit';
-    answerInput.disabled = false;
-    nextQuestion();
-  }
-
-  function stopGame() {
-    isPlaying = false;
-    clearInterval(timerInterval);
-    timerBar.style.width = '100%';
-    problemEl.textContent = 'Press Start';
-    answerInput.disabled = true;
-    answerInput.value = '';
-    startSubmitBtn.textContent = 'Start';
-  }
-
-  gameForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (!isPlaying) {
-      startGame();
-      return;
     }
 
-    const val = parseInt(answerInput.value, 10);
-    if (isNaN(val)) return;
-
-    if (val === currentProblem.answer) {
-      score += 10 + (streak * 2); // Streak bonus
-      streak++;
-      showFeedback('Correct!', true);
-    } else {
-      streak = 0;
-      showFeedback(`Wrong! Ans: ${currentProblem.answer}`, false);
+    function toggleAuth(mode) {
+      authMode = mode;
+      document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('auth-title').textContent = mode === 'signup' ? 'Create Your Account' : 'Sign In to Play';
+      document.getElementById('auth-btn').textContent = mode === 'signup' ? 'Create Account & Start' : 'Sign In & Start';
     }
 
-    scoreEl.textContent = score;
-    streakEl.textContent = streak;
-    nextQuestion();
-  });
-</script>
+    function handleAuth() {
+      const uInput = document.getElementById('auth-username').value.trim();
+      const eInput = document.getElementById('auth-email').value.trim();
 
+      if (!uInput || !eInput || !eInput.includes('@')) {
+        document.getElementById('status-msg').textContent = "Please enter a valid username and email.";
+        return;
+      }
+
+      currentUser = { username: uInput, email: eInput };
+      localStorage.setItem('cognishift_user', JSON.stringify(currentUser));
+      updateUserUI();
+      showScreen('screen-welcome');
+    }
+
+    function signOut() {
+      localStorage.removeItem('cognishift_user');
+      currentUser = null;
+      updateUserUI();
+      showScreen('screen-auth');
+    }
+
+    function updateHubUI() {
+      document.getElementById('session-score').textContent = totalScore;
+      ['r1', 'r2', 'r3', 'r4', 'r5', 'r6'].forEach(gameKey => {
+        const card = document.getElementById(`card-${gameKey}`);
+        const btn = document.getElementById(`btn-card-${gameKey}`);
+        if (playedGames[gameKey]) {
+          card.classList.add('disabled');
+          btn.textContent = "Completed ✓";
+          btn.disabled = true;
+        } else {
+          card.classList.remove('disabled');
+          btn.textContent = "Play Game";
+          btn.disabled = false;
+        }
+      });
+    }
+
+    function launchGame(gameKey) {
+      if (playedGames[gameKey]) return;
+      if (gameKey === 'r1') startRound1Sequence();
+      if (gameKey === 'r2') startRound2Sequence();
+      if (gameKey === 'r3') startRound3Level();
+      if (gameKey === 'r4') startRound4Level();
+      if (gameKey === 'r5') startRound5Math();
+      if (gameKey === 'r6') startRound6Color();
+    }
+
+    function resetSession() {
+      playedGames = { r1: false, r2: false, r3: false, r4: false, r5: false, r6: false };
+      totalScore = 0;
+      r1Digits = 3; r1MaxPassed = 0;
+      r2Digits = 3; r2MaxPassed = 0;
+      r3Level = 1;
+      r4Level = 1;
+      r5Score = 0;
+      r6Score = 0;
+      showScreen('screen-welcome');
+    }
+
+    function generateSequence(len) {
+      let seq = "";
+      for (let i = 0; i < len; i++) {
+        seq += Math.floor(Math.random() * 10);
+      }
+      return seq;
+    }
+
+    // --- ROUND 1: FORWARD DIGITS ---
+    function startRound1Sequence() {
+      showScreen('screen-r1');
+      document.getElementById('r1-input-area').style.display = 'none';
+      document.getElementById('r1-level').textContent = `Level ${r1Digits - 2} (${r1Digits} Digits)`;
+
+      r1CurrentSeq = generateSequence(r1Digits);
+      document.getElementById('r1-display').textContent = r1CurrentSeq;
+
+      setTimeout(() => {
+        document.getElementById('r1-display').textContent = "???";
+        document.getElementById('r1-input').value = "";
+        document.getElementById('r1-input-area').style.display = 'block';
+        document.getElementById('r1-input').focus();
+      }, 1200 + (r1Digits * 500));
+    }
+
+    function submitR1() {
+      const val = document.getElementById('r1-input').value.trim();
+      if (val === r1CurrentSeq) {
+        r1MaxPassed = r1Digits;
+        r1Digits++;
+        startRound1Sequence();
+      } else {
+        playedGames.r1 = true;
+        totalScore += (r1MaxPassed * 10);
+        showScreen('screen-welcome');
+      }
+    }
+
+    // --- ROUND 2: REVERSE DIGITS ---
+    function startRound2Sequence() {
+      showScreen('screen-r2');
+      document.getElementById('r2-input-area').style.display = 'none';
+      document.getElementById('r2-level').textContent = `Level ${r2Digits - 2} (${r2Digits} Digits)`;
+
+      r2CurrentSeq = generateSequence(r2Digits);
+      document.getElementById('r2-display').textContent = r2CurrentSeq;
+
+      setTimeout(() => {
+        document.getElementById('r2-display').textContent = "???";
+        document.getElementById('r2-input').value = "";
+        document.getElementById('r2-input-area').style.display = 'block';
+        document.getElementById('r2-input').focus();
+      }, 1200 + (r2Digits * 500));
+    }
+
+    function submitR2() {
+      const val = document.getElementById('r2-input').value.trim();
+      const expectedReverse = r2CurrentSeq.split('').reverse().join('');
+
+      if (val === expectedReverse) {
+        r2MaxPassed = r2Digits;
+        r2Digits++;
+        startRound2Sequence();
+      } else {
+        playedGames.r2 = true;
+        totalScore += (r2MaxPassed * 15);
+        showScreen('screen-welcome');
+      }
+    }
+
+    // --- ROUND 3: CLOCK BOX RECALL ---
+    function startRound3Level() {
+      showScreen('screen-r3');
+      document.getElementById('r3-level').textContent = `Level ${r3Level}`;
+      const grid = document.getElementById('r3-box-grid');
+      grid.innerHTML = "";
+      document.getElementById('r3-submit-btn').style.display = 'none';
+      r3SelectedIndex = null;
+
+      const numBoxes = Math.min(4 + (r3Level - 1), 8);
+      r3TargetIndex = Math.floor(Math.random() * numBoxes);
+      const baseTimes = ["02:15", "04:30", "07:45", "10:00", "01:20", "06:10", "08:25", "11:50"];
+
+      for (let i = 0; i < numBoxes; i++) {
+        const box = document.createElement('div');
+        box.className = 'clock-box';
+        box.textContent = baseTimes[i];
+        if (i === r3TargetIndex) box.style.borderColor = "var(--primary)";
+        grid.appendChild(box);
+      }
+
+      document.getElementById('r3-prompt').textContent = `Memorize Box #${r3TargetIndex + 1}! Hiding in 3s...`;
+
+      setTimeout(() => {
+        const boxes = grid.querySelectorAll('.clock-box');
+        boxes.forEach((box, index) => {
+          box.style.borderColor = "var(--border-color)";
+          box.textContent = `Box ${index + 1}`;
+          box.onclick = () => {
+            boxes.forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
+            r3SelectedIndex = index;
+          };
+        });
+        document.getElementById('r3-prompt').textContent = `Select the target box location:`;
+        document.getElementById('r3-submit-btn').style.display = 'block';
+      }, 3000);
+    }
+
+    function submitR3() {
+      if (r3SelectedIndex === r3TargetIndex) {
+        r3Level++;
+        startRound3Level();
+      } else {
+        playedGames.r3 = true;
+        totalScore += ((r3Level - 1) * 20);
+        showScreen('screen-welcome');
+      }
+    }
+
+    // --- ROUND 4: TIME BOX SHIFT ---
+    function startRound4Level() {
+      showScreen('screen-r4');
+      document.getElementById('r4-level').textContent = `Level ${r4Level}`;
+      const grid = document.getElementById('r4-box-grid');
+      grid.innerHTML = "";
+      document.getElementById('r4-submit-btn').style.display = 'none';
+      r4SelectedIndex = null;
+
+      const times = ["03:15", "03:30", "03:45", "04:00"];
+      r4TargetIndex = 1;
+
+      document.getElementById('r4-prompt').textContent = "Base Time: 03:15. Pick the box shifted forward by 15 minutes.";
+
+      times.forEach((t, i) => {
+        const box = document.createElement('div');
+        box.className = 'clock-box';
+        box.textContent = t;
+        box.onclick = () => {
+          grid.querySelectorAll('.clock-box').forEach(b => b.classList.remove('selected'));
+          box.classList.add('selected');
+          r4SelectedIndex = i;
+        };
+        grid.appendChild(box);
+      });
+
+      document.getElementById('r4-submit-btn').style.display = 'block';
+    }
+
+    function submitR4() {
+      if (r4SelectedIndex === r4TargetIndex) {
+        r4Level++;
+        startRound4Level();
+      } else {
+        playedGames.r4 = true;
+        totalScore += ((r4Level - 1) * 25);
+        showScreen('screen-welcome');
+      }
+    }
+
+    // --- ROUND 5: QUICK MATH RUSH ---
+    function startRound5Math() {
+      r5QCount = 0;
+      r5Score = 0;
+      nextR5Math();
+    }
+
+    function nextR5Math() {
+      if (r5QCount >= 5) {
+        playedGames.r5 = true;
+        totalScore += r5Score;
+        showScreen('screen-welcome');
+        return;
+      }
+      r5QCount++;
+      showScreen('screen-r5');
+      document.getElementById('r5-level').textContent = `Question ${r5QCount}/5`;
+      document.getElementById('r5-input').value = "";
+      document.getElementById('r5-input').focus();
+
+      const ops = ['+', '-', '*'];
+      const op = ops[Math.floor(Math.random() * ops.length)];
+      let a = Math.floor(Math.random() * 12) + 1;
+      let b = Math.floor(Math.random() * 12) + 1;
+
+      if (op === '+') r5CurrentAns = a + b;
+      if (op === '-') { if (a < b) [a, b] = [b, a]; r5CurrentAns = a - b; }
+      if (op === '*') r5CurrentAns = a * b;
+
+      const symbolMap = { '+': '+', '-': '-', '*': '×' };
+      document.getElementById('r5-display').textContent = `${a} ${symbolMap[op]} ${b}`;
+
+      let timeLeft = 10000;
+      const timerBar = document.getElementById('r5-timer');
+      clearInterval(r5TimerInt);
+      
+      r5TimerInt = setInterval(() => {
+        timeLeft -= 100;
+        timerBar.style.width = (timeLeft / 100) + '%';
+        if (timeLeft <= 0) {
+          clearInterval(r5TimerInt);
+          nextR5Math();
+        }
+      }, 100);
+    }
+
+    function submitR5() {
+      clearInterval(r5TimerInt);
+      const val = parseInt(document.getElementById('r5-input').value, 10);
+      if (val === r5CurrentAns) {
+        r5Score += 20;
+      }
+      nextR5Math();
+    }
+
+    // --- ROUND 6: COLOR WORD BLITZ ---
+    function startRound6Color() {
+      r6QCount = 0;
+      r6Score = 0;
+      nextR6Color();
+    }
+
+    function nextR6Color() {
+      if (r6QCount >= 5) {
+        playedGames.r6 = true;
+        totalScore += r6Score;
+        showScreen('screen-welcome');
+        return;
+      }
+      r6QCount++;
+      showScreen('screen-r6');
+      document.getElementById('r6-level').textContent = `Question ${r6QCount}/5`;
+
+      const textObj = colorList[Math.floor(Math.random() * colorList.length)];
+      const colorObj = colorList[Math.floor(Math.random() * colorList.length)];
+      
+      r6TargetColor = colorObj.name;
+      const display = document.getElementById('r6-display');
+      display.textContent = textObj.name;
+      display.style.color = colorObj.hex;
+
+      const grid = document.getElementById('r6-options');
+      grid.innerHTML = "";
+      
+      colorList.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'color-btn';
+        btn.textContent = c.name;
+        btn.onclick = () => {
+          if (c.name === r6TargetColor) r6Score += 20;
+          nextR6Color();
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    // --- FINAL RESULTS & SCORECARD ---
+    async function finishAssessment() {
+      showScreen('screen-results');
+
+      document.getElementById('final-score').textContent = `${totalScore} pts`;
+      document.getElementById('res-username').textContent = currentUser ? currentUser.username : "Player";
+      document.getElementById('res-r1-score').textContent = playedGames.r1 ? `${r1MaxPassed} digits` : "Not Played";
+      document.getElementById('res-r2-score').textContent = playedGames.r2 ? `${r2MaxPassed} digits` : "Not Played";
+      document.getElementById('res-r3-score').textContent = playedGames.r3 ? `Level ${r3Level - 1}` : "Not Played";
+      document.getElementById('res-r4-score').textContent = playedGames.r4 ? `Level ${r4Level - 1}` : "Not Played";
+      document.getElementById('res-r5-score').textContent = playedGames.r5 ? `${r5Score} pts` : "Not Played";
+      document.getElementById('res-r6-score').textContent = playedGames.r6 ? `${r6Score} pts` : "Not Played";
+      document.getElementById('res-score').textContent = `${totalScore} pts`;
+
+      try {
+        await fetch(`${BACKEND_URL}/api/leaderboard-stats?score=${totalScore}&username=${encodeURIComponent(currentUser.username)}&email=${encodeURIComponent(currentUser.email)}`);
+      } catch (e) {
+        console.log("Recorded score locally.");
+      }
+    }
+  </script>
 </body>
 </html>
